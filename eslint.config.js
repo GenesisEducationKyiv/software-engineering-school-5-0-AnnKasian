@@ -1,5 +1,5 @@
 import jsPlugin from "@eslint/js";
-import stylistiPlugin from "@stylistic/eslint-plugin";
+import stylisticPlugin from "@stylistic/eslint-plugin";
 import tsPlugin from "@typescript-eslint/eslint-plugin";
 import tsParser from "@typescript-eslint/parser";
 import { resolve as tsResolver } from "eslint-import-resolver-typescript";
@@ -16,7 +16,7 @@ let FlatConfig;
 
 /** @type {FlatConfig} */
 const filesConfig = {
-  files: ["**/*.{js,ts,tsx}"],
+  files: ["**/*.{js,ts}"],
 };
 
 /** @type {FlatConfig} */
@@ -63,9 +63,9 @@ const jsConfig = {
       },
       {
         message:
-          "Avoid import/export type { Type } from './module'. Prefer import/export { type Type } from './module'.",
+            "Avoid import/export type { Type } from './module'. Prefer import/export { type Type } from './module'.",
         selector:
-          "ImportDeclaration[importKind=type],ExportNamedDeclaration[exportKind=type]",
+            "ImportDeclaration[importKind=type],ExportNamedDeclaration[exportKind=type]",
       },
     ],
     "object-shorthand": ["error"],
@@ -95,7 +95,7 @@ const importConfig = {
   },
   settings: {
     "import/parsers": {
-      espree: [".js", ".cjs"],
+      espree: [".js"],
     },
     "import/resolver": {
       typescript: tsResolver,
@@ -107,7 +107,7 @@ const importConfig = {
 const sonarConfig = {
   plugins: {
     sonarjs:
-      /** @type {import('eslint').Linter.Plugin} */ /** @type {unknown} */ sonarjsPlugin,
+    /** @type {import('eslint').Linter.Plugin} */ /** @type {unknown} */ sonarjsPlugin,
   },
   rules: {
     ...sonarjsPlugin.configs.recommended.rules,
@@ -120,7 +120,7 @@ const sonarConfig = {
 const stylisticConfig = {
   plugins: {
     "@stylistic/js":
-      /** @type {import('eslint').Linter.Plugin} */ stylistiPlugin,
+    /** @type {import('eslint').Linter.Plugin} */ stylisticPlugin,
   },
   rules: {
     "@stylistic/js/padding-line-between-statements": [
@@ -146,7 +146,7 @@ const stylisticConfig = {
 
 /** @type {FlatConfig} */
 const typescriptConfig = {
-  ignores: ["eslint.config.js", "lint-staged.config.js", "stylelint.config.js"],
+  ignores: ["eslint.config.js"],
   languageOptions: {
     parser: tsParser,
     parserOptions: {
@@ -155,7 +155,7 @@ const typescriptConfig = {
   },
   plugins: {
     "@typescript-eslint" /** @type {import('eslint').Linter.Plugin} */:
-      /** @type {unknown} */ tsPlugin,
+    /** @type {unknown} */ tsPlugin,
   },
   rules: {
     ...tsPlugin.configs["strict-type-checked"].rules,
@@ -194,7 +194,7 @@ const typescriptConfig = {
 
 /** @type {FlatConfig} */
 const jsdocConfig = {
-  files: ["eslint.config.js", "lint-staged.config.js", "stylelint.config.js"],
+  files: ["eslint.config.js"],
   plugins: {
     jsdoc: jsdocPlugin,
   },
@@ -209,23 +209,16 @@ const jsdocConfig = {
 const explicitGenericsConfig = {
   plugins: {
     "require-explicit-generics":
-      /** @type {import('eslint').Linter.Plugin} */ explicitGenericsPlugin,
+    /** @type {import('eslint').Linter.Plugin} */ explicitGenericsPlugin,
   },
 };
 
 /** @type {FlatConfig[]} */
 const overridesConfigs = [
   {
-    files: [
-      "commitlint.config.ts",
-      "prettier.config.ts",
-      "stylelint.config.js",
-      "knip.config.ts",
-      "lint-staged.config.js",
-      "eslint.config.js",
-    ],
+    files: ["*.config.{ts,js}"],
     rules: {
-      "import/no-default-export": ["off"],
+      "import/no-default-export": "off",
     },
   },
   {
@@ -246,12 +239,6 @@ const overridesConfigs = [
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-magic-numbers": "off",
-    },
-  },
-  {
-    files: ["*.config.ts"],
-    rules: {
-      "import/no-default-export": "off",
     },
   },
 ];

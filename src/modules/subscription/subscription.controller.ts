@@ -7,7 +7,13 @@ import {
   ApiTags,
 } from "@nestjs/swagger";
 
-import { ErrorDto, MessageDto } from "../../libs/types/types.js";
+import { MessageDto } from "../../libs/types/types.js";
+import {
+  SwaggerBody,
+  SwaggerOperation,
+  SwaggerParam,
+  SwaggerResponse,
+} from "./swagger-docs/swagger-docs.js";
 import { SubscriptionService } from "./subscription.service.js";
 import { SubscriptionDto, SubscribeResponseDto } from "./types/types.js";
 
@@ -19,37 +25,11 @@ class SubscriptionController {
   ) {}
 
   @Post("/subscribe")
-  @ApiOperation({
-    summary: "Subscribe to weather updates",
-    description:
-      "Subscribe an email to receive weather updates for a specific city with chosen frequency.",
-  })
-  @ApiBody({
-    type: SubscriptionDto,
-    examples: {
-      example: {
-        value: {
-          email: "example@example.com",
-          city: "Kyiv",
-          frequency: "hourly",
-        },
-      },
-    },
-  })
-  @ApiResponse({
-    status: 200,
-    description: "Subscription successful. Confirmation email sent.",
-  })
-  @ApiResponse({
-    status: 400,
-    description: "Invalid input.",
-    type: ErrorDto,
-  })
-  @ApiResponse({
-    status: 409,
-    description: "Email already subscribed.",
-    type: ErrorDto,
-  })
+  @ApiOperation(SwaggerOperation.SUBSCRIBE)
+  @ApiBody(SwaggerBody.SUBSCRIBE)
+  @ApiResponse(SwaggerResponse.SUBSCRIPTION_SUCCESSFUL)
+  @ApiResponse(SwaggerResponse.SUBSCRIPTION_FAILED)
+  @ApiResponse(SwaggerResponse.SUBSCRIPTION_ALREADY_EXISTS)
   public subscribe(
     @Body() data: SubscriptionDto
   ): Promise<SubscribeResponseDto> {
@@ -57,32 +37,11 @@ class SubscriptionController {
   }
 
   @Get("/confirm/:token")
-  @ApiOperation({
-    summary: "Confirm email subscription",
-    description:
-      "Confirms a subscription using the token sent in the confirmation email.",
-  })
-  @ApiParam({
-    name: "token",
-    type: "string",
-    description: "Confirmation token",
-    required: true,
-  })
-  @ApiResponse({
-    status: 200,
-    description: "Subscription confirmed successfully.",
-    type: MessageDto,
-  })
-  @ApiResponse({
-    status: 400,
-    description: "Invalid token.",
-    type: ErrorDto,
-  })
-  @ApiResponse({
-    status: 404,
-    description: "Token not found.",
-    type: ErrorDto,
-  })
+  @ApiOperation(SwaggerOperation.CONFIRM)
+  @ApiParam(SwaggerParam.TOKEN)
+  @ApiResponse(SwaggerResponse.CONFIRMED_SUCCESSFULLY)
+  @ApiResponse(SwaggerResponse.INVALID_TOKEN)
+  @ApiResponse(SwaggerResponse.TOKEN_NOT_FOUND)
   public async confirm(@Param("token") token: string): Promise<MessageDto> {
     await this.subscriptionService.confirm(token);
 
@@ -90,26 +49,10 @@ class SubscriptionController {
   }
 
   @Get("/unsubscribe/:token")
-  @ApiOperation({
-    summary: "Unsubscribe from weather updates",
-    description:
-      "Unsubscribes an email from weather updates using the token sent in emails.",
-  })
-  @ApiResponse({
-    status: 200,
-    description: "Unsubscribed successfully.",
-    type: MessageDto,
-  })
-  @ApiResponse({
-    status: 400,
-    description: "Invalid token.",
-    type: ErrorDto,
-  })
-  @ApiResponse({
-    status: 404,
-    description: "Token not found.",
-    type: ErrorDto,
-  })
+  @ApiOperation(SwaggerOperation.UNSUBSCRIBE)
+  @ApiResponse(SwaggerResponse.UNSUBSCRIBED_SUCCESSFULLY)
+  @ApiResponse(SwaggerResponse.INVALID_TOKEN)
+  @ApiResponse(SwaggerResponse.TOKEN_NOT_FOUND)
   public async unsubscribe(@Param("token") token: string): Promise<MessageDto> {
     await this.subscriptionService.unsubscribe(token);
 
