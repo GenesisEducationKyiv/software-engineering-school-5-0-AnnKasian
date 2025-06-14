@@ -41,7 +41,7 @@ describe("WeatherService", () => {
   });
 
   test("should throw NotFoundException if city not found", async () => {
-    mockWeatherRepository.get.mockRejectedValue(new Error("error"));
+    mockWeatherRepository.get.mockReturnValue(null);
 
     await expect(
       weatherService.get(weatherMock.request.wrongCity)
