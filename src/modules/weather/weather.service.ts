@@ -7,11 +7,13 @@ class WeatherService {
   public constructor(private weatherRepository: WeatherRepository) {}
 
   public async get(city: string): Promise<WeatherDto> {
-    try {
-      return await this.weatherRepository.get(city);
-    } catch {
+    const weather = await this.weatherRepository.get(city);
+
+    if (!weather) {
       throw new NotFoundException("City not found");
     }
+
+    return weather;
   }
 }
 
