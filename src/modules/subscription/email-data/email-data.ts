@@ -1,2 +1,2 @@
-export { emailSubject } from "./email-subject.js";
-export { emailTemplate } from "./email-template.js";
+export { EmailSubject } from "./email-subject.js";
+export { EmailTemplate } from "./email-template.js";

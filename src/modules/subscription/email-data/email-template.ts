@@ -1,6 +1,6 @@
-const emailTemplate = {
-  confirm: "confirm",
-  weatherNotify: "weather-notify",
+const EmailTemplate = {
+  CONFIRM: "confirm",
+  WEATHER_NOTIFY: "weather-notify",
 };
 
-export { emailTemplate };
+export { EmailTemplate };

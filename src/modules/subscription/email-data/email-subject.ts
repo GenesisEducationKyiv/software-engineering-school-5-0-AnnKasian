@@ -1,6 +1,6 @@
-const emailSubject = {
-  subscribe: "Weather subscription",
-  confirm: "Confirmation email",
+const EmailSubject = {
+  SUBSCRIBE: "Weather subscription",
+  CONFIRM: "Confirmation email",
 };
 
-export { emailSubject };
+export { EmailSubject };

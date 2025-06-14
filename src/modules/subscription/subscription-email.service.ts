@@ -3,7 +3,7 @@ import { Injectable } from "@nestjs/common";
 import { MailerService } from "@nestjs-modules/mailer";
 import { WeatherService } from "../weather/weather.service.js";
 import { SubscriptionEntity } from "./entities/entities.js";
-import { emailSubject, emailTemplate } from "./email-data/email-data.js";
+import { EmailSubject, EmailTemplate } from "./email-data/email-data.js";
 import { ConfigKeys } from "../../libs/enums/enums.js";
 
 @Injectable()
@@ -26,8 +26,8 @@ class SubscriptionEmailService {
       subscriptions.map((subscription) =>
         this.mailerService.sendMail({
           to: subscription.email,
-          subject: emailSubject.subscribe,
-          template: emailTemplate.weatherNotify,
+          subject: EmailSubject.SUBSCRIBE,
+          template: EmailTemplate.WEATHER_NOTIFY,
           context: {
             city: subscription.city,
             temperature: weather.temperature,
@@ -47,8 +47,8 @@ class SubscriptionEmailService {
     const currentDate = new Date();
     await this.mailerService.sendMail({
       to: subscription.email,
-      subject: emailSubject.confirm,
-      template: emailTemplate.confirm,
+      subject: EmailSubject.CONFIRM,
+      template: EmailTemplate.CONFIRM,
       context: {
         year: currentDate.getFullYear(),
         confirmUrl: `${this.configService.get(
