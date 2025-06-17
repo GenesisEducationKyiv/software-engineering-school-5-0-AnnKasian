@@ -1,7 +1,7 @@
 import { Test } from "@nestjs/testing";
 import { WeatherService } from "../../src/modules/weather/weather.js";
 import { type WeatherDto } from "../../src/modules/weather/types/weather.dto.type.js";
-import { weatherMock } from "./mock-data/mock-data.js";
+import { WeatherMock } from "./mock-data/mock-data.js";
 import { NotFoundException } from "@nestjs/common";
 import { WeatherRepository } from "../../src/modules/weather/weather.repository.js";
 
@@ -27,15 +27,15 @@ describe("WeatherService", () => {
 
   describe("get", () => {
     test("should return an object with data from the weather service (temperature, humidity, description)", async () => {
-      const weather: WeatherDto = weatherMock.response;
+      const weather: WeatherDto = WeatherMock.response;
 
       mockWeatherRepository.get.mockResolvedValue(weather);
 
-      expect(await weatherService.get(weatherMock.request.corectCity)).toEqual(
+      expect(await weatherService.get(WeatherMock.request.corectCity)).toEqual(
         weather
       );
       expect(mockWeatherRepository.get).toHaveBeenCalledWith(
-        weatherMock.request.corectCity
+        WeatherMock.request.corectCity
       );
     });
   });
@@ -44,7 +44,7 @@ describe("WeatherService", () => {
     mockWeatherRepository.get.mockReturnValue(null);
 
     await expect(
-      weatherService.get(weatherMock.request.wrongCity)
+      weatherService.get(WeatherMock.request.wrongCity)
     ).rejects.toThrow(NotFoundException);
   });
 });
