@@ -5,7 +5,8 @@
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
-    "test": "jest --testPathPattern=unit",
+    "test": "jest ",
+    "test:unit": "jest --testPathPattern=unit",
     "test:watch": "jest --watch",
     "test:db:up": "docker-compose -f docker-compose-tests.yml up -d",
     "test:db:down": "docker-compose -f docker-compose-tests.yml down",

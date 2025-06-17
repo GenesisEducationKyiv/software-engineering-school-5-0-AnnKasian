@@ -4,8 +4,6 @@ services:
   db_test:
     image: postgres:16.4
     container_name: weather-notify-tests
-    env_file:
-      - .env
     ports:
       - ${DATABASE_TEST_PORT}:5432
     environment:
