@@ -1,0 +1,108 @@
+import { SubscriptionIntegrationMock } from "./mock-data/subscription.integration.mock.js";
+import { Test, type TestingModule } from "@nestjs/testing";
+import { ConfigModule, ConfigService } from "@nestjs/config";
+import { SubscriptionEmailService } from "../../src/modules/subscription/subscription-email.service.js";
+import ms from "smtp-tester";
+import { WeatherService } from "../../src/modules/weather/weather.js";
+import { WeatherMock } from "../weather/mock-data/mock-data.js";
+import { MailerModule } from "@nestjs-modules/mailer";
+import { HandlebarsAdapter } from "@nestjs-modules/mailer/dist/adapters/handlebars.adapter.js";
+
+describe("SubscriptionEmailService Integration Tests", () => {
+  let module: TestingModule;
+  let service: SubscriptionEmailService;
+  let mailServer: ms.MailServer;
+
+  const mockWeatherService = {
+    get: jest.fn(),
+  };
+
+  beforeAll(async () => {
+    module = await Test.createTestingModule({
+      imports: [
+        ConfigModule.forRoot({
+          isGlobal: true,
+        }),
+        MailerModule.forRootAsync({
+          imports: [ConfigModule],
+          inject: [ConfigService],
+          useFactory: () => ({
+            transport: {
+              host: "localhost",
+              port: 7081,
+              secure: false,
+            },
+            defaults: {
+              from: "test@example.com",
+            },
+            template: {
+              dir: process.cwd() + "/email-templates/",
+              adapter: new HandlebarsAdapter(),
+              options: {
+                strict: true,
+              },
+            },
+          }),
+        }),
+      ],
+      providers: [
+        SubscriptionEmailService,
+        {
+          provide: WeatherService,
+          useValue: mockWeatherService,
+        },
+      ],
+    }).compile();
+
+    service = module.get<SubscriptionEmailService>(SubscriptionEmailService);
+    mailServer = ms.init(7081);
+  });
+
+  afterAll(async () => {
+    await module.close();
+    await new Promise<void>((resolve) => {
+      mailServer.stop(resolve);
+    });
+  });
+
+  describe("sendWeatherEmail", () => {
+    it("should send email to subscription", async () => {
+      mockWeatherService.get.mockResolvedValue(WeatherMock.response);
+
+      await service.sendWeatherEmail(
+        SubscriptionIntegrationMock.newData.subscriptionToConfirm.city,
+        [SubscriptionIntegrationMock.newData.subscriptionToConfirm]
+      );
+
+      expect(mockWeatherService.get).toHaveBeenCalledWith(
+        SubscriptionIntegrationMock.newData.subscriptionToConfirm.city
+      );
+
+      const capturedEmail = await mailServer.captureOne(
+        SubscriptionIntegrationMock.newData.subscriptionToConfirm.email,
+        { wait: 5000 }
+      );
+
+      expect(capturedEmail.email.headers.to).toBe(
+        SubscriptionIntegrationMock.newData.subscriptionToConfirm.email
+      );
+    });
+  });
+
+  describe("sendConfirmationEmail", () => {
+    it("should send confirmatuion email to subscription", async () => {
+      await service.sendConfirmationEmail(
+        SubscriptionIntegrationMock.newData.subscriptionToConfirm
+      );
+
+      const capturedEmail = await mailServer.captureOne(
+        SubscriptionIntegrationMock.newData.subscriptionToConfirm.email,
+        { wait: 5000 }
+      );
+
+      expect(capturedEmail.email.headers.to).toBe(
+        SubscriptionIntegrationMock.newData.subscriptionToConfirm.email
+      );
+    });
+  });
+});

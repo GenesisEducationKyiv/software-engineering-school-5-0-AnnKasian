@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+  db_test:
+    image: postgres:16.4
+    container_name: weather-notify-tests
+    env_file:
+      - .env
+    ports:
+      - ${DATABASE_TEST_PORT}:5432
+    environment:
+      POSTGRES_USER: ${DATABASE_TEST_USER}
+      POSTGRES_PASSWORD: ${DATABASE_TEST_PASSWORD}
+      POSTGRES_DB: ${DATABASE_TEST_NAME}
+    volumes:
+      - postgres_test_data:/var/lib/postgresql/data
+    networks:
+      - test-network
+
+volumes:
+  postgres_test_data:
+
+networks:
+  test-network:
+    driver: bridge

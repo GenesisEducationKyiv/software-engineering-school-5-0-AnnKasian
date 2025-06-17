@@ -9,7 +9,7 @@ import { WeatherService } from "./weather.service.js";
   controllers: [WeatherController],
   imports: [HttpModule],
   providers: [WeatherRepository, WeatherService],
-  exports: [WeatherService],
+  exports: [HttpModule, WeatherService],
 })
 class WeatherModule {}
 
