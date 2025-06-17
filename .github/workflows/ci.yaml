@@ -59,6 +59,8 @@ jobs:
       DATABASE_TEST_PASSWORD: postgres
       DATABASE_TEST_NAME: weather_notify_test
       DATABASE_TEST_HOST: localhost
+      API_URL: "https://api.weatherapi.com/v1/current.json"
+      API_KEY: "test-api-key-for-tests"
 
     steps:
       - name: Checkout code
