@@ -10,11 +10,11 @@ Make sure you have installed the dependencies: `npm install`
 
 **What it tests:** Individual functions, methods, components without external dependencies.
 
-#### Run all unit tests `npm test`
+#### Run all unit tests `npm run test:unit`
 
-#### Run with watch mode `npm run test:watch`
+#### Run with watch mode `npm run test:unit:watch`
 
-#### Run a specific file `npm test -- subscription.service.spec.ts`
+#### Run a specific file `npx jest tests/subscription/subscription.service.unit.spec.ts` (change the path to the file)
 
 ### Integration tests
 
@@ -24,7 +24,7 @@ Make sure you have installed the dependencies: `npm install`
 
 #### Run with watch mode `npm run test:integration:watch`
 
-#### Run with detailed output `npm run test:integration:debug`
+#### Run a specific file `npx jest tests/subscription/subscription.controller.integration.spec.ts` (change the path to the file)
 
 **Note:** Integration tests automatically bring up the test PostgreSQL database through Docker.
 
@@ -42,5 +42,5 @@ Make sure you have installed the dependencies: `npm install`
 
 In GitHub Actions, the following are automatically run:
 
-- Unit tests: `npm test`
+- Unit tests: `npm run test:unit`
 - Integration tests: `npm run test:integration`
