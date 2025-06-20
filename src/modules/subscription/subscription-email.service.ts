@@ -1,16 +1,15 @@
-import { ConfigService } from "@nestjs/config";
 import { Injectable } from "@nestjs/common";
-import { MailerService } from "@nestjs-modules/mailer";
 import { WeatherService } from "../weather/weather.service.js";
 import { SubscriptionEntity } from "./entities/entities.js";
 import { EmailSubject, EmailTemplate } from "./email-data/email-data.js";
-import { ConfigKeys } from "../../libs/enums/enums.js";
+import { SubscriptionConfig } from "./types/subscription-config.type.js";
+import { MailerService } from "@nestjs-modules/mailer";
 
 @Injectable()
 class SubscriptionEmailService {
   public constructor(
-    private readonly configService: ConfigService,
     private readonly mailerService: MailerService,
+    private readonly config: SubscriptionConfig,
     private readonly weatherService: WeatherService
   ) {}
 
@@ -34,9 +33,7 @@ class SubscriptionEmailService {
             humidity: weather.humidity,
             description: weather.description,
             year: currentDate.getFullYear(),
-            unsubscribeUrl: `${this.configService.get(
-              ConfigKeys.BASE_URL
-            )}/action.html?action=unsubscribe&token=${subscription.token}`,
+            unsubscribeUrl: `${this.config.baseUrl}/action.html?action=unsubscribe&token=${subscription.token}`,
           },
         })
       )
@@ -51,9 +48,7 @@ class SubscriptionEmailService {
       template: EmailTemplate.CONFIRM,
       context: {
         year: currentDate.getFullYear(),
-        confirmUrl: `${this.configService.get(
-          ConfigKeys.BASE_URL
-        )}/action.html?action=confirm&token=${subscription.token}`,
+        confirmUrl: `${this.config.baseUrl}/action.html?action=confirm&token=${subscription.token}`,
       },
     });
   }

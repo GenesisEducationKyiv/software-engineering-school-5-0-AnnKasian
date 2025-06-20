@@ -1,9 +1,9 @@
 import {
   ConflictException,
+  Inject,
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
-import { SubscriptionRepository } from "./subscription.repository.js";
 import {
   SubscribeFilterDto,
   SubscribeResponseDto,
@@ -11,13 +11,15 @@ import {
 } from "./types/types.js";
 import { SubscriptionEntity } from "./entities/entities.js";
 import { SubscriptionEmailService } from "./subscription-email.service.js";
-import { Frequency } from "./enums/enums.js";
+import { Frequency, SUBSCRIPTION_INJECTION_TOKENS } from "./enums/enums.js";
 import { Cron, CronExpression } from "@nestjs/schedule";
+import { ISubscriptionRepository } from "./interfaces/interfaces.js";
 
 @Injectable()
 class SubscriptionService {
   public constructor(
-    private readonly subscriptionRepository: SubscriptionRepository,
+    @Inject(SUBSCRIPTION_INJECTION_TOKENS.SUBSCRIPTION_REPOSITORY)
+    private readonly subscriptionRepository: ISubscriptionRepository,
     private readonly subscriptionEmailService: SubscriptionEmailService
   ) {}
 
