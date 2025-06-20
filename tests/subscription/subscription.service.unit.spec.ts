@@ -4,7 +4,7 @@ import {
   SUBSCRIPTION_INJECTION_TOKENS,
   Frequency,
 } from "../../src/modules/subscription/enums/enums.js";
-import { subscriptionMock } from "./mock-data/mock-data.js";
+import { SubscriptionMock } from "./mock-data/mock-data.js";
 import { ConflictException, NotFoundException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { SubscriptionEmailService } from "../../src/modules/subscription/subscription-email.service.js";
@@ -68,44 +68,44 @@ describe("SubscriptionService", () => {
     test("should create subscription, send email, and return token", async () => {
       mockSubscriptionRepository.find.mockResolvedValue(null);
       mockSubscriptionRepository.create.mockResolvedValue(
-        subscriptionMock.responsefromRepository.emailNotExist
+        SubscriptionMock.responsefromRepository.emailNotExist
       );
 
       const result = await subscriptionService.subscribe(
-        subscriptionMock.request.emailNotExist
+        SubscriptionMock.request.emailNotExist
       );
 
       expect(mockEmailService.sendConfirmationEmail).toHaveBeenCalledWith(
-        subscriptionMock.responsefromRepository.emailNotExist
+        SubscriptionMock.responsefromRepository.emailNotExist
       );
 
-      expect(result).toEqual(subscriptionMock.response.emailNotExist);
+      expect(result).toEqual(SubscriptionMock.response.emailNotExist);
     });
 
     test("should send email again, and return token", async () => {
       mockSubscriptionRepository.find.mockResolvedValue(
-        subscriptionMock.responsefromRepository.emailExist
+        SubscriptionMock.responsefromRepository.emailExist
       );
 
       const result = await subscriptionService.subscribe(
-        subscriptionMock.request.emailExist
+        SubscriptionMock.request.emailExist
       );
 
       expect(mockEmailService.sendConfirmationEmail).toHaveBeenCalledWith(
-        subscriptionMock.responsefromRepository.emailExist
+        SubscriptionMock.responsefromRepository.emailExist
       );
 
-      expect(result).toEqual(subscriptionMock.response.emailExist);
+      expect(result).toEqual(SubscriptionMock.response.emailExist);
     });
 
     test("should throw ConflictException if email is already confirmed", async () => {
       mockSubscriptionRepository.find.mockResolvedValue(
-        subscriptionMock.responsefromRepository.emailExistAndConfirmed
+        SubscriptionMock.responsefromRepository.emailExistAndConfirmed
       );
 
       await expect(
         subscriptionService.subscribe(
-          subscriptionMock.request.emailExistAndConfirmed
+          SubscriptionMock.request.emailExistAndConfirmed
         )
       ).rejects.toThrow(ConflictException);
     });
@@ -114,15 +114,15 @@ describe("SubscriptionService", () => {
   describe("confirm", () => {
     test("should confirm subscription and return void", async () => {
       mockSubscriptionRepository.find.mockResolvedValue(
-        subscriptionMock.responsefromRepository.emailExist
+        SubscriptionMock.responsefromRepository.emailExist
       );
 
       await subscriptionService.confirm(
-        subscriptionMock.responsefromRepository.emailExist.token
+        SubscriptionMock.responsefromRepository.emailExist.token
       );
 
       expect(mockSubscriptionRepository.find).toHaveBeenCalledWith({
-        token: subscriptionMock.responsefromRepository.emailExist.token,
+        token: SubscriptionMock.responsefromRepository.emailExist.token,
       });
     });
 
@@ -131,19 +131,19 @@ describe("SubscriptionService", () => {
 
       await expect(
         subscriptionService.confirm(
-          subscriptionMock.responsefromRepository.emailNotExist.token
+          SubscriptionMock.responsefromRepository.emailNotExist.token
         )
       ).rejects.toThrow(NotFoundException);
     });
 
     test("should throw ConflictException if email is already confirmed", async () => {
       mockSubscriptionRepository.find.mockResolvedValue(
-        subscriptionMock.responsefromRepository.emailExistAndConfirmed
+        SubscriptionMock.responsefromRepository.emailExistAndConfirmed
       );
 
       await expect(
         subscriptionService.confirm(
-          subscriptionMock.responsefromRepository.emailExistAndConfirmed.token
+          SubscriptionMock.responsefromRepository.emailExistAndConfirmed.token
         )
       ).rejects.toThrow(ConflictException);
     });
@@ -152,15 +152,15 @@ describe("SubscriptionService", () => {
   describe("unsubscribe", () => {
     test("should unsubscribe and return void", async () => {
       mockSubscriptionRepository.find.mockResolvedValue(
-        subscriptionMock.responsefromRepository.emailExist
+        SubscriptionMock.responsefromRepository.emailExist
       );
 
       await subscriptionService.unsubscribe(
-        subscriptionMock.responsefromRepository.emailExist.token
+        SubscriptionMock.responsefromRepository.emailExist.token
       );
 
       expect(mockSubscriptionRepository.find).toHaveBeenCalledWith({
-        token: subscriptionMock.responsefromRepository.emailExist.token,
+        token: SubscriptionMock.responsefromRepository.emailExist.token,
       });
     });
 
@@ -169,7 +169,7 @@ describe("SubscriptionService", () => {
 
       await expect(
         subscriptionService.unsubscribe(
-          subscriptionMock.responsefromRepository.emailNotExist.token
+          SubscriptionMock.responsefromRepository.emailNotExist.token
         )
       ).rejects.toThrow(NotFoundException);
     });
@@ -178,7 +178,7 @@ describe("SubscriptionService", () => {
   describe("sendHourlyEmails", () => {
     test("should call sendFrequencyEmails with Frequency.Hourly", async () => {
       mockSubscriptionRepository.findByFrequency.mockResolvedValue(
-        subscriptionMock.responsefromRepository.hourly
+        SubscriptionMock.responsefromRepository.hourly
       );
 
       await subscriptionService.sendHourlyEmails();
@@ -188,7 +188,7 @@ describe("SubscriptionService", () => {
       );
 
       expect(mockEmailService.sendEmails).toHaveBeenCalledWith(
-        subscriptionMock.responsefromRepository.hourly
+        SubscriptionMock.responsefromRepository.hourly
       );
     });
   });
@@ -196,7 +196,7 @@ describe("SubscriptionService", () => {
   describe("sendDailyEmails", () => {
     test("should call sendFrequencyEmails with Frequency.Daily", async () => {
       mockSubscriptionRepository.findByFrequency.mockResolvedValue(
-        subscriptionMock.responsefromRepository.daily
+        SubscriptionMock.responsefromRepository.daily
       );
 
       await subscriptionService.sendDailyEmails();
@@ -206,7 +206,7 @@ describe("SubscriptionService", () => {
       );
 
       expect(mockEmailService.sendEmails).toHaveBeenCalledWith(
-        subscriptionMock.responsefromRepository.daily
+        SubscriptionMock.responsefromRepository.daily
       );
     });
   });

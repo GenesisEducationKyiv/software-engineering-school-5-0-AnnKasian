@@ -1,6 +1,6 @@
 import { Frequency } from "../../../src/modules/subscription/enums/frequency.enum.js";
 
-const subscriptionMock = {
+const SubscriptionMock = {
   responsefromRepository: {
     emailExist: {
       id: "123e4567-e89b-12d3-a456-555555555",
@@ -129,4 +129,4 @@ const subscriptionMock = {
   },
 };
 
-export { subscriptionMock };
+export { SubscriptionMock };

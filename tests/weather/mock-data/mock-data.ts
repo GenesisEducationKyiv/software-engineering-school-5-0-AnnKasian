@@ -1,1 +1,1 @@
-export { weatherMock } from "./weather-service.mock.js";
+export { WeatherMock } from "./weather-service.mock.js";

@@ -63,9 +63,9 @@ const jsConfig = {
       },
       {
         message:
-            "Avoid import/export type { Type } from './module'. Prefer import/export { type Type } from './module'.",
+          "Avoid import/export type { Type } from './module'. Prefer import/export { type Type } from './module'.",
         selector:
-            "ImportDeclaration[importKind=type],ExportNamedDeclaration[exportKind=type]",
+          "ImportDeclaration[importKind=type],ExportNamedDeclaration[exportKind=type]",
       },
     ],
     "object-shorthand": ["error"],
@@ -107,7 +107,7 @@ const importConfig = {
 const sonarConfig = {
   plugins: {
     sonarjs:
-    /** @type {import('eslint').Linter.Plugin} */ /** @type {unknown} */ sonarjsPlugin,
+      /** @type {import('eslint').Linter.Plugin} */ /** @type {unknown} */ sonarjsPlugin,
   },
   rules: {
     ...sonarjsPlugin.configs.recommended.rules,
@@ -120,7 +120,7 @@ const sonarConfig = {
 const stylisticConfig = {
   plugins: {
     "@stylistic/js":
-    /** @type {import('eslint').Linter.Plugin} */ stylisticPlugin,
+      /** @type {import('eslint').Linter.Plugin} */ stylisticPlugin,
   },
   rules: {
     "@stylistic/js/padding-line-between-statements": [
@@ -155,7 +155,7 @@ const typescriptConfig = {
   },
   plugins: {
     "@typescript-eslint" /** @type {import('eslint').Linter.Plugin} */:
-    /** @type {unknown} */ tsPlugin,
+      /** @type {unknown} */ tsPlugin,
   },
   rules: {
     ...tsPlugin.configs["strict-type-checked"].rules,
@@ -209,7 +209,7 @@ const jsdocConfig = {
 const explicitGenericsConfig = {
   plugins: {
     "require-explicit-generics":
-    /** @type {import('eslint').Linter.Plugin} */ explicitGenericsPlugin,
+      /** @type {import('eslint').Linter.Plugin} */ explicitGenericsPlugin,
   },
 };
 
@@ -239,6 +239,7 @@ const overridesConfigs = [
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-magic-numbers": "off",
+      "@typescript-eslint/no-unsafe-assignment": "off",
     },
   },
 ];
