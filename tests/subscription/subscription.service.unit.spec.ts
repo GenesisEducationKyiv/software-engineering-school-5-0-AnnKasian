@@ -1,9 +1,11 @@
 import { Test } from "@nestjs/testing";
 import { SubscriptionService } from "../../src/modules/subscription/subscription.js";
+import {
+  SUBSCRIPTION_INJECTION_TOKENS,
+  Frequency,
+} from "../../src/modules/subscription/enums/enums.js";
 import { SubscriptionMock } from "./mock-data/mock-data.js";
-import { SubscriptionRepository } from "../../src/modules/subscription/subscription.repository.js";
 import { ConflictException, NotFoundException } from "@nestjs/common";
-import { Frequency } from "../../src/modules/subscription/enums/enums.js";
 import { ConfigService } from "@nestjs/config";
 import { SubscriptionEmailService } from "../../src/modules/subscription/subscription-email.service.js";
 import { WeatherService } from "../../src/modules/weather/weather.service.js";
@@ -37,7 +39,7 @@ describe("SubscriptionService", () => {
       providers: [
         SubscriptionService,
         {
-          provide: SubscriptionRepository,
+          provide: SUBSCRIPTION_INJECTION_TOKENS.SUBSCRIPTION_REPOSITORY,
           useValue: mockSubscriptionRepository,
         },
         {

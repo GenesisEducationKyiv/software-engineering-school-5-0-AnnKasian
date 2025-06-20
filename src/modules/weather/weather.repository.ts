@@ -1,38 +1,29 @@
 import { firstValueFrom } from "rxjs";
 import { HttpException, Injectable } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
 import { HttpService } from "@nestjs/axios";
 import { AxiosError } from "axios";
-import {
-  ConfigKeys,
-  ErrorMessage,
-  ErrorStatusCode,
-} from "../../libs/enums/enums.js";
+import { ErrorMessage, ErrorStatusCode } from "../../libs/enums/enums.js";
 import {
   WeatherApiResponseDto,
+  WeatherConfig,
   WeatherDto,
   WeatherError,
 } from "./types/types.js";
 import { WeatherErrorCode } from "./enums/enums.js";
+import { IWeatherRepository } from "./interfaces/interfaces.js";
 
 @Injectable()
-class WeatherRepository {
-  private readonly API_URL: string;
-  private readonly API_KEY: string;
-
+class WeatherRepository implements IWeatherRepository {
   public constructor(
     private readonly httpService: HttpService,
-    configService: ConfigService
-  ) {
-    this.API_URL = configService.get(ConfigKeys.API_URL) as string;
-    this.API_KEY = configService.get(ConfigKeys.API_KEY) as string;
-  }
+    private readonly config: WeatherConfig
+  ) {}
 
   public async get(city: string): Promise<WeatherDto | null> {
     try {
       const { data } = await firstValueFrom(
-        this.httpService.get<WeatherApiResponseDto>(this.API_URL, {
-          params: { key: this.API_KEY, q: city },
+        this.httpService.get<WeatherApiResponseDto>(this.config.apiUrl, {
+          params: { key: this.config.apiKey, q: city },
         })
       );
 
