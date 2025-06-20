@@ -3,8 +3,9 @@ import { Test, type TestingModule } from "@nestjs/testing";
 import { ConfigModule } from "@nestjs/config";
 import nock from "nock";
 import { WeatherMock } from "./mock-data/weather-service.mock.js";
-import { HttpModule } from "@nestjs/axios";
+import { HttpModule, HttpService } from "@nestjs/axios";
 import { HttpException } from "@nestjs/common";
+import { WEATHER_INJECTION_TOKENS } from "../../src/modules/weather/enums/enums.js";
 
 describe("WeatherRepository  Integration Tests", () => {
   let module: TestingModule;
@@ -12,11 +13,9 @@ describe("WeatherRepository  Integration Tests", () => {
   let server: nock.Scope;
 
   beforeAll(async () => {
-    const TEST_API_URL = "https://api.weatherapi/current";
-    const TEST_API_KEY = "test-api-key";
+    const apiUrl = "https://api.weatherapi/current";
+    const apiKey = "test-api-key";
 
-    process.env.API_URL = TEST_API_URL;
-    process.env.API_KEY = TEST_API_KEY;
     module = await Test.createTestingModule({
       imports: [
         ConfigModule.forRoot({
@@ -24,10 +23,23 @@ describe("WeatherRepository  Integration Tests", () => {
         }),
         HttpModule,
       ],
-      providers: [WeatherRepository],
+      providers: [
+        {
+          provide: WEATHER_INJECTION_TOKENS.WEATHER_REPOSITORY,
+          useFactory: (httpService: HttpService) => {
+            return new WeatherRepository(httpService, {
+              apiUrl,
+              apiKey,
+            });
+          },
+          inject: [HttpService],
+        },
+      ],
     }).compile();
 
-    repository = module.get<WeatherRepository>(WeatherRepository);
+    repository = module.get<WeatherRepository>(
+      WEATHER_INJECTION_TOKENS.WEATHER_REPOSITORY
+    );
   });
 
   beforeEach(() => {
@@ -41,8 +53,6 @@ describe("WeatherRepository  Integration Tests", () => {
   afterAll(async () => {
     nock.restore();
     await module.close();
-    delete process.env.API_URL;
-    delete process.env.API_KEY;
   });
 
   describe("get", () => {

@@ -5,13 +5,15 @@ import { SubscriptionEmailService } from "../../src/modules/subscription/subscri
 import ms from "smtp-tester";
 import { WeatherService } from "../../src/modules/weather/weather.js";
 import { WeatherMock } from "../weather/mock-data/mock-data.js";
-import { MailerModule } from "@nestjs-modules/mailer";
+import { MailerModule, MailerService } from "@nestjs-modules/mailer";
 import { HandlebarsAdapter } from "@nestjs-modules/mailer/dist/adapters/handlebars.adapter.js";
 
 describe("SubscriptionEmailService Integration Tests", () => {
   let module: TestingModule;
   let service: SubscriptionEmailService;
   let mailServer: ms.MailServer;
+
+  const baseUrl = "http://localhost:3000";
 
   const mockWeatherService = {
     get: jest.fn(),
@@ -46,10 +48,23 @@ describe("SubscriptionEmailService Integration Tests", () => {
         }),
       ],
       providers: [
-        SubscriptionEmailService,
         {
           provide: WeatherService,
           useValue: mockWeatherService,
+        },
+        {
+          provide: SubscriptionEmailService,
+          useFactory: (
+            mailerService: MailerService,
+            weatherService: WeatherService
+          ) => {
+            return new SubscriptionEmailService(
+              mailerService,
+              { baseUrl },
+              weatherService
+            );
+          },
+          inject: [MailerService, WeatherService],
         },
       ],
     }).compile();
