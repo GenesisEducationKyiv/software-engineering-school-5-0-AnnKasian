@@ -5,6 +5,8 @@ import { EmailSubject, EmailTemplate } from "./email-data/email-data.js";
 import { SubscriptionConfig } from "./types/subscription-config.type.js";
 import { MailerService } from "@nestjs-modules/mailer";
 
+import { SubscriptionEmailErrorHandler } from "./helpers/helpers.js";
+
 @Injectable()
 class SubscriptionEmailService {
   public constructor(
@@ -21,7 +23,7 @@ class SubscriptionEmailService {
 
     const currentDate = new Date();
 
-    await Promise.all(
+    const results = await Promise.allSettled(
       subscriptions.map((subscription) =>
         this.mailerService.sendMail({
           to: subscription.email,
@@ -38,19 +40,26 @@ class SubscriptionEmailService {
         })
       )
     );
+
+    this.handleEmailFailures(results);
   }
 
   async sendConfirmationEmail(subscription: SubscriptionEntity) {
     const currentDate = new Date();
-    await this.mailerService.sendMail({
-      to: subscription.email,
-      subject: EmailSubject.CONFIRM,
-      template: EmailTemplate.CONFIRM,
-      context: {
-        year: currentDate.getFullYear(),
-        confirmUrl: `${this.config.baseUrl}/action.html?action=confirm&token=${subscription.token}`,
-      },
-    });
+
+    try {
+      await this.mailerService.sendMail({
+        to: subscription.email,
+        subject: EmailSubject.CONFIRM,
+        template: EmailTemplate.CONFIRM,
+        context: {
+          year: currentDate.getFullYear(),
+          confirmUrl: `${this.config.baseUrl}/action.html?action=confirm&token=${subscription.token}`,
+        },
+      });
+    } catch (error: unknown) {
+      SubscriptionEmailErrorHandler(error);
+    }
   }
 
   async sendEmails(subscriptions: SubscriptionEntity[]): Promise<void> {
@@ -60,11 +69,21 @@ class SubscriptionEmailService {
       cities[subscription.city].push(subscription);
     });
 
-    await Promise.all(
+    await Promise.allSettled(
       Object.entries(cities).map(([city, subscriptions]) =>
         this.sendWeatherEmail(city, subscriptions)
       )
     );
+  }
+
+  private handleEmailFailures(results: PromiseSettledResult<void>[]) {
+    const failures = results.filter((result) => result.status === "rejected");
+
+    if (failures.length) {
+      const firstError = failures[0].reason as Error;
+
+      SubscriptionEmailErrorHandler(firstError);
+    }
   }
 }
 
