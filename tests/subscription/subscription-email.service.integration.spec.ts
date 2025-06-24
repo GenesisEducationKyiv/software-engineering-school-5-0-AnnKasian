@@ -7,6 +7,7 @@ import { WeatherService } from "../../src/modules/weather/weather.js";
 import { WeatherMock } from "../weather/mock-data/mock-data.js";
 import { MailerModule, MailerService } from "@nestjs-modules/mailer";
 import { HandlebarsAdapter } from "@nestjs-modules/mailer/dist/adapters/handlebars.adapter.js";
+import { HttpException } from "@nestjs/common";
 
 describe("SubscriptionEmailService Integration Tests", () => {
   let module: TestingModule;
@@ -102,6 +103,17 @@ describe("SubscriptionEmailService Integration Tests", () => {
         SubscriptionIntegrationMock.newData.subscriptionToConfirm.email
       );
     });
+
+    it("should throw HttpException if email is not valid", async () => {
+      mockWeatherService.get.mockResolvedValue(WeatherMock.response);
+
+      await expect(
+        service.sendWeatherEmail(
+          SubscriptionIntegrationMock.newData.invalidSubscriptionToConfirm.city,
+          [SubscriptionIntegrationMock.newData.invalidSubscriptionToConfirm]
+        )
+      ).rejects.toThrow(HttpException);
+    });
   });
 
   describe("sendConfirmationEmail", () => {
@@ -118,6 +130,14 @@ describe("SubscriptionEmailService Integration Tests", () => {
       expect(capturedEmail.email.headers.to).toBe(
         SubscriptionIntegrationMock.newData.subscriptionToConfirm.email
       );
+    });
+
+    it("should throw HttpException if email is not valid", async () => {
+      await expect(
+        service.sendConfirmationEmail(
+          SubscriptionIntegrationMock.newData.invalidSubscriptionToConfirm
+        )
+      ).rejects.toThrow(HttpException);
     });
   });
 });

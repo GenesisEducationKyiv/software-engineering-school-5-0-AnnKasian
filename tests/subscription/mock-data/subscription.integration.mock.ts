@@ -33,6 +33,16 @@ const SubscriptionIntegrationMock = {
     invalidToken: {
       token: "invalid-token",
     },
+    invalidSubscriptionToConfirm: {
+      id: "123e4567-e89b-12d3-a456-426614174000",
+      email: "ffff",
+      token: "123e4567-e89b-12d3-a456-426614174000",
+      city: "Kyiv",
+      frequency: Frequency.HOURLY,
+      confirmed: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
   },
 };
 
