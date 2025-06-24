@@ -174,6 +174,7 @@ const typescriptConfig = {
       {
         ignoreEnums: true,
         ignoreReadonlyClassProperties: true,
+        ignoreArrayIndexes: true,
       },
     ],
     "@typescript-eslint/return-await": ["warn", "always"],
