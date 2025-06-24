@@ -1,12 +1,13 @@
-import { HttpException, type Logger } from "@nestjs/common";
+import { HttpException } from "@nestjs/common";
 import { type AxiosError, isAxiosError } from "axios";
 import { type WeatherError } from "../types/types.js";
 import { ErrorMessage, ErrorStatusCode } from "../../../libs/enums/enums.js";
+import { fileLogger } from "./helpers.js";
 
 class WeatherErrorHandler {
-  public handleError(error: unknown, logger: Logger): null {
+  public handleError(error: unknown, providerName: string): null {
     if (!(error instanceof Error)) {
-      logger.error(`Unknown error: ${typeof error}`);
+      fileLogger(providerName, `Unknown error: ${typeof error}`);
 
       throw new HttpException(
         ErrorMessage.UNKNOWN_ERROR,
@@ -15,20 +16,24 @@ class WeatherErrorHandler {
     }
 
     if (isAxiosError(error)) {
-      return this.handleAxiosError(error as AxiosError<WeatherError>, logger);
+      return this.handleAxiosError(
+        error as AxiosError<WeatherError>,
+        providerName
+      );
     }
 
-    logger.error(`Adapter error: ${error.message}`);
+    fileLogger(providerName, `Adapter error: ${error.message}`);
 
     throw new HttpException(error.message, ErrorStatusCode.BAD_REQUEST);
   }
 
   private handleAxiosError(
     axiosError: AxiosError<WeatherError>,
-    logger: Logger
+    providerName: string
   ): null {
     if (axiosError.response?.status === ErrorStatusCode.BAD_REQUEST) {
-      logger.warn(
+      fileLogger(
+        providerName,
         `Invalid city: ${this.extractErrorMessage(
           axiosError.response.data.error
         )}`
@@ -45,7 +50,7 @@ class WeatherErrorHandler {
     const statusCode =
       axiosError.response?.status ?? ErrorStatusCode.INTERNAL_SERVER_ERROR;
 
-    logger.error(`API Error: (${statusCode}) - ${errorMessage}`);
+    fileLogger(providerName, `API Error: (${statusCode}) - ${errorMessage}`);
 
     throw new HttpException(errorMessage, statusCode);
   }

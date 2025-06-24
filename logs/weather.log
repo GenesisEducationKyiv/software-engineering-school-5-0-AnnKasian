@@ -1,0 +1,5 @@
+WeatherApiProvider - Response : Lviv - {"description":"Partly Cloudy","humidity":49,"temperature":21.6}"
+WeatherApiProvider - Invalid city: No matching location found.
+WeatherbitProvider - Invalid city: Invalid Parameters supplied.
+WeatherstackProvider - Adapter error: Your API request failed. Please try again or contact support.
+WeatherApiProvider - Response : New York - {"description":"Sunny","humidity":59,"temperature":29.4}"

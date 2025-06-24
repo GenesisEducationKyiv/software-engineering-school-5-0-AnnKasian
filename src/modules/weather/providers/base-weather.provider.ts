@@ -1,14 +1,14 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { HttpService } from "@nestjs/axios";
 import { firstValueFrom } from "rxjs";
 import { IWeatherProvider } from "../interfaces/interfaces.js";
 import { WeatherConfig } from "../types/weather-config.type.js";
 import { WeatherAdapter, WeatherDto } from "../types/types.js";
-import { WeatherErrorHandler } from "../helpers/helpers.js";
+import { fileLogger, WeatherErrorHandler } from "../helpers/helpers.js";
 
 @Injectable()
 class BaseWeatherProvider<TResponse> implements IWeatherProvider {
-  private readonly logger: Logger;
+  private readonly providerName: string;
   private nextProvider: IWeatherProvider | null = null;
   private weatherErrorHandler: WeatherErrorHandler = new WeatherErrorHandler();
 
@@ -18,7 +18,7 @@ class BaseWeatherProvider<TResponse> implements IWeatherProvider {
     private readonly adapter: WeatherAdapter<TResponse>,
     providerName: string
   ) {
-    this.logger = new Logger(providerName);
+    this.providerName = providerName;
   }
 
   setNext(provider: IWeatherProvider): IWeatherProvider {
@@ -32,7 +32,10 @@ class BaseWeatherProvider<TResponse> implements IWeatherProvider {
       const weather = await this.fetchWeatherFromApi(city);
 
       if (weather) {
-        this.logger.log(`Response ${city} : ${JSON.stringify(weather)}"`);
+        fileLogger(
+          this.providerName,
+          `Response : ${city} - ${JSON.stringify(weather)}"`
+        );
 
         return weather;
       }
@@ -59,7 +62,7 @@ class BaseWeatherProvider<TResponse> implements IWeatherProvider {
 
       return this.adapter.parseResponse(data);
     } catch (error: unknown) {
-      return this.weatherErrorHandler.handleError(error, this.logger);
+      return this.weatherErrorHandler.handleError(error, this.providerName);
     }
   }
 }
