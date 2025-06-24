@@ -114,9 +114,7 @@ const SubscriptionMock = {
       city: "Kyiv",
       frequency: Frequency.HOURLY,
     },
-    tokenConfirm: {
-      token: "123e4567-e89b-12d3-a456-88888888",
-    },
+    invalidToken: "Invalid token",
   },
 
   response: {
