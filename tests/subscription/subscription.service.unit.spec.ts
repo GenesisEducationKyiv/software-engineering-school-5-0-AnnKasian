@@ -5,7 +5,11 @@ import {
   Frequency,
 } from "../../src/modules/subscription/enums/enums.js";
 import { SubscriptionMock } from "./mock-data/mock-data.js";
-import { ConflictException, NotFoundException } from "@nestjs/common";
+import {
+  BadRequestException,
+  ConflictException,
+  NotFoundException,
+} from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { SubscriptionEmailService } from "../../src/modules/subscription/subscription-email.service.js";
 import { WeatherService } from "../../src/modules/weather/weather.service.js";
@@ -147,6 +151,14 @@ describe("SubscriptionService", () => {
         )
       ).rejects.toThrow(ConflictException);
     });
+
+    test("should throw BadRequestException if token is invalid", async () => {
+      mockSubscriptionRepository.find.mockRejectedValue(new Error());
+
+      await expect(
+        subscriptionService.confirm(SubscriptionMock.request.invalidToken)
+      ).rejects.toThrow(BadRequestException);
+    });
   });
 
   describe("unsubscribe", () => {
@@ -172,6 +184,14 @@ describe("SubscriptionService", () => {
           SubscriptionMock.responsefromRepository.emailNotExist.token
         )
       ).rejects.toThrow(NotFoundException);
+    });
+
+    test("should throw BadRequestException if token is invalid", async () => {
+      mockSubscriptionRepository.find.mockRejectedValue(new Error());
+
+      await expect(
+        subscriptionService.unsubscribe(SubscriptionMock.request.invalidToken)
+      ).rejects.toThrow(BadRequestException);
     });
   });
 

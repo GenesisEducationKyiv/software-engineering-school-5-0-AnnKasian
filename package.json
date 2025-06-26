@@ -12,6 +12,8 @@
     "test:db:health": "docker compose -f docker-compose-tests.yml exec db_test pg_isready -U postgres -d weather_notify_test",
     "test:integration": "npm run test:db:up && npx jest --testPathPattern=integration && npm run test:db:down",
     "test:integration:watch": "npm run test:db:up && npx jest --testPathPattern=integration --watch",
+    "test:e2e": "npm run test:db:up && npx jest --testPathPattern=e2e && npm run test:db:down",
+    "test:e2e:watch": "npm run test:db:up && npx jest --testPathPattern=e2e --watch",
     "lint:type": "npx tsc --noEmit",
     "lint:js": "npx eslint . --max-warnings=0",
     "lint": "npm run lint:type && npm run lint:js",

@@ -75,3 +75,30 @@ jobs:
 
       - name: Run integration tests
         run: npm run test:integration
+
+  e2e-tests:
+    needs: linting
+    runs-on: ubuntu-latest
+
+    env:
+      DATABASE_TEST_PORT: 5435
+      DATABASE_TEST_USER: postgres
+      DATABASE_TEST_PASSWORD: postgres
+      DATABASE_TEST_NAME: weather_notify_test
+      DATABASE_TEST_HOST: localhost
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run e2e tests
+        run: npm run test:e2e
