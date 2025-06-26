@@ -1,5 +1,5 @@
 type WeatherError = {
-  error: { code: number; message: string };
+  error: { code: number; message: string } | string;
 };
 
 export { type WeatherError };
