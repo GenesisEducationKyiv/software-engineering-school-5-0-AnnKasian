@@ -1,13 +1,14 @@
 import { Test } from "@nestjs/testing";
 import { SubscriptionService } from "../../src/modules/subscription/subscription.js";
+import {
+  SUBSCRIPTION_INJECTION_TOKENS,
+  Frequency,
+} from "../../src/modules/subscription/enums/enums.js";
 import { subscriptionMock } from "./mock-data/mock-data.js";
-import { SubscriptionRepository } from "../../src/modules/subscription/subscription.repository.js";
 import { ConflictException, NotFoundException } from "@nestjs/common";
-import { Frequency } from "../../src/modules/subscription/enums/enums.js";
 import { ConfigService } from "@nestjs/config";
-import { MailerService } from "@nestjs-modules/mailer";
+import { SubscriptionEmailService } from "../../src/modules/subscription/subscription-email.service.js";
 import { WeatherService } from "../../src/modules/weather/weather.service.js";
-import { weatherMock } from "../weather/mock-data/mock-data.js";
 
 describe("SubscriptionService", () => {
   let subscriptionService: SubscriptionService;
@@ -28,8 +29,9 @@ describe("SubscriptionService", () => {
     get: jest.fn(),
   };
 
-  const mockMailerService = {
-    sendMail: jest.fn(),
+  const mockEmailService = {
+    sendConfirmationEmail: jest.fn(),
+    sendEmails: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -37,7 +39,7 @@ describe("SubscriptionService", () => {
       providers: [
         SubscriptionService,
         {
-          provide: SubscriptionRepository,
+          provide: SUBSCRIPTION_INJECTION_TOKENS.SUBSCRIPTION_REPOSITORY,
           useValue: mockSubscriptionRepository,
         },
         {
@@ -49,8 +51,8 @@ describe("SubscriptionService", () => {
           useValue: mockConfigService,
         },
         {
-          provide: MailerService,
-          useValue: mockMailerService,
+          provide: SubscriptionEmailService,
+          useValue: mockEmailService,
         },
       ],
     }).compile();
@@ -69,15 +71,11 @@ describe("SubscriptionService", () => {
         subscriptionMock.responsefromRepository.emailNotExist
       );
 
-      jest
-        .spyOn(subscriptionService as any, "sendConfirmationEmail")
-        .mockImplementation(async () => {});
-
       const result = await subscriptionService.subscribe(
         subscriptionMock.request.emailNotExist
       );
 
-      expect(subscriptionService["sendConfirmationEmail"]).toHaveBeenCalledWith(
+      expect(mockEmailService.sendConfirmationEmail).toHaveBeenCalledWith(
         subscriptionMock.responsefromRepository.emailNotExist
       );
 
@@ -89,15 +87,11 @@ describe("SubscriptionService", () => {
         subscriptionMock.responsefromRepository.emailExist
       );
 
-      jest
-        .spyOn(subscriptionService as any, "sendConfirmationEmail")
-        .mockImplementation(async () => {});
-
       const result = await subscriptionService.subscribe(
         subscriptionMock.request.emailExist
       );
 
-      expect(subscriptionService["sendConfirmationEmail"]).toHaveBeenCalledWith(
+      expect(mockEmailService.sendConfirmationEmail).toHaveBeenCalledWith(
         subscriptionMock.responsefromRepository.emailExist
       );
 
@@ -183,79 +177,36 @@ describe("SubscriptionService", () => {
 
   describe("sendHourlyEmails", () => {
     test("should call sendFrequencyEmails with Frequency.Hourly", async () => {
-      const frequencyEmails = jest
-        .spyOn(subscriptionService as any, "sendFrequencyEmails")
-        .mockImplementation(async () => {});
-
-      await subscriptionService.sendHourlyEmails();
-
-      expect(frequencyEmails).toHaveBeenCalledWith(Frequency.HOURLY);
-    });
-  });
-
-  describe("sendDailyEmails", () => {
-    test("should call sendFrequencyEmails with Frequency.Daily", async () => {
-      const spy = jest
-        .spyOn(subscriptionService as any, "sendFrequencyEmails")
-        .mockImplementation(async () => {});
-
-      await subscriptionService.sendDailyEmails();
-
-      expect(spy).toHaveBeenCalledWith(Frequency.DAILY);
-    });
-  });
-
-  describe("sendFrequencyEmails", () => {
-    test("should find subscriptions and send weather emails", async () => {
-      jest
-        .spyOn(subscriptionService as any, "sendWeatherEmail")
-        .mockImplementation(async () => {});
-
       mockSubscriptionRepository.findByFrequency.mockResolvedValue(
-        subscriptionMock.responsefromRepository.frequency
+        subscriptionMock.responsefromRepository.hourly
       );
 
-      await subscriptionService["sendFrequencyEmails"](Frequency.HOURLY);
+      await subscriptionService.sendHourlyEmails();
 
       expect(mockSubscriptionRepository.findByFrequency).toHaveBeenCalledWith(
         Frequency.HOURLY
       );
 
-      expect(subscriptionService["sendWeatherEmail"]).toHaveBeenCalledTimes(2);
-      expect(subscriptionService["sendWeatherEmail"]).toHaveBeenCalledWith(
-        subscriptionMock.responsefromRepository.frequency[0].city,
-        [subscriptionMock.responsefromRepository.frequency[0]]
-      );
-      expect(subscriptionService["sendWeatherEmail"]).toHaveBeenCalledWith(
-        subscriptionMock.responsefromRepository.frequency[1].city,
-        subscriptionMock.responsefromRepository.frequency.slice(1, 3)
+      expect(mockEmailService.sendEmails).toHaveBeenCalledWith(
+        subscriptionMock.responsefromRepository.hourly
       );
     });
   });
 
-  describe("sendWeatherEmail", () => {
-    test("should get weather and send weather email to each subscription", async () => {
-      mockWeatherService.get.mockResolvedValue(weatherMock.response);
-      mockMailerService.sendMail.mockImplementation(async () => {});
-
-      await subscriptionService["sendWeatherEmail"](
-        subscriptionMock.responsefromRepository.emailExistAndConfirmed.city,
-        subscriptionMock.responsefromRepository.frequency
+  describe("sendDailyEmails", () => {
+    test("should call sendFrequencyEmails with Frequency.Daily", async () => {
+      mockSubscriptionRepository.findByFrequency.mockResolvedValue(
+        subscriptionMock.responsefromRepository.daily
       );
 
-      expect(mockWeatherService.get).toHaveBeenCalledWith(
-        subscriptionMock.responsefromRepository.emailExistAndConfirmed.city
+      await subscriptionService.sendDailyEmails();
+
+      expect(mockSubscriptionRepository.findByFrequency).toHaveBeenCalledWith(
+        Frequency.DAILY
       );
 
-      expect(mockMailerService.sendMail).toHaveBeenCalledTimes(3);
-
-      subscriptionMock.responsefromRepository.frequency.forEach(
-        (subscription) =>
-          expect(mockMailerService.sendMail).toHaveBeenCalledWith(
-            expect.objectContaining({
-              to: subscription.email,
-            })
-          )
+      expect(mockEmailService.sendEmails).toHaveBeenCalledWith(
+        subscriptionMock.responsefromRepository.daily
       );
     });
   });

@@ -5,9 +5,10 @@ import { Repository } from "typeorm";
 import { SubscriptionEntity } from "./entities/entities.js";
 import { SubscriptionDto, SubscribeFilterDto } from "./types/types.js";
 import { Frequency } from "./enums/enums.js";
+import { ISubscriptionRepository } from "./interfaces/interfaces.js";
 
 @Injectable()
-class SubscriptionRepository {
+class SubscriptionRepository implements ISubscriptionRepository {
   public constructor(
     @InjectRepository(SubscriptionEntity)
     private readonly subscription: Repository<SubscriptionEntity>

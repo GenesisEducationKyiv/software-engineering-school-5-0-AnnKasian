@@ -1,95 +1,42 @@
 import {
   ConflictException,
+  Inject,
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
-import { SubscriptionRepository } from "./subscription.repository.js";
 import {
   SubscribeFilterDto,
   SubscribeResponseDto,
   type SubscriptionDto,
 } from "./types/types.js";
-import { MailerService } from "@nestjs-modules/mailer";
-import { WeatherService } from "../weather/weather.service.js";
-import { Cron, CronExpression } from "@nestjs/schedule";
-import { Frequency } from "./enums/enums.js";
 import { SubscriptionEntity } from "./entities/entities.js";
-import { ConfigService } from "@nestjs/config";
+import { SubscriptionEmailService } from "./subscription-email.service.js";
+import { Frequency, SUBSCRIPTION_INJECTION_TOKENS } from "./enums/enums.js";
+import { Cron, CronExpression } from "@nestjs/schedule";
+import { ISubscriptionRepository } from "./interfaces/interfaces.js";
 
 @Injectable()
 class SubscriptionService {
   public constructor(
-    private readonly subscriptionRepository: SubscriptionRepository,
-    private readonly configService: ConfigService,
-    private readonly mailerService: MailerService,
-    private readonly weatherService: WeatherService
+    @Inject(SUBSCRIPTION_INJECTION_TOKENS.SUBSCRIPTION_REPOSITORY)
+    private readonly subscriptionRepository: ISubscriptionRepository,
+    private readonly subscriptionEmailService: SubscriptionEmailService
   ) {}
-
-  private async sendFrequencyEmails(frequency: Frequency): Promise<void> {
-    const subscriptions = await this.subscriptionRepository.findByFrequency(
-      frequency
-    );
-
-    const cities: Record<string, SubscriptionEntity[]> = {};
-    subscriptions.forEach((subscription) => {
-      cities[subscription.city] ??= [];
-      cities[subscription.city].push(subscription);
-    });
-
-    await Promise.all(
-      Object.entries(cities).map(([city, subscriptions]) =>
-        this.sendWeatherEmail(city, subscriptions)
-      )
-    );
-  }
 
   @Cron(CronExpression.EVERY_HOUR)
   public async sendHourlyEmails(): Promise<void> {
-    await this.sendFrequencyEmails(Frequency.HOURLY);
+    const subscriptions = await this.subscriptionRepository.findByFrequency(
+      Frequency.HOURLY
+    );
+    await this.subscriptionEmailService.sendEmails(subscriptions);
   }
 
   @Cron(CronExpression.EVERY_DAY_AT_10AM)
   public async sendDailyEmails(): Promise<void> {
-    await this.sendFrequencyEmails(Frequency.DAILY);
-  }
-
-  private async sendWeatherEmail(
-    city: string,
-    subscriptions: SubscriptionEntity[]
-  ): Promise<void> {
-    const weather = await this.weatherService.get(city);
-
-    await Promise.all(
-      subscriptions.map((subscription) =>
-        this.mailerService.sendMail({
-          to: subscription.email,
-          subject: "Weather subscription",
-          template: "weather-notify",
-          context: {
-            city: subscription.city,
-            temperature: weather.temperature,
-            humidity: weather.humidity,
-            description: weather.description,
-            unsubscribeUrl: `${this.configService.get(
-              "BASE_URL"
-            )}/action.html?action=unsubscribe&token=${subscription.token}`,
-          },
-        })
-      )
+    const subscriptions = await this.subscriptionRepository.findByFrequency(
+      Frequency.DAILY
     );
-  }
-
-  private async sendConfirmationEmail(subscription: SubscriptionEntity) {
-    await this.mailerService.sendMail({
-      to: subscription.email,
-      subject: "Confirmation email",
-      template: "confirm",
-      context: {
-        confirmUrl: `${this.configService.get(
-          "BASE_URL"
-        )}/action.html?action=confirm&token=${subscription.token}`,
-      },
-    });
+    await this.subscriptionEmailService.sendEmails(subscriptions);
   }
 
   public async subscribe(data: SubscriptionDto): Promise<SubscribeResponseDto> {
@@ -102,29 +49,17 @@ class SubscriptionService {
         throw new ConflictException("Email already subscribed.");
       }
 
-      await this.sendConfirmationEmail(existingSubscribe);
+      await this.subscriptionEmailService.sendConfirmationEmail(
+        existingSubscribe
+      );
 
       return { token: existingSubscribe.token };
     }
 
     const subscription = await this.subscriptionRepository.create(data);
-    await this.sendConfirmationEmail(subscription);
+    await this.subscriptionEmailService.sendConfirmationEmail(subscription);
 
     return { token: subscription.token };
-  }
-
-  private async findToken({
-    token,
-  }: SubscribeFilterDto): Promise<SubscriptionEntity> {
-    const existingSubscribe = await this.subscriptionRepository.find({
-      token,
-    });
-
-    if (!existingSubscribe) {
-      throw new NotFoundException("Token not found.");
-    }
-
-    return existingSubscribe;
   }
 
   public async confirm(token: string): Promise<void> {
@@ -140,6 +75,20 @@ class SubscriptionService {
   public async unsubscribe(token: string): Promise<void> {
     const subscription = await this.findToken({ token });
     await this.subscriptionRepository.delete(subscription?.id);
+  }
+
+  private async findToken({
+    token,
+  }: SubscribeFilterDto): Promise<SubscriptionEntity> {
+    const existingSubscribe = await this.subscriptionRepository.find({
+      token,
+    });
+
+    if (!existingSubscribe) {
+      throw new NotFoundException("Token not found.");
+    }
+
+    return existingSubscribe;
   }
 }
 
