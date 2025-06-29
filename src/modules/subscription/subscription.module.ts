@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
 import { Cache } from "cache-manager";
-import { CACHE_MANAGER, CacheModule } from "@nestjs/cache-manager";
+import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import { getRepositoryToken, TypeOrmModule } from "@nestjs/typeorm";
 import { SubscriptionEntity } from "./entities/entities.js";
 import { SubscriptionController } from "./subscription.controller.js";
@@ -14,15 +14,10 @@ import { ConfigService } from "@nestjs/config";
 import { WeatherService } from "../weather/weather.js";
 import { MailerService } from "@nestjs-modules/mailer";
 import { ConfigKeys } from "../../libs/enums/enums.js";
-import { RedisConfig } from "../../../redis.config.js";
 
 @Module({
   controllers: [SubscriptionController],
-  imports: [
-    TypeOrmModule.forFeature([SubscriptionEntity]),
-    WeatherModule,
-    CacheModule.registerAsync(RedisConfig),
-  ],
+  imports: [TypeOrmModule.forFeature([SubscriptionEntity]), WeatherModule],
   providers: [
     SubscriptionService,
     {

@@ -1,6 +1,7 @@
 import { SubscriptionIntegrationMock } from "./mock-data/subscription.integration.mock.js";
 import { Test, type TestingModule } from "@nestjs/testing";
 import { ConfigModule, ConfigService } from "@nestjs/config";
+import { type Cache } from "cache-manager";
 import { SubscriptionEmailService } from "../../src/modules/subscription/subscription-email.service.js";
 import ms from "smtp-tester";
 import { WeatherService } from "../../src/modules/weather/weather.js";
@@ -8,6 +9,8 @@ import { WeatherMock } from "../weather/mock-data/mock-data.js";
 import { MailerModule, MailerService } from "@nestjs-modules/mailer";
 import { HandlebarsAdapter } from "@nestjs-modules/mailer/dist/adapters/handlebars.adapter.js";
 import { HttpException } from "@nestjs/common";
+import { CACHE_MANAGER, CacheModule } from "@nestjs/cache-manager";
+import { TestRedisConfig } from "../test-redis.config.js";
 
 describe("SubscriptionEmailService Integration Tests", () => {
   let module: TestingModule;
@@ -15,6 +18,7 @@ describe("SubscriptionEmailService Integration Tests", () => {
   let mailServer: ms.MailServer;
 
   const baseUrl = "http://localhost:3000";
+  const cacheTTL = 1000;
 
   const mockWeatherService = {
     get: jest.fn(),
@@ -26,6 +30,7 @@ describe("SubscriptionEmailService Integration Tests", () => {
         ConfigModule.forRoot({
           isGlobal: true,
         }),
+        CacheModule.registerAsync({ ...TestRedisConfig, isGlobal: true }),
         MailerModule.forRootAsync({
           imports: [ConfigModule],
           inject: [ConfigService],
@@ -57,15 +62,17 @@ describe("SubscriptionEmailService Integration Tests", () => {
           provide: SubscriptionEmailService,
           useFactory: (
             mailerService: MailerService,
-            weatherService: WeatherService
+            weatherService: WeatherService,
+            casheManager: Cache
           ) => {
             return new SubscriptionEmailService(
               mailerService,
-              { baseUrl },
-              weatherService
+              { baseUrl, cacheTTL },
+              weatherService,
+              casheManager
             );
           },
-          inject: [MailerService, WeatherService],
+          inject: [MailerService, WeatherService, CACHE_MANAGER],
         },
       ],
     }).compile();

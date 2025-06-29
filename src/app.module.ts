@@ -2,7 +2,6 @@ import { Module } from "@nestjs/common";
 import { MailerModule } from "@nestjs-modules/mailer";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
-
 import { databaseConfig } from "../database.config.js";
 import { SubscriptionModule } from "./modules/subscription/subscription.module.js";
 import { HandlebarsAdapter } from "@nestjs-modules/mailer/dist/adapters/handlebars.adapter.js";
@@ -10,6 +9,8 @@ import { ScheduleModule } from "@nestjs/schedule";
 import { ServeStaticModule } from "@nestjs/serve-static";
 import path from "path";
 import { ConfigKeys } from "./libs/enums/config.enum.js";
+import { CacheModule } from "@nestjs/cache-manager";
+import { RedisConfig } from "../redis.config.js";
 
 @Module({
   imports: [
@@ -29,6 +30,10 @@ import { ConfigKeys } from "./libs/enums/config.enum.js";
         },
       ],
       inject: [ConfigService],
+    }),
+    CacheModule.registerAsync({
+      ...RedisConfig,
+      isGlobal: true,
     }),
     MailerModule.forRootAsync({
       imports: [ConfigModule],
