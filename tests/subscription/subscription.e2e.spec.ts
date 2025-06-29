@@ -13,6 +13,8 @@ import { SubscriptionE2eMock } from "./mock-data/mock-data.js";
 import { type App } from "supertest/types";
 import { HandlebarsAdapter } from "@nestjs-modules/mailer/dist/adapters/handlebars.adapter";
 import ms from "smtp-tester";
+import { CacheModule } from "@nestjs/cache-manager";
+import { TestRedisConfig } from "../test-redis.config.js";
 
 describe("Subscription", () => {
   let app: INestApplication<App>;
@@ -31,6 +33,7 @@ describe("Subscription", () => {
           ...testDatabaseConfig,
           entities: [SubscriptionEntity],
         }),
+        CacheModule.registerAsync(TestRedisConfig),
         MailerModule.forRootAsync({
           imports: [ConfigModule],
           inject: [ConfigService],

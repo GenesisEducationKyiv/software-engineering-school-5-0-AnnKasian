@@ -21,6 +21,10 @@ const ConfigKeys = {
   EMAIL_USER: "EMAIL_USER",
   EMAIL_PASS: "EMAIL_PASS",
   EMAIL_FROM: "EMAIL_FROM",
+
+  REDIS_HOST: "REDIS_HOST",
+  REDIS_PORT: "REDIS_PORT",
+  CACHE_TTL: "CACHE_TTL",
 } as const;
 
 export { ConfigKeys };

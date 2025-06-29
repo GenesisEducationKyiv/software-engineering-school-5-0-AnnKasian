@@ -11,6 +11,7 @@ services:
       - "${PORT}:7081"
     depends_on:
       - db
+      - cache
     volumes:
       - ./logs:/app/logs
     networks:
@@ -31,8 +32,21 @@ services:
     networks:
       - app-network
 
+  cache:
+    image: redis:7-alpine
+    container_name: weather-cache
+    ports:
+      - "6379:6379"
+    volumes:
+      - cache_data:/data
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+    networks:
+      - app-network
+
 volumes:
   postgres_data:
+  cache_data:
 
 networks:
   app-network:
