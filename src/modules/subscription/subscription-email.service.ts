@@ -1,25 +1,32 @@
 import { Injectable } from "@nestjs/common";
+import { Cache } from "cache-manager";
 import { WeatherService } from "../weather/weather.service.js";
 import { SubscriptionEntity } from "./entities/entities.js";
 import { EmailSubject, EmailTemplate } from "./email-data/email-data.js";
 import { SubscriptionConfig } from "./types/subscription-config.type.js";
 import { MailerService } from "@nestjs-modules/mailer";
-
 import { SubscriptionEmailErrorHandler } from "./helpers/helpers.js";
+import { WeatherDto } from "../weather/types/weather.dto.type.js";
 
 @Injectable()
 class SubscriptionEmailService {
   public constructor(
     private readonly mailerService: MailerService,
     private readonly config: SubscriptionConfig,
-    private readonly weatherService: WeatherService
+    private readonly weatherService: WeatherService,
+    private readonly cacheManager: Cache
   ) {}
 
   async sendWeatherEmail(
     city: string,
     subscriptions: SubscriptionEntity[]
   ): Promise<void> {
-    const weather = await this.weatherService.get(city);
+    let weather = await this.getCachedWeather(city);
+
+    if (!weather) {
+      weather = await this.weatherService.get(city);
+      await this.casheWeather(city, weather);
+    }
 
     const currentDate = new Date();
 
@@ -84,6 +91,16 @@ class SubscriptionEmailService {
 
       SubscriptionEmailErrorHandler(firstError);
     }
+  }
+
+  private async casheWeather(city: string, weather: WeatherDto) {
+    await this.cacheManager.set(city, weather, this.config.cacheTTL);
+  }
+
+  private async getCachedWeather(city: string): Promise<WeatherDto | null> {
+    const cachedData = await this.cacheManager.get<WeatherDto>(city);
+
+    return cachedData ?? null;
   }
 }
 
