@@ -109,7 +109,7 @@ A pull request cannot be merged unless all of the following CI checks **pass**:
 
 ---
 
-## 📝 Notes for Contributors
+## Notes for Contributors
 
 Please make sure to:
 1. Fork or create a feature branch.
