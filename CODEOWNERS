@@ -4,6 +4,8 @@
 *.js @Valmark-de-Valera @vikkyvl @AnnKasian
 *.ts @Valmark-de-Valera @vikkyvl @AnnKasian
 
+.github/workflows @Valmark-de-Valera @vikkyvl @AnnKasian
+
 deployment/ @Valmark-de-Valera @vikkyvl @AnnKasian
 
 deployment/kube/ @Valmark-de-Valera
