@@ -6,8 +6,9 @@ on:
       - main
   pull_request:
     types: [opened, synchronize, reopened]
-    branches-ignore:
-      - feedback
+    branches:
+      - "**"
+      - "!feedback"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
