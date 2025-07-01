@@ -1,19 +1,27 @@
 import { Injectable } from "@nestjs/common";
-import { HttpService } from "@nestjs/axios";
 import { BaseWeatherProvider } from "./base-weather.provider.js";
-import { WeatherApiResponseDto, WeatherConfig } from "../types/types.js";
-import { weatherApiAdapter } from "../adapters/adapters.js";
+import { WeatherApiResponseDto, WeatherDto } from "../types/types.js";
 import { WEATHER_PROVIDERS } from "../enums/enums.js";
 
 @Injectable()
 class WeatherApiProvider extends BaseWeatherProvider<WeatherApiResponseDto> {
-  constructor(httpService: HttpService, config: WeatherConfig) {
-    super(
-      httpService,
-      config,
-      weatherApiAdapter,
-      WEATHER_PROVIDERS.WEATHER_API_PROVIDER
-    );
+  getProviderName(): string {
+    return WEATHER_PROVIDERS.WEATHER_API_PROVIDER;
+  }
+
+  buildParams(city: string, apiKey: string): Record<string, string> {
+    return {
+      key: apiKey,
+      q: city,
+    };
+  }
+
+  parseResponse(data: WeatherApiResponseDto): WeatherDto {
+    return {
+      description: data.current?.condition?.text,
+      humidity: data.current?.humidity,
+      temperature: data.current?.temp_c,
+    };
   }
 }
 

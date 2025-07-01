@@ -3,10 +3,11 @@ import { Cache } from "cache-manager";
 import { WeatherService } from "../weather/weather.service.js";
 import { SubscriptionEntity } from "./entities/entities.js";
 import { EmailSubject, EmailTemplate } from "./email-data/email-data.js";
-import { SubscriptionConfig } from "./types/subscription-config.type.js";
+import { SubscriptionConfig } from "./types/types.js";
 import { MailerService } from "@nestjs-modules/mailer";
 import { SubscriptionEmailErrorHandler } from "./helpers/helpers.js";
-import { WeatherDto } from "../weather/types/weather.dto.type.js";
+import { SUBSCRIPTION_EMAIL_STATUS } from "./enums/enums.js";
+import { WeatherDto } from "../weather/types/types.js";
 
 @Injectable()
 class SubscriptionEmailService {
@@ -84,7 +85,9 @@ class SubscriptionEmailService {
   }
 
   private handleEmailFailures(results: PromiseSettledResult<void>[]) {
-    const failures = results.filter((result) => result.status === "rejected");
+    const failures = results.filter(
+      (result) => result.status === SUBSCRIPTION_EMAIL_STATUS.REJECTED
+    );
 
     if (failures.length) {
       const firstError = failures[0].reason as Error;

@@ -2,24 +2,26 @@ import { Injectable } from "@nestjs/common";
 import { HttpService } from "@nestjs/axios";
 import { firstValueFrom } from "rxjs";
 import { IWeatherProvider } from "../interfaces/interfaces.js";
-import { WeatherConfig } from "../types/weather-config.type.js";
-import { WeatherAdapter, WeatherDto } from "../types/types.js";
-import { fileLogger, WeatherErrorHandler } from "../helpers/helpers.js";
+import { WeatherConfig, WeatherDto } from "../types/types.js";
+import { WeatherErrorHandler, FileLogger } from "../helpers/helpers.js";
+import { WeatherErrors } from "../enums/enums.js";
 
 @Injectable()
-class BaseWeatherProvider<TResponse> implements IWeatherProvider {
-  private readonly providerName: string;
+abstract class BaseWeatherProvider<TResponse> implements IWeatherProvider {
   private nextProvider: IWeatherProvider | null = null;
-  private weatherErrorHandler: WeatherErrorHandler = new WeatherErrorHandler();
 
   constructor(
     private readonly httpService: HttpService,
     private readonly config: WeatherConfig,
-    private readonly adapter: WeatherAdapter<TResponse>,
-    providerName: string
+    private weatherErrorHandler: WeatherErrorHandler,
+    private logger: FileLogger
   ) {
-    this.providerName = providerName;
+    this.logger = new FileLogger(this.getProviderName());
   }
+
+  abstract getProviderName(): string;
+  abstract buildParams(city: string, apiKey: string): Record<string, string>;
+  abstract parseResponse(data: TResponse): WeatherDto;
 
   setNext(provider: IWeatherProvider): IWeatherProvider {
     this.nextProvider = provider;
@@ -27,42 +29,82 @@ class BaseWeatherProvider<TResponse> implements IWeatherProvider {
     return provider;
   }
 
-  async getWeather(city: string): Promise<WeatherDto | null> {
+  async getWeather(city: string): Promise<WeatherDto> {
+    return await this.getWeatherWithErrors(city, []);
+  }
+
+  async getWeatherWithErrors(
+    city: string,
+    previousErrors: unknown[]
+  ): Promise<WeatherDto> {
     try {
       const weather = await this.fetchWeatherFromApi(city);
+      this.logger.response(city, JSON.stringify(weather));
 
-      if (weather) {
-        fileLogger(
-          this.providerName,
-          `Response : ${city} - ${JSON.stringify(weather)}"`
-        );
+      return weather;
+    } catch (error: unknown) {
+      const allErrors = [...previousErrors, error];
 
-        return weather;
-      }
-
-      await this.tryNextProvider(city);
-
-      return null;
-    } catch {
-      return await this.tryNextProvider(city);
+      return await this.tryNextProvider(city, allErrors);
     }
   }
 
-  private async tryNextProvider(city: string): Promise<WeatherDto | null> {
-    return this.nextProvider ? await this.nextProvider.getWeather(city) : null;
+  private async tryNextProvider(
+    city: string,
+    allErrors: unknown[]
+  ): Promise<WeatherDto> {
+    if (this.nextProvider) {
+      return await this.nextProvider.getWeatherWithErrors(city, allErrors);
+    }
+
+    return await this.analyzeAllErrors(allErrors);
   }
 
-  private async fetchWeatherFromApi(city: string): Promise<WeatherDto | null> {
+  private analyzeAllErrors(allErrors: unknown[]): Promise<WeatherDto> {
+    const hasCityNotFoundError = allErrors.some((error) =>
+      this.weatherErrorHandler.isCityNotFoundError(error)
+    );
+
+    if (hasCityNotFoundError) {
+      return this.weatherErrorHandler.handleError(
+        new Error(WeatherErrors.CITY_NOT_FOUND),
+        this.getProviderName()
+      );
+    }
+
+    return this.weatherErrorHandler.handleError(
+      new Error(WeatherErrors.PROVIDERS_NOT_AVAILABLE),
+      this.getProviderName()
+    );
+  }
+
+  private async fetchWeatherFromApi(city: string): Promise<WeatherDto> {
     try {
       const { data } = await firstValueFrom(
         this.httpService.get<TResponse>(this.config.apiUrl, {
-          params: this.adapter.buildParams(city, this.config.apiKey),
+          params: this.buildParams(city, this.config.apiKey),
         })
       );
 
-      return this.adapter.parseResponse(data);
+      const response = this.parseResponse(data);
+
+      if (
+        response.description === undefined &&
+        response.humidity === undefined &&
+        response.temperature === undefined
+      ) {
+        return this.weatherErrorHandler.handleError(
+          new Error(WeatherErrors.API_ERROR),
+          this.getProviderName()
+        );
+      }
+
+      return response;
     } catch (error: unknown) {
-      return this.weatherErrorHandler.handleError(error, this.providerName);
+      return this.weatherErrorHandler.handleError(
+        error,
+        this.getProviderName()
+      );
     }
   }
 }

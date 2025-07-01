@@ -9,21 +9,43 @@ import { WeatherService } from "./weather.service.js";
 import { ConfigService } from "@nestjs/config";
 import { IWeatherProvider } from "./interfaces/interfaces.js";
 import { WeatherRepository } from "./weather.repository.js";
+import { FileLogger, WeatherErrorHandler } from "./helpers/helpers.js";
 
 @Module({
   controllers: [WeatherController],
   imports: [HttpModule],
   providers: [
     WeatherService,
+    WeatherErrorHandler,
+    {
+      provide: WEATHER_INJECTION_TOKENS.FILE_LOGGER,
+      useFactory: () => (context: string) => new FileLogger(context),
+    },
     ...WEATHER_PROVIDER_CONFIGS.map(({ token, url, key, providerClass }) => ({
       provide: token,
-      useFactory: (httpService: HttpService, configService: ConfigService) => {
+      useFactory: (
+        httpService: HttpService,
+        configService: ConfigService,
+        weatherErrorHandler: WeatherErrorHandler,
+        fileLogger: (context: string) => FileLogger
+      ) => {
         const apiUrl = configService.get(url) as string;
         const apiKey = configService.get(key) as string;
+        const logger = fileLogger(providerClass.name);
 
-        return new providerClass(httpService, { apiUrl, apiKey });
+        return new providerClass(
+          httpService,
+          { apiUrl, apiKey },
+          weatherErrorHandler,
+          logger
+        );
       },
-      inject: [HttpService, ConfigService],
+      inject: [
+        HttpService,
+        ConfigService,
+        WeatherErrorHandler,
+        WEATHER_INJECTION_TOKENS.FILE_LOGGER,
+      ],
     })),
     {
       provide: WEATHER_INJECTION_TOKENS.WEATHER_REPOSITORY,

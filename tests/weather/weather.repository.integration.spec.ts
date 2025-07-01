@@ -4,13 +4,21 @@ import { ConfigModule } from "@nestjs/config";
 import nock from "nock";
 import { WeatherMock } from "./mock-data/weather-service.mock.js";
 import { HttpModule, HttpService } from "@nestjs/axios";
-import { WEATHER_INJECTION_TOKENS } from "../../src/modules/weather/enums/enums.js";
+import {
+  WEATHER_INJECTION_TOKENS,
+  WeatherstackErrorCodes,
+} from "../../src/modules/weather/enums/enums.js";
 import {
   WeatherApiProvider,
   WeatherbitProvider,
   WeatherstackProvider,
 } from "../../src/modules/weather/providers/providers.js";
 import { type IWeatherProvider } from "../../src/modules/weather/interfaces/interfaces.js";
+import {
+  FileLogger,
+  WeatherErrorHandler,
+} from "../../src/modules/weather/helpers/helpers.js";
+import { HttpException } from "@nestjs/common";
 
 describe("WeatherRepository  Integration Tests", () => {
   let module: TestingModule;
@@ -28,35 +36,79 @@ describe("WeatherRepository  Integration Tests", () => {
         HttpModule,
       ],
       providers: [
+        WeatherErrorHandler,
+        {
+          provide: WEATHER_INJECTION_TOKENS.FILE_LOGGER,
+          useFactory: () => (context: string) => new FileLogger(context),
+        },
         {
           provide: WEATHER_INJECTION_TOKENS.WEATHER_API_PROVIDER,
-          useFactory: (httpService: HttpService) => {
-            return new WeatherApiProvider(httpService, {
-              apiUrl: "https://api.weatherapi/current",
-              apiKey: WeatherMock.request.weatherApiKey,
-            });
+          useFactory: (
+            httpService: HttpService,
+            weatherErrorHandler: WeatherErrorHandler,
+            fileLogger: (context: string) => FileLogger
+          ) => {
+            return new WeatherApiProvider(
+              httpService,
+              {
+                apiUrl: "https://api.weatherapi/current",
+                apiKey: WeatherMock.request.weatherApiKey,
+              },
+              weatherErrorHandler,
+              fileLogger(WeatherApiProvider.name)
+            );
           },
-          inject: [HttpService],
+          inject: [
+            HttpService,
+            WeatherErrorHandler,
+            WEATHER_INJECTION_TOKENS.FILE_LOGGER,
+          ],
         },
         {
           provide: WEATHER_INJECTION_TOKENS.WEATHERBIT_PROVIDER,
-          useFactory: (httpService: HttpService) => {
-            return new WeatherbitProvider(httpService, {
-              apiUrl: "https://api.weatherbit/current",
-              apiKey: WeatherMock.request.weatherbitKey,
-            });
+          useFactory: (
+            httpService: HttpService,
+            weatherErrorHandler: WeatherErrorHandler,
+            fileLogger: (context: string) => FileLogger
+          ) => {
+            return new WeatherbitProvider(
+              httpService,
+              {
+                apiUrl: "https://api.weatherbit/current",
+                apiKey: WeatherMock.request.weatherbitKey,
+              },
+              weatherErrorHandler,
+              fileLogger(WeatherbitProvider.name)
+            );
           },
-          inject: [HttpService],
+          inject: [
+            HttpService,
+            WeatherErrorHandler,
+            WEATHER_INJECTION_TOKENS.FILE_LOGGER,
+          ],
         },
         {
           provide: WEATHER_INJECTION_TOKENS.WEATHERSTACK_PROVIDER,
-          useFactory: (httpService: HttpService) => {
-            return new WeatherstackProvider(httpService, {
-              apiUrl: "https://api.weatherstack/current",
-              apiKey: WeatherMock.request.weatherstackKey,
-            });
+          useFactory: (
+            httpService: HttpService,
+            weatherErrorHandler: WeatherErrorHandler,
+            fileLogger: (context: string) => FileLogger
+          ) => {
+            return new WeatherstackProvider(
+              httpService,
+              {
+                apiUrl: "https://api.weatherstack/current",
+                apiKey: WeatherMock.request.weatherstackKey,
+              },
+              weatherErrorHandler,
+              fileLogger(WeatherstackProvider.name)
+            );
           },
-          inject: [HttpService],
+          inject: [
+            HttpService,
+            WeatherErrorHandler,
+            WEATHER_INJECTION_TOKENS.FILE_LOGGER,
+          ],
         },
         {
           provide: WEATHER_INJECTION_TOKENS.WEATHER_REPOSITORY,
@@ -168,7 +220,7 @@ describe("WeatherRepository  Integration Tests", () => {
       expect(result).toEqual(WeatherMock.response);
     });
 
-    it("should return null when all providers return 400 (city not found)", async () => {
+    it("should  throw HttpException when all providers return 400 (city not found)", async () => {
       weatherApiHandler
         .query({
           key: WeatherMock.request.weatherApiKey,
@@ -190,48 +242,46 @@ describe("WeatherRepository  Integration Tests", () => {
           access_key: WeatherMock.request.weatherstackKey,
           query: WeatherMock.request.wrongCity,
         })
-        .reply(200, { status: "failed", error: expect.any(String) });
+        .reply(200, {
+          success: false,
+          error: {
+            code: WeatherstackErrorCodes.CITY_NOT_FOUND,
+            info: expect.any(String),
+          },
+        });
 
-      const result = await repository.get(WeatherMock.request.wrongCity);
-      expect(result).toBeNull();
+      await expect(
+        repository.get(WeatherMock.request.wrongCity)
+      ).rejects.toThrow(HttpException);
     });
 
-    it("should throw HttpException if first server is not responding", async () => {
+    it("should throw HttpException if all servers are not responding", async () => {
       weatherApiHandler
         .query({
-          key: WeatherMock.request.weatherApiKey,
+          key: WeatherMock.request.wrongWeatherApiKey,
           q: WeatherMock.request.corectCity,
         })
         .reply(500, {
           error: { code: expect.any(Number), message: expect.any(String) },
         });
 
-      const result = await repository.get(WeatherMock.request.corectCity);
-      expect(result).toBeNull();
-    });
-
-    it("should throw HttpException if second server is not responding", async () => {
       weatherbitHandler
         .query({
-          key: WeatherMock.request.weatherbitKey,
+          key: WeatherMock.request.wrongWeatherApiKey,
           q: WeatherMock.request.corectCity,
         })
         .reply(500, { error: expect.any(String) });
 
-      const result = await repository.get(WeatherMock.request.corectCity);
-      expect(result).toBeNull();
-    });
-
-    it("should throw HttpException if third server is not responding", async () => {
       weatherstackHandler
         .query({
-          access_key: WeatherMock.request.weatherstackKey,
+          access_key: WeatherMock.request.wrongWeatherstackKey,
           query: WeatherMock.request.wrongCity,
         })
-        .reply(200, { success: false, error: expect.any(String) });
+        .reply(200, { success: false, error: expect.any(Object) });
 
-      const result = await repository.get(WeatherMock.request.corectCity);
-      expect(result).toBeNull();
+      await expect(
+        repository.get(WeatherMock.request.corectCity)
+      ).rejects.toThrow(HttpException);
     });
   });
 });

@@ -8,10 +8,10 @@ import { Injectable } from "@nestjs/common";
 
 @Injectable()
 class WeatherRepository implements IWeatherRepository {
-  constructor(private readonly firstProvider: IWeatherProvider) {}
+  constructor(private readonly provider: IWeatherProvider) {}
 
-  async get(city: string): Promise<WeatherDto | null> {
-    return await this.firstProvider.getWeather(city);
+  async get(city: string): Promise<WeatherDto> {
+    return await this.provider.getWeather(city);
   }
 }
 
