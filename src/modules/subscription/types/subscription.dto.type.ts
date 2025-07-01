@@ -1,6 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsOptional, IsString } from "class-validator";
-
+import { IsBoolean, IsNotEmpty, IsOptional, IsString } from "class-validator";
 import { Frequency } from "../enums/enums.js";
 
 class SubscriptionDto {
@@ -22,7 +21,7 @@ class SubscriptionDto {
   })
   public frequency!: Frequency;
 
-  @IsString()
+  @IsBoolean()
   @IsOptional()
   @ApiProperty({
     type: "boolean",
