@@ -6,6 +6,7 @@ import { SubscriptionConfig } from "./types/subscription-config.type.js";
 import { MailerService } from "@nestjs-modules/mailer";
 
 import { SubscriptionEmailErrorHandler } from "./helpers/helpers.js";
+import { SUBSCRIPTION_EMAIL_STATUS } from "./enums/enums.js";
 
 @Injectable()
 class SubscriptionEmailService {
@@ -77,7 +78,9 @@ class SubscriptionEmailService {
   }
 
   private handleEmailFailures(results: PromiseSettledResult<void>[]) {
-    const failures = results.filter((result) => result.status === "rejected");
+    const failures = results.filter(
+      (result) => result.status === SUBSCRIPTION_EMAIL_STATUS.REJECTED
+    );
 
     if (failures.length) {
       const firstError = failures[0].reason as Error;
