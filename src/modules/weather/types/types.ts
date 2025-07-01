@@ -9,3 +9,4 @@ export { WeatherQueryDto } from "./weather-query-dto.type.js";
 export { type WeatherError } from "./weather-error.type.js";
 export { type WeatherConfig } from "./weather-config.type.js";
 export { type WeatherProviderConfig } from "./weather-provider-configs.type.js";
+export { type WeatherLog } from "./weather-log.type.js";
