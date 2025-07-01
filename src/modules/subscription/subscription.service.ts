@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Inject,
   Injectable,
@@ -80,9 +81,15 @@ class SubscriptionService {
   private async findToken({
     token,
   }: SubscribeFilterDto): Promise<SubscriptionEntity> {
-    const existingSubscribe = await this.subscriptionRepository.find({
-      token,
-    });
+    let existingSubscribe: SubscriptionEntity | null = null;
+
+    try {
+      existingSubscribe = await this.subscriptionRepository.find({
+        token,
+      });
+    } catch {
+      throw new BadRequestException("Invalid token");
+    }
 
     if (!existingSubscribe) {
       throw new NotFoundException("Token not found.");
