@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { Cache } from "cache-manager";
 import { WeatherService } from "../weather/weather.service.js";
 import { SubscriptionEntity } from "./entities/entities.js";
@@ -11,22 +11,32 @@ import { WeatherDto } from "../weather/types/types.js";
 
 @Injectable()
 class SubscriptionEmailService {
+  private readonly logger: Logger;
+
   public constructor(
     private readonly mailerService: MailerService,
     private readonly config: SubscriptionConfig,
     private readonly weatherService: WeatherService,
     private readonly cacheManager: Cache
-  ) {}
+  ) {
+    this.logger = new Logger(SubscriptionEmailService.name);
+  }
 
   async sendWeatherEmail(
     city: string,
     subscriptions: SubscriptionEntity[]
   ): Promise<void> {
-    let weather = await this.getCachedWeather(city);
+    const cachedWeather = await this.getCachedWeather(city);
+    const weather = cachedWeather ?? (await this.weatherService.get(city));
 
-    if (!weather) {
-      weather = await this.weatherService.get(city);
-      await this.casheWeather(city, weather);
+    this.logger.log(
+      cachedWeather
+        ? `Weather loaded from cache for ${city}`
+        : `Weather fetched from API for ${city}`
+    );
+
+    if (!cachedWeather) {
+      await this.cacheWeather(city, weather);
     }
 
     const currentDate = new Date();
@@ -96,7 +106,7 @@ class SubscriptionEmailService {
     }
   }
 
-  private async casheWeather(city: string, weather: WeatherDto) {
+  private async cacheWeather(city: string, weather: WeatherDto) {
     await this.cacheManager.set(city, weather, this.config.cacheTTL);
   }
 
