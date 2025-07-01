@@ -1,5 +1,4 @@
 import { Module } from "@nestjs/common";
-import { HttpModule } from "@nestjs/axios";
 import { getRepositoryToken, TypeOrmModule } from "@nestjs/typeorm";
 import { SubscriptionEntity } from "./entities/entities.js";
 import { SubscriptionController } from "./subscription.controller.js";
@@ -16,11 +15,7 @@ import { ConfigKeys } from "../../libs/enums/enums.js";
 
 @Module({
   controllers: [SubscriptionController],
-  imports: [
-    HttpModule,
-    TypeOrmModule.forFeature([SubscriptionEntity]),
-    WeatherModule,
-  ],
+  imports: [TypeOrmModule.forFeature([SubscriptionEntity]), WeatherModule],
   providers: [
     SubscriptionService,
     {
