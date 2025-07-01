@@ -1,6 +1,9 @@
 import { type HttpService } from "@nestjs/axios";
-
 import { type IWeatherProvider } from "../interfaces/interfaces.js";
+import {
+  type FileLogger,
+  type WeatherErrorHandler,
+} from "../helpers/helpers.js";
 
 type WeatherProviderConfig = {
   token: string;
@@ -8,7 +11,9 @@ type WeatherProviderConfig = {
   key: string;
   providerClass: new (
     httpService: HttpService,
-    config: { apiUrl: string; apiKey: string }
+    config: { apiUrl: string; apiKey: string },
+    weatherErrorHandler: WeatherErrorHandler,
+    logger: FileLogger
   ) => IWeatherProvider;
 };
 

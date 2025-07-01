@@ -6,6 +6,7 @@ type WeatherstackResponseDto = {
   };
   success?: boolean;
   error?: {
+    code: number;
     info: string;
   };
 };
