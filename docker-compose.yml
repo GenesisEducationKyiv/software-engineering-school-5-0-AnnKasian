@@ -11,6 +11,8 @@ services:
       - "${PORT}:7081"
     depends_on:
       - db
+    volumes:
+      - ./logs:/app/logs
     networks:
       - app-network
 
