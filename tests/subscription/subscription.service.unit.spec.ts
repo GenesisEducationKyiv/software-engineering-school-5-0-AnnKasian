@@ -5,14 +5,15 @@ import {
   Frequency,
 } from "../../src/modules/subscription/enums/enums.js";
 import { SubscriptionMock } from "./mock-data/mock-data.js";
-import {
-  BadRequestException,
-  ConflictException,
-  NotFoundException,
-} from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { SubscriptionEmailService } from "../../src/modules/subscription/subscription-email.service.js";
 import { WeatherService } from "../../src/modules/weather/weather.service.js";
+import {
+  EmailAlreadyExistsException,
+  InvalidTokenException,
+  SubscriptionAlreadyConfirmedException,
+  TokenNotFoundException,
+} from "../../src/modules/subscription/exceptions/exceptions.js";
 
 describe("SubscriptionService", () => {
   let subscriptionService: SubscriptionService;
@@ -111,7 +112,7 @@ describe("SubscriptionService", () => {
         subscriptionService.subscribe(
           SubscriptionMock.request.emailExistAndConfirmed
         )
-      ).rejects.toThrow(ConflictException);
+      ).rejects.toThrow(EmailAlreadyExistsException);
     });
   });
 
@@ -137,7 +138,7 @@ describe("SubscriptionService", () => {
         subscriptionService.confirm(
           SubscriptionMock.responsefromRepository.emailNotExist.token
         )
-      ).rejects.toThrow(NotFoundException);
+      ).rejects.toThrow(TokenNotFoundException);
     });
 
     test("should throw ConflictException if email is already confirmed", async () => {
@@ -149,7 +150,7 @@ describe("SubscriptionService", () => {
         subscriptionService.confirm(
           SubscriptionMock.responsefromRepository.emailExistAndConfirmed.token
         )
-      ).rejects.toThrow(ConflictException);
+      ).rejects.toThrow(SubscriptionAlreadyConfirmedException);
     });
 
     test("should throw BadRequestException if token is invalid", async () => {
@@ -157,7 +158,7 @@ describe("SubscriptionService", () => {
 
       await expect(
         subscriptionService.confirm(SubscriptionMock.request.invalidToken)
-      ).rejects.toThrow(BadRequestException);
+      ).rejects.toThrow(InvalidTokenException);
     });
   });
 
@@ -183,7 +184,7 @@ describe("SubscriptionService", () => {
         subscriptionService.unsubscribe(
           SubscriptionMock.responsefromRepository.emailNotExist.token
         )
-      ).rejects.toThrow(NotFoundException);
+      ).rejects.toThrow(TokenNotFoundException);
     });
 
     test("should throw BadRequestException if token is invalid", async () => {
@@ -191,7 +192,7 @@ describe("SubscriptionService", () => {
 
       await expect(
         subscriptionService.unsubscribe(SubscriptionMock.request.invalidToken)
-      ).rejects.toThrow(BadRequestException);
+      ).rejects.toThrow(InvalidTokenException);
     });
   });
 

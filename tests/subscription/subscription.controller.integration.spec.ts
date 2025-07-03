@@ -2,15 +2,15 @@ import request from "supertest";
 import { SubscriptionIntegrationMock } from "./mock-data/subscription.integration.mock.js";
 import { Test } from "@nestjs/testing";
 import { SubscriptionService } from "../../src/modules/subscription/subscription.js";
-import {
-  BadRequestException,
-  ConflictException,
-  NotFoundException,
-  ValidationPipe,
-  type INestApplication,
-} from "@nestjs/common";
+import { ValidationPipe, type INestApplication } from "@nestjs/common";
 import { SubscriptionController } from "../../src/modules/subscription/subscription.controller.js";
 import { type App } from "supertest/types.js";
+import {
+  EmailAlreadyExistsException,
+  InvalidTokenException,
+  SubscriptionAlreadyConfirmedException,
+  TokenNotFoundException,
+} from "../../src/modules/subscription/exceptions/exceptions.js";
 
 const mockSubscriptionService = {
   subscribe: jest.fn(),
@@ -74,7 +74,7 @@ describe("SubscriptionController Integration Tests", () => {
 
     it("should return a message that email already confirmed", async () => {
       mockSubscriptionService.subscribe.mockRejectedValue(
-        new ConflictException("Email already subscribed.")
+        new EmailAlreadyExistsException()
       );
 
       const response = await request(app.getHttpServer())
@@ -128,7 +128,7 @@ describe("SubscriptionController Integration Tests", () => {
 
     it("should return a message that subscription already confirmed", async () => {
       mockSubscriptionService.confirm.mockRejectedValue(
-        new ConflictException("Email already confirmed.")
+        new SubscriptionAlreadyConfirmedException()
       );
       const response = await request(app.getHttpServer())
         .get(
@@ -149,7 +149,7 @@ describe("SubscriptionController Integration Tests", () => {
 
     it("should return a message that token not found", async () => {
       mockSubscriptionService.confirm.mockRejectedValue(
-        new NotFoundException("Token not found")
+        new TokenNotFoundException()
       );
       const response = await request(app.getHttpServer())
         .get(
@@ -170,7 +170,7 @@ describe("SubscriptionController Integration Tests", () => {
 
     it("should return a message that token is invalid", async () => {
       mockSubscriptionService.confirm.mockRejectedValue(
-        new BadRequestException("Invalid token")
+        new InvalidTokenException()
       );
 
       const response = await request(app.getHttpServer())
@@ -208,7 +208,7 @@ describe("SubscriptionController Integration Tests", () => {
 
     it("should return a message that token not found", async () => {
       mockSubscriptionService.unsubscribe.mockRejectedValue(
-        new NotFoundException("Token not found")
+        new TokenNotFoundException()
       );
 
       const response = await request(app.getHttpServer())
@@ -230,7 +230,7 @@ describe("SubscriptionController Integration Tests", () => {
 
     it("should return a message that token is invalid", async () => {
       mockSubscriptionService.unsubscribe.mockRejectedValue(
-        new BadRequestException("Invalid token")
+        new InvalidTokenException()
       );
 
       const response = await request(app.getHttpServer())

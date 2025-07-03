@@ -3,12 +3,12 @@ import { Test, type TestingModule } from "@nestjs/testing";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { type Cache } from "cache-manager";
 import { SubscriptionEmailService } from "../../src/modules/subscription/subscription-email.service.js";
+import { EmailSendFailException } from "../../src/modules/subscription/exceptions/exceptions.js";
 import ms from "smtp-tester";
 import { WeatherService } from "../../src/modules/weather/weather.js";
 import { WeatherMock } from "../weather/mock-data/mock-data.js";
 import { MailerModule, MailerService } from "@nestjs-modules/mailer";
 import { HandlebarsAdapter } from "@nestjs-modules/mailer/dist/adapters/handlebars.adapter.js";
-import { HttpException } from "@nestjs/common";
 import { CACHE_MANAGER, CacheModule } from "@nestjs/cache-manager";
 import { TestRedisConfig } from "../test-redis.config.js";
 
@@ -119,7 +119,7 @@ describe("SubscriptionEmailService Integration Tests", () => {
           SubscriptionIntegrationMock.newData.invalidSubscriptionToConfirm.city,
           [SubscriptionIntegrationMock.newData.invalidSubscriptionToConfirm]
         )
-      ).rejects.toThrow(HttpException);
+      ).rejects.toThrow(EmailSendFailException);
     });
   });
 
@@ -144,7 +144,7 @@ describe("SubscriptionEmailService Integration Tests", () => {
         service.sendConfirmationEmail(
           SubscriptionIntegrationMock.newData.invalidSubscriptionToConfirm
         )
-      ).rejects.toThrow(HttpException);
+      ).rejects.toThrow(EmailSendFailException);
     });
   });
 });
