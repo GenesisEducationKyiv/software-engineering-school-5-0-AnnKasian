@@ -1,18 +1,18 @@
-import request from "supertest";
 import { MailerModule } from "@nestjs-modules/mailer";
-import { WeatherModule } from "../../src/modules/weather/weather.module";
-import { Test, type TestingModule } from "@nestjs/testing";
-import { SubscriptionModule } from "../../src/modules/subscription/subscription.module";
-import { ValidationPipe, type INestApplication } from "@nestjs/common";
-import { ConfigModule, ConfigService } from "@nestjs/config";
-import { DataSource, type Repository } from "typeorm";
-import { SubscriptionEntity } from "../../src/modules/subscription/subscription.js";
-import { TypeOrmModule } from "@nestjs/typeorm";
-import { testDatabaseConfig } from "../text-database.config.js";
-import { SubscriptionE2eMock } from "./mock-data/mock-data.js";
-import { type App } from "supertest/types";
 import { HandlebarsAdapter } from "@nestjs-modules/mailer/dist/adapters/handlebars.adapter";
 import ms from "smtp-tester";
+import request from "supertest";
+import { type App } from "supertest/types";
+import { DataSource, type Repository } from "typeorm";
+import { type INestApplication,ValidationPipe } from "@nestjs/common";
+import { ConfigModule, ConfigService } from "@nestjs/config";
+import { Test, type TestingModule } from "@nestjs/testing";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { SubscriptionEntity } from "../../src/modules/subscription/subscription.js";
+import { SubscriptionModule } from "../../src/modules/subscription/subscription.module";
+import { WeatherModule } from "../../src/modules/weather/weather.module";
+import { testDatabaseConfig } from "../text-database.config.js";
+import { SubscriptionE2eMock } from "./mock-data/mock-data.js";
 
 describe("Subscription", () => {
   let app: INestApplication<App>;

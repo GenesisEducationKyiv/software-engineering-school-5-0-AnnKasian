@@ -1,16 +1,16 @@
 import request from "supertest";
-import { SubscriptionIntegrationMock } from "./mock-data/subscription.integration.mock.js";
-import { Test } from "@nestjs/testing";
-import { SubscriptionService } from "../../src/modules/subscription/subscription.js";
+import { type App } from "supertest/types.js";
 import {
   BadRequestException,
   ConflictException,
+  type INestApplication,
   NotFoundException,
   ValidationPipe,
-  type INestApplication,
 } from "@nestjs/common";
+import { Test } from "@nestjs/testing";
 import { SubscriptionController } from "../../src/modules/subscription/subscription.controller.js";
-import { type App } from "supertest/types.js";
+import { SubscriptionService } from "../../src/modules/subscription/subscription.js";
+import { SubscriptionIntegrationMock } from "./mock-data/subscription.integration.mock.js";
 
 const mockSubscriptionService = {
   subscribe: jest.fn(),

@@ -1,15 +1,14 @@
-import { Module } from "@nestjs/common";
+import path from "path";
 import { MailerModule } from "@nestjs-modules/mailer";
-import { ConfigModule, ConfigService } from "@nestjs/config";
-import { TypeOrmModule } from "@nestjs/typeorm";
-
-import { databaseConfig } from "../database.config.js";
-import { SubscriptionModule } from "./modules/subscription/subscription.module.js";
 import { HandlebarsAdapter } from "@nestjs-modules/mailer/dist/adapters/handlebars.adapter.js";
+import { Module } from "@nestjs/common";
+import { ConfigModule, ConfigService } from "@nestjs/config";
 import { ScheduleModule } from "@nestjs/schedule";
 import { ServeStaticModule } from "@nestjs/serve-static";
-import path from "path";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { databaseConfig } from "../database.config.js";
 import { ConfigKeys } from "./libs/enums/config.enum.js";
+import { SubscriptionModule } from "./modules/subscription/subscription.module.js";
 
 @Module({
   imports: [

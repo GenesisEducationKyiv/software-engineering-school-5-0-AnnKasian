@@ -1,11 +1,10 @@
+import { Repository } from "typeorm";
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-
 import { SubscriptionEntity } from "./entities/entities.js";
-import { SubscriptionDto, SubscribeFilterDto } from "./types/types.js";
 import { Frequency } from "./enums/enums.js";
 import { ISubscriptionRepository } from "./interfaces/interfaces.js";
+import { SubscribeFilterDto,SubscriptionDto } from "./types/types.js";
 
 @Injectable()
 class SubscriptionRepository implements ISubscriptionRepository {

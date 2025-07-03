@@ -1,12 +1,11 @@
-import { Module } from "@nestjs/common";
 import { HttpModule, HttpService } from "@nestjs/axios";
-
+import { Module } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { ConfigKeys } from "../../libs/enums/enums.js";
+import { WEATHER_INJECTION_TOKENS } from "./enums/weather-injection-tokens.enum.js";
 import { WeatherController } from "./weather.controller.js";
 import { WeatherRepository } from "./weather.repository.js";
 import { WeatherService } from "./weather.service.js";
-import { WEATHER_INJECTION_TOKENS } from "./enums/weather-injection-tokens.enum.js";
-import { ConfigService } from "@nestjs/config";
-import { ConfigKeys } from "../../libs/enums/enums.js";
 
 @Module({
   controllers: [WeatherController],
