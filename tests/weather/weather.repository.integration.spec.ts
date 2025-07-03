@@ -1,11 +1,11 @@
-import { WeatherRepository } from "../../src/modules/weather/weather.repository.js";
-import { Test, type TestingModule } from "@nestjs/testing";
-import { ConfigModule } from "@nestjs/config";
 import nock from "nock";
-import { WeatherMock } from "./mock-data/weather-service.mock.js";
 import { HttpModule, HttpService } from "@nestjs/axios";
 import { HttpException } from "@nestjs/common";
+import { ConfigModule } from "@nestjs/config";
+import { Test, type TestingModule } from "@nestjs/testing";
 import { WEATHER_INJECTION_TOKENS } from "../../src/modules/weather/enums/enums.js";
+import { WeatherRepository } from "../../src/modules/weather/weather.repository.js";
+import { WeatherMock } from "./mock-data/weather-service.mock.js";
 
 describe("WeatherRepository  Integration Tests", () => {
   let module: TestingModule;

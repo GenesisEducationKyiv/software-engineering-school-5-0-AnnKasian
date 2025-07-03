@@ -1,12 +1,11 @@
+import { MailerService } from "@nestjs-modules/mailer";
 import { Injectable } from "@nestjs/common";
 import { WeatherService } from "../weather/weather.service.js";
-import { SubscriptionEntity } from "./entities/entities.js";
 import { EmailSubject, EmailTemplate } from "./email-data/email-data.js";
-import { SubscriptionConfig } from "./types/subscription-config.type.js";
-import { MailerService } from "@nestjs-modules/mailer";
-
-import { SubscriptionEmailErrorHandler } from "./helpers/helpers.js";
+import { SubscriptionEntity } from "./entities/entities.js";
 import { SUBSCRIPTION_EMAIL_STATUS } from "./enums/enums.js";
+import { SubscriptionEmailErrorHandler } from "./helpers/helpers.js";
+import { SubscriptionConfig } from "./types/types.js";
 
 @Injectable()
 class SubscriptionEmailService {

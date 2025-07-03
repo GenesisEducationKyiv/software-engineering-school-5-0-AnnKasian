@@ -1,5 +1,5 @@
-import { ApiProperty } from "@nestjs/swagger";
 import { IsInt, IsOptional, IsString } from "class-validator";
+import { ApiProperty } from "@nestjs/swagger";
 
 class WeatherDto {
   @IsInt()
