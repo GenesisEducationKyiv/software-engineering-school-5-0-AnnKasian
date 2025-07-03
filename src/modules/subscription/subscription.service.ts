@@ -1,10 +1,4 @@
-import {
-  BadRequestException,
-  ConflictException,
-  Inject,
-  Injectable,
-  NotFoundException,
-} from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import {
   SubscribeFilterDto,
   SubscribeResponseDto,
@@ -15,6 +9,12 @@ import { SubscriptionEmailService } from "./subscription-email.service.js";
 import { Frequency, SUBSCRIPTION_INJECTION_TOKENS } from "./enums/enums.js";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { ISubscriptionRepository } from "./interfaces/interfaces.js";
+import {
+  EmailAlreadyExistsException,
+  InvalidTokenException,
+  SubscriptionAlreadyConfirmedException,
+  TokenNotFoundException,
+} from "./exceptions/exceptions.js";
 
 @Injectable()
 class SubscriptionService {
@@ -47,7 +47,7 @@ class SubscriptionService {
 
     if (existingSubscribe) {
       if (existingSubscribe.confirmed === true) {
-        throw new ConflictException("Email already subscribed.");
+        throw new EmailAlreadyExistsException();
       }
 
       await this.subscriptionEmailService.sendConfirmationEmail(
@@ -67,7 +67,7 @@ class SubscriptionService {
     const subscription = await this.findToken({ token });
 
     if (subscription.confirmed === true) {
-      throw new ConflictException("Email already confirmed.");
+      throw new SubscriptionAlreadyConfirmedException();
     }
 
     await this.subscriptionRepository.confirm(subscription);
@@ -88,11 +88,11 @@ class SubscriptionService {
         token,
       });
     } catch {
-      throw new BadRequestException("Invalid token");
+      throw new InvalidTokenException();
     }
 
     if (!existingSubscribe) {
-      throw new NotFoundException("Token not found.");
+      throw new TokenNotFoundException();
     }
 
     return existingSubscribe;

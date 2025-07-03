@@ -3,13 +3,13 @@ import { ConfigService } from "@nestjs/config";
 import { NestFactory } from "@nestjs/core";
 import { type NestExpressApplication } from "@nestjs/platform-express";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
-import { ConfigKeys } from "./libs/enums/enums.js";
+import { CONFIG_KEYS } from "./libs/enums/enums.js";
 import { AppModule } from "./app.module.js";
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const configService = app.get(ConfigService);
-  const port = configService.get<number>(ConfigKeys.PORT);
+  const port = configService.get<number>(CONFIG_KEYS.PORT);
 
   if (!port) {
     throw new Error("PORT is not defined in the environment variables");

@@ -1,4 +1,4 @@
-const ConfigKeys = {
+const CONFIG_KEYS = {
   PORT: "PORT",
   BASE_URL: "BASE_URL",
   SERVE_ROOT: "SERVE_ROOT",
@@ -27,4 +27,4 @@ const ConfigKeys = {
   CACHE_TTL: "CACHE_TTL",
 } as const;
 
-export { ConfigKeys };
+export { CONFIG_KEYS };

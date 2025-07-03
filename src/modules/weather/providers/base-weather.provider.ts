@@ -4,7 +4,7 @@ import { firstValueFrom } from "rxjs";
 import { IWeatherProvider } from "../interfaces/interfaces.js";
 import { WeatherConfig, WeatherDto } from "../types/types.js";
 import { WeatherErrorHandler, FileLogger } from "../helpers/helpers.js";
-import { WeatherErrors } from "../enums/enums.js";
+import { WEATHER_ERROR_MESSAGES } from "../enums/enums.js";
 
 @Injectable()
 abstract class BaseWeatherProvider<TResponse> implements IWeatherProvider {
@@ -67,13 +67,13 @@ abstract class BaseWeatherProvider<TResponse> implements IWeatherProvider {
 
     if (hasCityNotFoundError) {
       return this.weatherErrorHandler.handleError(
-        new Error(WeatherErrors.CITY_NOT_FOUND),
+        new Error(WEATHER_ERROR_MESSAGES.CITY_NOT_FOUND),
         this.getProviderName()
       );
     }
 
     return this.weatherErrorHandler.handleError(
-      new Error(WeatherErrors.PROVIDERS_NOT_AVAILABLE),
+      new Error(WEATHER_ERROR_MESSAGES.PROVIDERS_NOT_AVAILABLE),
       this.getProviderName()
     );
   }
@@ -94,7 +94,7 @@ abstract class BaseWeatherProvider<TResponse> implements IWeatherProvider {
         response.temperature === undefined
       ) {
         return this.weatherErrorHandler.handleError(
-          new Error(WeatherErrors.API_ERROR),
+          new Error(WEATHER_ERROR_MESSAGES.API_ERROR),
           this.getProviderName()
         );
       }

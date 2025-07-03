@@ -3,8 +3,8 @@ import { BaseWeatherProvider } from "./base-weather.provider.js";
 import { WeatherstackResponseDto, WeatherDto } from "../types/types.js";
 import {
   WEATHER_PROVIDERS,
-  WeatherErrors,
-  WeatherstackErrorCodes,
+  WEATHER_ERROR_MESSAGES,
+  WEATHER_PROVIDERS_ERROR_CODES,
 } from "../enums/enums.js";
 
 @Injectable()
@@ -22,8 +22,11 @@ class WeatherstackProvider extends BaseWeatherProvider<WeatherstackResponseDto> 
 
   parseResponse(data: WeatherstackResponseDto): WeatherDto {
     if (data.success === false) {
-      if (data.error?.code === WeatherstackErrorCodes.CITY_NOT_FOUND) {
-        throw new Error(WeatherErrors.CITY_NOT_FOUND);
+      if (
+        data.error?.code ===
+        WEATHER_PROVIDERS_ERROR_CODES.WEATHERSTACK_CITY_NOT_FOUND
+      ) {
+        throw new Error(WEATHER_ERROR_MESSAGES.CITY_NOT_FOUND);
       }
 
       throw new Error(data.error?.info);

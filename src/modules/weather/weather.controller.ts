@@ -9,6 +9,7 @@ import {
   SwaggerQuery,
   SwaggerResponse,
 } from "./swagger-docs/swagger-docs.js";
+import { httpErrorHandler } from "../../libs/helpers/helpers.js";
 
 @ApiTags("weather")
 @Controller("weather")
@@ -21,8 +22,12 @@ class WeatherController {
   @ApiResponse(SwaggerResponse.SUCCESSFUL)
   @ApiResponse(SwaggerResponse.FAILED)
   @ApiResponse(SwaggerResponse.NOT_FOUND)
-  public getOne(@Query() payload: WeatherQueryDto): Promise<WeatherDto> {
-    return this.weatherService.get(payload.city);
+  public async getOne(@Query() payload: WeatherQueryDto): Promise<WeatherDto> {
+    try {
+      return await this.weatherService.get(payload.city);
+    } catch (error: unknown) {
+      return httpErrorHandler(error);
+    }
   }
 }
 

@@ -5,9 +5,10 @@ import { SubscriptionEntity } from "./entities/entities.js";
 import { EmailSubject, EmailTemplate } from "./email-data/email-data.js";
 import { SubscriptionConfig } from "./types/types.js";
 import { MailerService } from "@nestjs-modules/mailer";
-import { SubscriptionEmailErrorHandler } from "./helpers/helpers.js";
+import { EmailSendFailException } from "./exceptions/exceptions.js";
 import { SUBSCRIPTION_EMAIL_STATUS } from "./enums/enums.js";
 import { WeatherDto } from "../weather/types/types.js";
+import { ERROR_MESSAGES } from "../../libs/enums/enums.js";
 
 @Injectable()
 class SubscriptionEmailService {
@@ -76,7 +77,11 @@ class SubscriptionEmailService {
         },
       });
     } catch (error: unknown) {
-      SubscriptionEmailErrorHandler(error);
+      if (error instanceof Error) {
+        throw new EmailSendFailException(error.message);
+      }
+
+      throw new EmailSendFailException(ERROR_MESSAGES.UNKNOWN_ERROR);
     }
   }
 
@@ -102,7 +107,7 @@ class SubscriptionEmailService {
     if (failures.length) {
       const firstError = failures[0].reason as Error;
 
-      SubscriptionEmailErrorHandler(firstError);
+      throw new EmailSendFailException(firstError.message);
     }
   }
 

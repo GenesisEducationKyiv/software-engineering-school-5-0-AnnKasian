@@ -1,9 +1,18 @@
-import { HttpException, Injectable } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { type AxiosError, isAxiosError } from "axios";
 import { type WeatherError } from "../types/types.js";
-import { ErrorMessage, ErrorStatusCode } from "../../../libs/enums/enums.js";
+import { ERROR_MESSAGES } from "../../../libs/enums/enums.js";
 import { FileLogger } from "./file-logger.helper.js";
-import { WeatherErrors } from "../enums/enums.js";
+import {
+  CityNotFoundException,
+  InvalidRequestException,
+  NotAvailableException,
+  UnknownErrorException,
+} from "../exceptions/exceptions.js";
+import {
+  WEATHER_ERROR_MESSAGES,
+  WEATHER_PROVIDERS_ERROR_CODES,
+} from "../enums/enums.js";
 
 @Injectable()
 class WeatherErrorHandler {
@@ -13,10 +22,7 @@ class WeatherErrorHandler {
     if (!(error instanceof Error)) {
       logger.unknownError(error);
 
-      throw new HttpException(
-        ErrorMessage.UNKNOWN_ERROR,
-        ErrorStatusCode.INTERNAL_SERVER_ERROR
-      );
+      throw new UnknownErrorException();
     }
 
     if (isAxiosError(error)) {
@@ -26,34 +32,31 @@ class WeatherErrorHandler {
       );
     }
 
-    if (error.message === WeatherErrors.CITY_NOT_FOUND) {
+    if (error.message === WEATHER_ERROR_MESSAGES.CITY_NOT_FOUND) {
       logger.invalidCity(error.message);
 
-      throw new HttpException(
-        WeatherErrors.CITY_NOT_FOUND,
-        ErrorStatusCode.BAD_REQUEST
-      );
+      throw new CityNotFoundException();
     }
 
-    if (error.message === WeatherErrors.PROVIDERS_NOT_AVAILABLE) {
+    if (error.message === WEATHER_ERROR_MESSAGES.PROVIDERS_NOT_AVAILABLE) {
       logger.allProvidersFailed(error.message);
 
-      throw new HttpException(
-        WeatherErrors.PROVIDERS_NOT_AVAILABLE,
-        ErrorStatusCode.INTERNAL_SERVER_ERROR
-      );
+      throw new NotAvailableException();
     }
 
-    throw new HttpException(error.message, ErrorStatusCode.BAD_REQUEST);
+    throw new InvalidRequestException(error.message);
   }
 
   public isCityNotFoundError(error: unknown): boolean {
     if (isAxiosError(error)) {
-      return error.response?.status === ErrorStatusCode.BAD_REQUEST;
+      return (
+        error.response?.status === WEATHER_PROVIDERS_ERROR_CODES.BAD_REQUEST
+      );
     }
 
     return (
-      error instanceof Error && error.message === WeatherErrors.CITY_NOT_FOUND
+      error instanceof Error &&
+      error.message === WEATHER_ERROR_MESSAGES.CITY_NOT_FOUND
     );
   }
 
@@ -63,25 +66,28 @@ class WeatherErrorHandler {
   ): never {
     const logger = new FileLogger(providerName);
 
-    if (axiosError.response?.status === ErrorStatusCode.BAD_REQUEST) {
+    if (
+      axiosError.response?.status === WEATHER_PROVIDERS_ERROR_CODES.BAD_REQUEST
+    ) {
       logger.invalidCity(
         this.extractErrorMessage(axiosError.response.data.error)
       );
 
-      throw new HttpException(axiosError.message, ErrorStatusCode.BAD_REQUEST);
+      throw new InvalidRequestException(axiosError.message);
     }
 
     const errorMessage =
       this.extractErrorMessage(axiosError.response?.data?.error) ??
       axiosError.message ??
-      ErrorMessage.UNKNOWN_ERROR;
+      ERROR_MESSAGES.UNKNOWN_ERROR;
 
     const statusCode =
-      axiosError.response?.status ?? ErrorStatusCode.INTERNAL_SERVER_ERROR;
+      axiosError.response?.status ??
+      WEATHER_PROVIDERS_ERROR_CODES.INTERNAL_SERVER_ERROR;
 
     logger.apiError(statusCode, errorMessage);
 
-    throw new HttpException(errorMessage, statusCode);
+    throw new UnknownErrorException(errorMessage, statusCode);
   }
 
   private extractErrorMessage(
@@ -95,7 +101,7 @@ class WeatherErrorHandler {
       return error.message;
     }
 
-    return ErrorMessage.UNKNOWN_ERROR;
+    return ERROR_MESSAGES.UNKNOWN_ERROR;
   }
 }
 
