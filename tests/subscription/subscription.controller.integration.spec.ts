@@ -55,20 +55,20 @@ describe("SubscriptionController Integration Tests", () => {
   describe("create", () => {
     it("should create and save subscription", async () => {
       mockSubscriptionService.subscribe.mockResolvedValue({
-        token: SubscriptionIntegrationMock.newData.subscriptionToConfirm.token,
+        token: SubscriptionIntegrationMock.newData.newSubscription.token,
       });
 
       const response = await request(app.getHttpServer())
         .post("/subscribe")
-        .send(SubscriptionIntegrationMock.newData.newSubscription)
+        .send(SubscriptionIntegrationMock.newData.newDtoSubscription)
         .expect(201);
 
       expect(mockSubscriptionService.subscribe).toHaveBeenCalledWith(
-        SubscriptionIntegrationMock.newData.newSubscription
+        SubscriptionIntegrationMock.newData.newDtoSubscription
       );
 
       expect(response.body).toEqual({
-        token: SubscriptionIntegrationMock.newData.subscriptionToConfirm.token,
+        token: SubscriptionIntegrationMock.newData.newSubscription.token,
       });
     });
 
@@ -79,11 +79,11 @@ describe("SubscriptionController Integration Tests", () => {
 
       const response = await request(app.getHttpServer())
         .post("/subscribe")
-        .send(SubscriptionIntegrationMock.newData.newSubscription)
+        .send(SubscriptionIntegrationMock.newData.newDtoSubscription)
         .expect(409);
 
       expect(mockSubscriptionService.subscribe).toHaveBeenCalledWith(
-        SubscriptionIntegrationMock.newData.newSubscription
+        SubscriptionIntegrationMock.newData.newDtoSubscription
       );
 
       expect(response.body).toMatchObject({
@@ -112,13 +112,13 @@ describe("SubscriptionController Integration Tests", () => {
       mockSubscriptionService.confirm.mockReturnValue(undefined);
       const response = await request(app.getHttpServer())
         .get(
-          `/confirm/${SubscriptionIntegrationMock.newData.subscriptionToConfirm.token}`
+          `/confirm/${SubscriptionIntegrationMock.newData.newSubscription.token}`
         )
-        .send(SubscriptionIntegrationMock.newData.subscriptionToConfirm.token)
+        .send(SubscriptionIntegrationMock.newData.newSubscription.token)
         .expect(200);
 
       expect(mockSubscriptionService.confirm).toHaveBeenCalledWith(
-        SubscriptionIntegrationMock.newData.subscriptionToConfirm.token
+        SubscriptionIntegrationMock.newData.newSubscription.token
       );
       expect(response.body).toMatchObject({
         statusCode: 200,
@@ -132,13 +132,13 @@ describe("SubscriptionController Integration Tests", () => {
       );
       const response = await request(app.getHttpServer())
         .get(
-          `/confirm/${SubscriptionIntegrationMock.newData.subscriptionToConfirm.token}`
+          `/confirm/${SubscriptionIntegrationMock.newData.newSubscription.token}`
         )
-        .send(SubscriptionIntegrationMock.newData.subscriptionToConfirm.token)
+        .send(SubscriptionIntegrationMock.newData.newSubscription.token)
         .expect(409);
 
       expect(mockSubscriptionService.confirm).toHaveBeenCalledWith(
-        SubscriptionIntegrationMock.newData.subscriptionToConfirm.token
+        SubscriptionIntegrationMock.newData.newSubscription.token
       );
 
       expect(response.body).toMatchObject({
@@ -153,13 +153,13 @@ describe("SubscriptionController Integration Tests", () => {
       );
       const response = await request(app.getHttpServer())
         .get(
-          `/confirm/${SubscriptionIntegrationMock.newData.subscriptionToConfirm.token}`
+          `/confirm/${SubscriptionIntegrationMock.newData.newSubscription.token}`
         )
-        .send(SubscriptionIntegrationMock.newData.subscriptionToConfirm.token)
+        .send(SubscriptionIntegrationMock.newData.newSubscription.token)
         .expect(404);
 
       expect(mockSubscriptionService.confirm).toHaveBeenCalledWith(
-        SubscriptionIntegrationMock.newData.subscriptionToConfirm.token
+        SubscriptionIntegrationMock.newData.newSubscription.token
       );
 
       expect(response.body).toMatchObject({
@@ -192,13 +192,13 @@ describe("SubscriptionController Integration Tests", () => {
       mockSubscriptionService.unsubscribe.mockResolvedValue(undefined);
       const response = await request(app.getHttpServer())
         .get(
-          `/unsubscribe/${SubscriptionIntegrationMock.newData.subscriptionToConfirm.token}`
+          `/unsubscribe/${SubscriptionIntegrationMock.newData.newSubscription.token}`
         )
-        .send(SubscriptionIntegrationMock.newData.subscriptionToConfirm.token)
+        .send(SubscriptionIntegrationMock.newData.newSubscription.token)
         .expect(200);
 
       expect(mockSubscriptionService.unsubscribe).toHaveBeenCalledWith(
-        SubscriptionIntegrationMock.newData.subscriptionToConfirm.token
+        SubscriptionIntegrationMock.newData.newSubscription.token
       );
       expect(response.body).toMatchObject({
         statusCode: 200,
@@ -213,13 +213,13 @@ describe("SubscriptionController Integration Tests", () => {
 
       const response = await request(app.getHttpServer())
         .get(
-          `/unsubscribe/${SubscriptionIntegrationMock.newData.subscriptionToConfirm.token}`
+          `/unsubscribe/${SubscriptionIntegrationMock.newData.newSubscription.token}`
         )
-        .send(SubscriptionIntegrationMock.newData.subscriptionToConfirm.token)
+        .send(SubscriptionIntegrationMock.newData.newSubscription.token)
         .expect(404);
 
       expect(mockSubscriptionService.unsubscribe).toHaveBeenCalledWith(
-        SubscriptionIntegrationMock.newData.subscriptionToConfirm.token
+        SubscriptionIntegrationMock.newData.newSubscription.token
       );
 
       expect(response.body).toMatchObject({

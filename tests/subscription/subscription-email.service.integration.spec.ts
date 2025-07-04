@@ -93,21 +93,21 @@ describe("SubscriptionEmailService Integration Tests", () => {
       mockWeatherService.get.mockResolvedValue(WeatherMock.response);
 
       await service.sendWeatherEmail(
-        SubscriptionIntegrationMock.newData.subscriptionToConfirm.city,
-        [SubscriptionIntegrationMock.newData.subscriptionToConfirm]
+        SubscriptionIntegrationMock.newData.newSubscription.city,
+        [SubscriptionIntegrationMock.newData.newSubscription]
       );
 
-      expect(mockWeatherService.get).toHaveBeenCalledWith(
-        SubscriptionIntegrationMock.newData.subscriptionToConfirm.city
-      );
+      expect(mockWeatherService.get).toHaveBeenCalledWith({
+        city: SubscriptionIntegrationMock.newData.newSubscription.city,
+      });
 
       const capturedEmail = await mailServer.captureOne(
-        SubscriptionIntegrationMock.newData.subscriptionToConfirm.email,
+        SubscriptionIntegrationMock.newData.newSubscription.email,
         { wait: 5000 }
       );
 
       expect(capturedEmail.email.headers.to).toBe(
-        SubscriptionIntegrationMock.newData.subscriptionToConfirm.email
+        SubscriptionIntegrationMock.newData.newSubscription.email
       );
     });
 
@@ -126,16 +126,16 @@ describe("SubscriptionEmailService Integration Tests", () => {
   describe("sendConfirmationEmail", () => {
     it("should send confirmatuion email to subscription", async () => {
       await service.sendConfirmationEmail(
-        SubscriptionIntegrationMock.newData.subscriptionToConfirm
+        SubscriptionIntegrationMock.newData.newSubscription
       );
 
       const capturedEmail = await mailServer.captureOne(
-        SubscriptionIntegrationMock.newData.subscriptionToConfirm.email,
+        SubscriptionIntegrationMock.newData.newSubscription.email,
         { wait: 5000 }
       );
 
       expect(capturedEmail.email.headers.to).toBe(
-        SubscriptionIntegrationMock.newData.subscriptionToConfirm.email
+        SubscriptionIntegrationMock.newData.newSubscription.email
       );
     });
 

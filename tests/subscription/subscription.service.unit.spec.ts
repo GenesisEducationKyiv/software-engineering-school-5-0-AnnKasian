@@ -21,7 +21,7 @@ describe("SubscriptionService", () => {
   const mockSubscriptionRepository = {
     find: jest.fn(),
     create: jest.fn(),
-    confirm: jest.fn(),
+    save: jest.fn(),
     delete: jest.fn(),
     findByFrequency: jest.fn(),
   };
