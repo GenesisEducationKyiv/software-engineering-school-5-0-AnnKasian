@@ -1,5 +1,4 @@
-import { WeatherDto } from "./types/types.js";
-
+import { WeatherType } from "./types/types.js";
 import {
   IWeatherProvider,
   IWeatherRepository,
@@ -10,7 +9,7 @@ import { Injectable } from "@nestjs/common";
 class WeatherRepository implements IWeatherRepository {
   constructor(private readonly provider: IWeatherProvider) {}
 
-  async get(city: string): Promise<WeatherDto> {
+  async get(city: string): Promise<WeatherType> {
     return await this.provider.getWeather(city);
   }
 }

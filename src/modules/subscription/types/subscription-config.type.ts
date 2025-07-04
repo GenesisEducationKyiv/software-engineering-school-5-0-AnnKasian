@@ -1,6 +1,6 @@
-type SubscriptionConfig = {
+type SubscriptionConfigType = {
   baseUrl: string;
   cacheTTL: number;
 };
 
-export { type SubscriptionConfig };
+export { type SubscriptionConfigType };

@@ -1,4 +1,4 @@
-type WeatherApiResponseDto = {
+type WeatherApiResponseType = {
   current?: {
     temp_c: number;
     condition: {
@@ -8,4 +8,4 @@ type WeatherApiResponseDto = {
   };
 };
 
-export { type WeatherApiResponseDto };
+export { type WeatherApiResponseType };

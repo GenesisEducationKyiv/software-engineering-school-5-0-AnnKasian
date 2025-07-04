@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { HttpService } from "@nestjs/axios";
 import { firstValueFrom } from "rxjs";
 import { IWeatherProvider } from "../interfaces/interfaces.js";
-import { WeatherConfig, WeatherDto } from "../types/types.js";
+import { WeatherConfigType, WeatherType } from "../types/types.js";
 import { WeatherErrorHandler, FileLogger } from "../helpers/helpers.js";
 import { WEATHER_ERROR_MESSAGES } from "../enums/enums.js";
 
@@ -12,7 +12,7 @@ abstract class BaseWeatherProvider<TResponse> implements IWeatherProvider {
 
   constructor(
     private readonly httpService: HttpService,
-    private readonly config: WeatherConfig,
+    private readonly config: WeatherConfigType,
     private weatherErrorHandler: WeatherErrorHandler,
     private logger: FileLogger
   ) {
@@ -21,7 +21,7 @@ abstract class BaseWeatherProvider<TResponse> implements IWeatherProvider {
 
   abstract getProviderName(): string;
   abstract buildParams(city: string, apiKey: string): Record<string, string>;
-  abstract parseResponse(data: TResponse): WeatherDto;
+  abstract parseResponse(data: TResponse): WeatherType;
 
   setNext(provider: IWeatherProvider): IWeatherProvider {
     this.nextProvider = provider;
@@ -29,14 +29,14 @@ abstract class BaseWeatherProvider<TResponse> implements IWeatherProvider {
     return provider;
   }
 
-  async getWeather(city: string): Promise<WeatherDto> {
+  async getWeather(city: string): Promise<WeatherType> {
     return await this.getWeatherWithErrors(city, []);
   }
 
   async getWeatherWithErrors(
     city: string,
     previousErrors: unknown[]
-  ): Promise<WeatherDto> {
+  ): Promise<WeatherType> {
     try {
       const weather = await this.fetchWeatherFromApi(city);
       this.logger.response(city, JSON.stringify(weather));
@@ -52,7 +52,7 @@ abstract class BaseWeatherProvider<TResponse> implements IWeatherProvider {
   private async tryNextProvider(
     city: string,
     allErrors: unknown[]
-  ): Promise<WeatherDto> {
+  ): Promise<WeatherType> {
     if (this.nextProvider) {
       return await this.nextProvider.getWeatherWithErrors(city, allErrors);
     }
@@ -60,7 +60,7 @@ abstract class BaseWeatherProvider<TResponse> implements IWeatherProvider {
     return await this.analyzeAllErrors(allErrors);
   }
 
-  private analyzeAllErrors(allErrors: unknown[]): Promise<WeatherDto> {
+  private analyzeAllErrors(allErrors: unknown[]): Promise<WeatherType> {
     const hasCityNotFoundError = allErrors.some((error) =>
       this.weatherErrorHandler.isCityNotFoundError(error)
     );
@@ -78,7 +78,7 @@ abstract class BaseWeatherProvider<TResponse> implements IWeatherProvider {
     );
   }
 
-  private async fetchWeatherFromApi(city: string): Promise<WeatherDto> {
+  private async fetchWeatherFromApi(city: string): Promise<WeatherType> {
     try {
       const { data } = await firstValueFrom(
         this.httpService.get<TResponse>(this.config.apiUrl, {

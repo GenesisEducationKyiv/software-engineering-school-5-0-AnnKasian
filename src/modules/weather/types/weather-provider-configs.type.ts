@@ -5,7 +5,7 @@ import {
   type WeatherErrorHandler,
 } from "../helpers/helpers.js";
 
-type WeatherProviderConfig = {
+type WeatherProviderConfigType = {
   token: string;
   url: string;
   key: string;
@@ -17,4 +17,4 @@ type WeatherProviderConfig = {
   ) => IWeatherProvider;
 };
 
-export { type WeatherProviderConfig };
+export { type WeatherProviderConfigType };

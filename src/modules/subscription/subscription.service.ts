@@ -1,10 +1,10 @@
 import { Inject, Injectable } from "@nestjs/common";
 import {
-  SubscribeFilterDto,
-  SubscribeResponseDto,
-  type SubscriptionDto,
+  SubscribeFilterType,
+  SubscribeResponseType,
+  Subscription,
+  type SubscriptionType,
 } from "./types/types.js";
-import { SubscriptionEntity } from "./entities/entities.js";
 import { SubscriptionEmailService } from "./subscription-email.service.js";
 import { Frequency, SUBSCRIPTION_INJECTION_TOKENS } from "./enums/enums.js";
 import { Cron, CronExpression } from "@nestjs/schedule";
@@ -40,13 +40,15 @@ class SubscriptionService {
     await this.subscriptionEmailService.sendEmails(subscriptions);
   }
 
-  public async subscribe(data: SubscriptionDto): Promise<SubscribeResponseDto> {
+  public async subscribe(
+    data: SubscriptionType
+  ): Promise<SubscribeResponseType> {
     const existingSubscribe = await this.subscriptionRepository.find({
       email: data.email,
     });
 
     if (existingSubscribe) {
-      if (existingSubscribe.confirmed === true) {
+      if (existingSubscribe.isConfirmed()) {
         throw new EmailAlreadyExistsException();
       }
 
@@ -66,11 +68,12 @@ class SubscriptionService {
   public async confirm(token: string): Promise<void> {
     const subscription = await this.findToken({ token });
 
-    if (subscription.confirmed === true) {
+    if (subscription.isConfirmed()) {
       throw new SubscriptionAlreadyConfirmedException();
     }
 
-    await this.subscriptionRepository.confirm(subscription);
+    const confirmedSubscription = subscription.confirm();
+    await this.subscriptionRepository.save(confirmedSubscription);
   }
 
   public async unsubscribe(token: string): Promise<void> {
@@ -80,8 +83,8 @@ class SubscriptionService {
 
   private async findToken({
     token,
-  }: SubscribeFilterDto): Promise<SubscriptionEntity> {
-    let existingSubscribe: SubscriptionEntity | null = null;
+  }: SubscribeFilterType): Promise<Subscription> {
+    let existingSubscribe: Subscription | null = null;
 
     try {
       existingSubscribe = await this.subscriptionRepository.find({

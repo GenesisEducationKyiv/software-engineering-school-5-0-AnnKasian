@@ -24,7 +24,7 @@ class WeatherController {
   @ApiResponse(SwaggerResponse.NOT_FOUND)
   public async getOne(@Query() payload: WeatherQueryDto): Promise<WeatherDto> {
     try {
-      return await this.weatherService.get(payload.city);
+      return await this.weatherService.get(payload);
     } catch (error: unknown) {
       return httpErrorHandler(error);
     }

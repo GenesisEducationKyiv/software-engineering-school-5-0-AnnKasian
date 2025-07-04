@@ -1,5 +1,5 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { WeatherDto } from "./types/types";
+import { WeatherQueryType, WeatherType } from "./types/types.js";
 import { WEATHER_INJECTION_TOKENS } from "./enums/weather-injection-tokens.enum.js";
 import { IWeatherRepository } from "./interfaces/interfaces.js";
 
@@ -10,7 +10,7 @@ class WeatherService {
     private readonly weatherRepository: IWeatherRepository
   ) {}
 
-  public async get(city: string): Promise<WeatherDto> {
+  public async get({ city }: WeatherQueryType): Promise<WeatherType> {
     return await this.weatherRepository.get(city);
   }
 }

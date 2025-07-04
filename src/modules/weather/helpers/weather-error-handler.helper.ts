@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { type AxiosError, isAxiosError } from "axios";
-import { type WeatherError } from "../types/types.js";
+import { type WeatherErrorType } from "../types/types.js";
 import { ERROR_MESSAGES } from "../../../libs/enums/enums.js";
 import { FileLogger } from "./file-logger.helper.js";
 import {
@@ -27,7 +27,7 @@ class WeatherErrorHandler {
 
     if (isAxiosError(error)) {
       return this.handleAxiosError(
-        error as AxiosError<WeatherError>,
+        error as AxiosError<WeatherErrorType>,
         providerName
       );
     }
@@ -61,7 +61,7 @@ class WeatherErrorHandler {
   }
 
   private handleAxiosError(
-    axiosError: AxiosError<WeatherError>,
+    axiosError: AxiosError<WeatherErrorType>,
     providerName: string
   ): never {
     const logger = new FileLogger(providerName);

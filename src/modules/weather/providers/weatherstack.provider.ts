@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { BaseWeatherProvider } from "./base-weather.provider.js";
-import { WeatherstackResponseDto, WeatherDto } from "../types/types.js";
+import { WeatherstackResponseType, WeatherType } from "../types/types.js";
 import {
   WEATHER_PROVIDERS,
   WEATHER_ERROR_MESSAGES,
@@ -8,7 +8,7 @@ import {
 } from "../enums/enums.js";
 
 @Injectable()
-class WeatherstackProvider extends BaseWeatherProvider<WeatherstackResponseDto> {
+class WeatherstackProvider extends BaseWeatherProvider<WeatherstackResponseType> {
   getProviderName(): string {
     return WEATHER_PROVIDERS.WEATHERSTACK_PROVIDER;
   }
@@ -20,7 +20,7 @@ class WeatherstackProvider extends BaseWeatherProvider<WeatherstackResponseDto> 
     };
   }
 
-  parseResponse(data: WeatherstackResponseDto): WeatherDto {
+  parseResponse(data: WeatherstackResponseType): WeatherType {
     if (data.success === false) {
       if (
         data.error?.code ===

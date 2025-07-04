@@ -6,7 +6,6 @@ import {
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
-
 import { MessageDto } from "../../libs/types/types.js";
 import {
   SwaggerBody,
@@ -15,7 +14,7 @@ import {
   SwaggerResponse,
 } from "./swagger-docs/swagger-docs.js";
 import { SubscriptionService } from "./subscription.service.js";
-import { SubscriptionDto, SubscribeResponseDto } from "./types/types.js";
+import { SubscriptionDto, SubscribeResponseType } from "./types/types.js";
 import { httpErrorHandler } from "../../libs/helpers/helpers.js";
 
 @ApiTags("subscription")
@@ -33,7 +32,7 @@ class SubscriptionController {
   @ApiResponse(SwaggerResponse.SUBSCRIPTION_ALREADY_EXISTS)
   public async subscribe(
     @Body() data: SubscriptionDto
-  ): Promise<SubscribeResponseDto> {
+  ): Promise<SubscribeResponseType> {
     try {
       return await this.subscriptionService.subscribe(data);
     } catch (error: unknown) {

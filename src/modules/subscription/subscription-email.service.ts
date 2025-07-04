@@ -1,13 +1,12 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { Cache } from "cache-manager";
 import { WeatherService } from "../weather/weather.service.js";
-import { SubscriptionEntity } from "./entities/entities.js";
 import { EmailSubject, EmailTemplate } from "./email-data/email-data.js";
-import { SubscriptionConfig } from "./types/types.js";
+import { Subscription, SubscriptionConfigType } from "./types/types.js";
 import { MailerService } from "@nestjs-modules/mailer";
 import { EmailSendFailException } from "./exceptions/exceptions.js";
 import { SUBSCRIPTION_EMAIL_STATUS } from "./enums/enums.js";
-import { WeatherDto } from "../weather/types/types.js";
+import { WeatherType } from "../weather/types/types.js";
 import { ERROR_MESSAGES } from "../../libs/enums/enums.js";
 
 @Injectable()
@@ -16,7 +15,7 @@ class SubscriptionEmailService {
 
   public constructor(
     private readonly mailerService: MailerService,
-    private readonly config: SubscriptionConfig,
+    private readonly config: SubscriptionConfigType,
     private readonly weatherService: WeatherService,
     private readonly cacheManager: Cache
   ) {
@@ -25,10 +24,10 @@ class SubscriptionEmailService {
 
   async sendWeatherEmail(
     city: string,
-    subscriptions: SubscriptionEntity[]
+    subscriptions: Subscription[]
   ): Promise<void> {
     const cachedWeather = await this.getCachedWeather(city);
-    const weather = cachedWeather ?? (await this.weatherService.get(city));
+    const weather = cachedWeather ?? (await this.weatherService.get({ city }));
 
     this.logger.log(
       cachedWeather
@@ -63,7 +62,7 @@ class SubscriptionEmailService {
     this.handleEmailFailures(results);
   }
 
-  async sendConfirmationEmail(subscription: SubscriptionEntity) {
+  async sendConfirmationEmail(subscription: Subscription) {
     const currentDate = new Date();
 
     try {
@@ -85,8 +84,8 @@ class SubscriptionEmailService {
     }
   }
 
-  async sendEmails(subscriptions: SubscriptionEntity[]): Promise<void> {
-    const cities: Record<string, SubscriptionEntity[]> = {};
+  async sendEmails(subscriptions: Subscription[]): Promise<void> {
+    const cities: Record<string, Subscription[]> = {};
     subscriptions.forEach((subscription) => {
       cities[subscription.city] ??= [];
       cities[subscription.city].push(subscription);
@@ -111,12 +110,12 @@ class SubscriptionEmailService {
     }
   }
 
-  private async cacheWeather(city: string, weather: WeatherDto) {
+  private async cacheWeather(city: string, weather: WeatherType) {
     await this.cacheManager.set(city, weather, this.config.cacheTTL);
   }
 
-  private async getCachedWeather(city: string): Promise<WeatherDto | null> {
-    const cachedData = await this.cacheManager.get<WeatherDto>(city);
+  private async getCachedWeather(city: string): Promise<WeatherType | null> {
+    const cachedData = await this.cacheManager.get<WeatherType>(city);
 
     return cachedData ?? null;
   }

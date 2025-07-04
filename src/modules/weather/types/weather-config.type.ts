@@ -1,6 +1,6 @@
-type WeatherConfig = {
+type WeatherConfigType = {
   apiUrl: string;
   apiKey: string;
 };
 
-export { type WeatherConfig };
+export { type WeatherConfigType };
