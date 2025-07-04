@@ -13,7 +13,7 @@ import { Repository } from "typeorm";
 import { ConfigService } from "@nestjs/config";
 import { WeatherService } from "../weather/weather.js";
 import { MailerService } from "@nestjs-modules/mailer";
-import { ConfigKeys } from "../../libs/enums/enums.js";
+import { CONFIG_KEYS } from "../../libs/enums/enums.js";
 
 @Module({
   controllers: [SubscriptionController],
@@ -28,8 +28,8 @@ import { ConfigKeys } from "../../libs/enums/enums.js";
         weatherService: WeatherService,
         cacheManager: Cache
       ) => {
-        const baseUrl = configService.get(ConfigKeys.BASE_URL) as string;
-        const cacheTTL = configService.get(ConfigKeys.CACHE_TTL) as number;
+        const baseUrl = configService.get(CONFIG_KEYS.BASE_URL) as string;
+        const cacheTTL = configService.get(CONFIG_KEYS.CACHE_TTL) as number;
 
         return new SubscriptionEmailService(
           mailerService,

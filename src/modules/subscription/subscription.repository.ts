@@ -1,11 +1,15 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-
 import { SubscriptionEntity } from "./entities/entities.js";
-import { SubscriptionDto, SubscribeFilterDto } from "./types/types.js";
+import {
+  SubscriptionType,
+  SubscribeFilterType,
+  Subscription,
+} from "./types/types.js";
 import { Frequency } from "./enums/enums.js";
 import { ISubscriptionRepository } from "./interfaces/interfaces.js";
+import { MapToDomain, MapToEntity } from "./mappers/mappers.js";
 
 @Injectable()
 class SubscriptionRepository implements ISubscriptionRepository {
@@ -14,39 +18,44 @@ class SubscriptionRepository implements ISubscriptionRepository {
     private readonly subscription: Repository<SubscriptionEntity>
   ) {}
 
-  public create(data: SubscriptionDto): Promise<SubscriptionEntity> {
-    const newSubscription = new SubscriptionEntity(data);
+  public async create(data: SubscriptionType): Promise<Subscription> {
+    const entity = new SubscriptionEntity(data);
+    const savedEntity = await this.subscription.save(entity);
 
-    return this.subscription.save(newSubscription);
+    return MapToDomain(savedEntity);
   }
 
-  public async confirm(subscription: SubscriptionEntity): Promise<void> {
-    await this.subscription.update(subscription.id, {
-      ...subscription,
-      confirmed: true,
-    });
+  public async save(subscription: Subscription): Promise<Subscription> {
+    const entity = MapToEntity(subscription);
+    const savedEntity = await this.subscription.save(entity);
+
+    return MapToDomain(savedEntity);
   }
 
   public async delete(id: string): Promise<void> {
     await this.subscription.delete(id);
   }
 
-  public findByFrequency(frequency: Frequency): Promise<SubscriptionEntity[]> {
-    return this.subscription.find({
+  public async findByFrequency(frequency: Frequency): Promise<Subscription[]> {
+    const entities = await this.subscription.find({
       where: {
         frequency,
         confirmed: true,
       },
     });
+
+    return entities.map((entity) => MapToDomain(entity));
   }
 
-  public find({
+  public async find({
     email,
     token,
-  }: SubscribeFilterDto): Promise<SubscriptionEntity | null> {
-    return this.subscription.findOne({
+  }: SubscribeFilterType): Promise<Subscription | null> {
+    const entities = await this.subscription.findOne({
       where: { email, token },
     });
+
+    return entities ? MapToDomain(entities) : null;
   }
 }
 

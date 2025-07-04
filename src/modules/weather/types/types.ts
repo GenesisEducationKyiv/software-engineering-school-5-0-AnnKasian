@@ -1,12 +1,12 @@
-export { WeatherDto } from "./weather.dto.type.js";
+export { WeatherDto, WeatherQueryDto } from "./dtos/dtos.js";
 export {
-  type WeatherApiResponseDto,
-  type WeatherbitResponseDto,
-  type WeatherstackResponseDto,
-  type WeatherAdapter,
+  type WeatherApiResponseType,
+  type WeatherbitResponseType,
+  type WeatherstackResponseType,
 } from "./api-responses/api-responses.js";
-export { WeatherQueryDto } from "./weather-query-dto.type.js";
-export { type WeatherError } from "./weather-error.type.js";
-export { type WeatherConfig } from "./weather-config.type.js";
-export { type WeatherProviderConfig } from "./weather-provider-configs.type.js";
-export { type WeatherLog } from "./weather-log.type.js";
+export { type WeatherErrorType } from "./weather-error.type.js";
+export { type WeatherConfigType } from "./weather-config.type.js";
+export { type WeatherProviderConfigType } from "./weather-provider-configs.type.js";
+export { type WeatherLogType } from "./weather-log.type.js";
+export { type WeatherType } from "./weather.type.js";
+export { type WeatherQueryType } from "./weather-query.type.js";

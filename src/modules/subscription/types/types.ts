@@ -1,4 +1,6 @@
-export { SubscriptionDto } from "./subscription.dto.type.js";
-export { type SubscribeFilterDto } from "./subscribe-filter.dto.type.js";
-export { type SubscribeResponseDto } from "./subscribe-response.dto.type.js";
-export { type SubscriptionConfig } from "./subscription-config.type.js";
+export { SubscriptionDto } from "./dtos/dtos.js";
+export { type SubscribeFilterType } from "./subscribe-filter.type.js";
+export { type SubscribeResponseType } from "./subscribe-response.type.js";
+export { type SubscriptionConfigType } from "./subscription-config.type.js";
+export { type SubscriptionType } from "./subscription.type.js";
+export { Subscription } from "./subscription-domain-entity.js";
