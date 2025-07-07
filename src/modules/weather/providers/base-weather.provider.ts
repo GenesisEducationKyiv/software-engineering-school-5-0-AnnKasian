@@ -13,11 +13,9 @@ abstract class BaseWeatherProvider<TResponse> implements IWeatherProvider {
   constructor(
     private readonly httpService: HttpService,
     private readonly config: WeatherConfigType,
-    private weatherErrorHandler: WeatherErrorHandler,
-    private logger: FileLogger
-  ) {
-    this.logger = new FileLogger(this.getProviderName());
-  }
+    private readonly weatherErrorHandler: WeatherErrorHandler,
+    private readonly logger: FileLogger
+  ) {}
 
   abstract getProviderName(): string;
   abstract buildParams(city: string, apiKey: string): Record<string, string>;
@@ -39,7 +37,11 @@ abstract class BaseWeatherProvider<TResponse> implements IWeatherProvider {
   ): Promise<WeatherType> {
     try {
       const weather = await this.fetchWeatherFromApi(city);
-      this.logger.response(city, JSON.stringify(weather));
+      this.logger.response(
+        city,
+        JSON.stringify(weather),
+        this.getProviderName()
+      );
 
       return weather;
     } catch (error: unknown) {

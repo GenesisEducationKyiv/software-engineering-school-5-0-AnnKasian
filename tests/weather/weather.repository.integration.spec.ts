@@ -4,6 +4,7 @@ import { ConfigModule } from "@nestjs/config";
 import nock from "nock";
 import { WeatherMock } from "./mock-data/weather-service.mock.js";
 import { HttpModule, HttpService } from "@nestjs/axios";
+import { type Cache } from "cache-manager";
 import {
   WEATHER_INJECTION_TOKENS,
   WEATHER_PROVIDERS_ERROR_CODES,
@@ -18,6 +19,8 @@ import {
   FileLogger,
   WeatherErrorHandler,
 } from "../../src/modules/weather/helpers/helpers.js";
+import { CACHE_MANAGER, CacheModule } from "@nestjs/cache-manager";
+import { TestRedisConfig } from "../test-redis.config.js";
 import {
   CityNotFoundException,
   NotAvailableException,
@@ -30,26 +33,36 @@ describe("WeatherRepository  Integration Tests", () => {
   let weatherbitServer: nock.Scope;
   let weatherstackServer: nock.Scope;
 
+  const cacheTTL = 60;
+
   beforeAll(async () => {
     module = await Test.createTestingModule({
       imports: [
         ConfigModule.forRoot({
           isGlobal: true,
         }),
+        CacheModule.registerAsync({ ...TestRedisConfig, isGlobal: true }),
         HttpModule,
       ],
+
       providers: [
-        WeatherErrorHandler,
         {
           provide: WEATHER_INJECTION_TOKENS.FILE_LOGGER,
-          useFactory: () => (context: string) => new FileLogger(context),
+          useClass: FileLogger,
+        },
+        {
+          provide: WeatherErrorHandler,
+          useFactory: (logger: FileLogger) => {
+            return new WeatherErrorHandler(logger);
+          },
+          inject: [WEATHER_INJECTION_TOKENS.FILE_LOGGER],
         },
         {
           provide: WEATHER_INJECTION_TOKENS.WEATHER_API_PROVIDER,
           useFactory: (
             httpService: HttpService,
-            weatherErrorHandler: WeatherErrorHandler,
-            fileLogger: (context: string) => FileLogger
+            fileLogger: FileLogger,
+            weatherErrorHandler: WeatherErrorHandler
           ) => {
             return new WeatherApiProvider(
               httpService,
@@ -58,21 +71,21 @@ describe("WeatherRepository  Integration Tests", () => {
                 apiKey: WeatherMock.request.weatherApiKey,
               },
               weatherErrorHandler,
-              fileLogger(WeatherApiProvider.name)
+              fileLogger
             );
           },
           inject: [
             HttpService,
-            WeatherErrorHandler,
             WEATHER_INJECTION_TOKENS.FILE_LOGGER,
+            WeatherErrorHandler,
           ],
         },
         {
           provide: WEATHER_INJECTION_TOKENS.WEATHERBIT_PROVIDER,
           useFactory: (
             httpService: HttpService,
-            weatherErrorHandler: WeatherErrorHandler,
-            fileLogger: (context: string) => FileLogger
+            fileLogger: FileLogger,
+            weatherErrorHandler: WeatherErrorHandler
           ) => {
             return new WeatherbitProvider(
               httpService,
@@ -81,21 +94,21 @@ describe("WeatherRepository  Integration Tests", () => {
                 apiKey: WeatherMock.request.weatherbitKey,
               },
               weatherErrorHandler,
-              fileLogger(WeatherbitProvider.name)
+              fileLogger
             );
           },
           inject: [
             HttpService,
-            WeatherErrorHandler,
             WEATHER_INJECTION_TOKENS.FILE_LOGGER,
+            WeatherErrorHandler,
           ],
         },
         {
           provide: WEATHER_INJECTION_TOKENS.WEATHERSTACK_PROVIDER,
           useFactory: (
             httpService: HttpService,
-            weatherErrorHandler: WeatherErrorHandler,
-            fileLogger: (context: string) => FileLogger
+            fileLogger: FileLogger,
+            weatherErrorHandler: WeatherErrorHandler
           ) => {
             return new WeatherstackProvider(
               httpService,
@@ -104,13 +117,13 @@ describe("WeatherRepository  Integration Tests", () => {
                 apiKey: WeatherMock.request.weatherstackKey,
               },
               weatherErrorHandler,
-              fileLogger(WeatherstackProvider.name)
+              fileLogger
             );
           },
           inject: [
             HttpService,
-            WeatherErrorHandler,
             WEATHER_INJECTION_TOKENS.FILE_LOGGER,
+            WeatherErrorHandler,
           ],
         },
         {
@@ -118,18 +131,24 @@ describe("WeatherRepository  Integration Tests", () => {
           useFactory: (
             weatherApiProvider: IWeatherProvider,
             weatherbitProvider: IWeatherProvider,
-            weatherstackProvider: IWeatherProvider
+            weatherstackProvider: IWeatherProvider,
+            cacheManager: Cache
           ) => {
             weatherApiProvider
               .setNext(weatherbitProvider)
               .setNext(weatherstackProvider);
 
-            return new WeatherRepository(weatherApiProvider);
+            return new WeatherRepository(
+              weatherApiProvider,
+              cacheManager,
+              cacheTTL
+            );
           },
           inject: [
             WEATHER_INJECTION_TOKENS.WEATHER_API_PROVIDER,
             WEATHER_INJECTION_TOKENS.WEATHERBIT_PROVIDER,
             WEATHER_INJECTION_TOKENS.WEATHERSTACK_PROVIDER,
+            CACHE_MANAGER,
           ],
         },
       ],
