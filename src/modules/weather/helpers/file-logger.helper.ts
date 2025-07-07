@@ -4,31 +4,32 @@ import { type WeatherLog } from "../types/types.js";
 
 @Injectable()
 class FileLogger {
-  constructor(private readonly provider: string) {}
-
-  invalidCity(error: string) {
-    this.logResponse(`Invalid city: ${error}`);
+  invalidCity(error: string, provider: string) {
+    this.logResponse(`Invalid city: ${error}`, provider);
   }
 
-  apiError(statusCode: number, errorMessage: string) {
-    this.logResponse(`API Error: (${statusCode}) - ${errorMessage}`);
+  apiError(statusCode: number, errorMessage: string, provider: string) {
+    this.logResponse(`API Error: (${statusCode}) - ${errorMessage}`, provider);
   }
 
-  allProvidersFailed(errorMessage: string) {
-    this.logResponse(`All providers failed: ${errorMessage}`);
+  allProvidersFailed(errorMessage: string, provider: string) {
+    this.logResponse(`All providers failed: ${errorMessage}`, provider);
   }
 
-  unknownError(error: unknown) {
-    this.logResponse(`Unknown error: ${typeof error}`);
+  unknownError(error: unknown, provider: string) {
+    this.logResponse(`Unknown error: ${typeof error}`, provider);
   }
 
-  response(city: string, weather: string) {
-    this.logResponse(`Response : ${city} - ${JSON.stringify(weather)}`);
+  response(city: string, weather: string, provider: string) {
+    this.logResponse(
+      `Response : ${city} - ${JSON.stringify(weather)}`,
+      provider
+    );
   }
 
-  private logResponse(response: string) {
+  private logResponse(response: string, provider: string) {
     const log: WeatherLog = {
-      className: this.provider,
+      className: provider,
       response,
     };
     this.write(log);

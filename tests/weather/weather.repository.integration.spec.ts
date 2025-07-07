@@ -36,17 +36,23 @@ describe("WeatherRepository  Integration Tests", () => {
         HttpModule,
       ],
       providers: [
-        WeatherErrorHandler,
         {
           provide: WEATHER_INJECTION_TOKENS.FILE_LOGGER,
-          useFactory: () => (context: string) => new FileLogger(context),
+          useClass: FileLogger,
+        },
+        {
+          provide: WeatherErrorHandler,
+          useFactory: (logger: FileLogger) => {
+            return new WeatherErrorHandler(logger);
+          },
+          inject: [WEATHER_INJECTION_TOKENS.FILE_LOGGER],
         },
         {
           provide: WEATHER_INJECTION_TOKENS.WEATHER_API_PROVIDER,
           useFactory: (
             httpService: HttpService,
-            weatherErrorHandler: WeatherErrorHandler,
-            fileLogger: (context: string) => FileLogger
+            fileLogger: FileLogger,
+            weatherErrorHandler: WeatherErrorHandler
           ) => {
             return new WeatherApiProvider(
               httpService,
@@ -55,21 +61,21 @@ describe("WeatherRepository  Integration Tests", () => {
                 apiKey: WeatherMock.request.weatherApiKey,
               },
               weatherErrorHandler,
-              fileLogger(WeatherApiProvider.name)
+              fileLogger
             );
           },
           inject: [
             HttpService,
-            WeatherErrorHandler,
             WEATHER_INJECTION_TOKENS.FILE_LOGGER,
+            WeatherErrorHandler,
           ],
         },
         {
           provide: WEATHER_INJECTION_TOKENS.WEATHERBIT_PROVIDER,
           useFactory: (
             httpService: HttpService,
-            weatherErrorHandler: WeatherErrorHandler,
-            fileLogger: (context: string) => FileLogger
+            fileLogger: FileLogger,
+            weatherErrorHandler: WeatherErrorHandler
           ) => {
             return new WeatherbitProvider(
               httpService,
@@ -78,21 +84,21 @@ describe("WeatherRepository  Integration Tests", () => {
                 apiKey: WeatherMock.request.weatherbitKey,
               },
               weatherErrorHandler,
-              fileLogger(WeatherbitProvider.name)
+              fileLogger
             );
           },
           inject: [
             HttpService,
-            WeatherErrorHandler,
             WEATHER_INJECTION_TOKENS.FILE_LOGGER,
+            WeatherErrorHandler,
           ],
         },
         {
           provide: WEATHER_INJECTION_TOKENS.WEATHERSTACK_PROVIDER,
           useFactory: (
             httpService: HttpService,
-            weatherErrorHandler: WeatherErrorHandler,
-            fileLogger: (context: string) => FileLogger
+            fileLogger: FileLogger,
+            weatherErrorHandler: WeatherErrorHandler
           ) => {
             return new WeatherstackProvider(
               httpService,
@@ -101,13 +107,13 @@ describe("WeatherRepository  Integration Tests", () => {
                 apiKey: WeatherMock.request.weatherstackKey,
               },
               weatherErrorHandler,
-              fileLogger(WeatherstackProvider.name)
+              fileLogger
             );
           },
           inject: [
             HttpService,
-            WeatherErrorHandler,
             WEATHER_INJECTION_TOKENS.FILE_LOGGER,
+            WeatherErrorHandler,
           ],
         },
         {
