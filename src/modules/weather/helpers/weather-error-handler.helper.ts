@@ -1,17 +1,20 @@
-import { HttpException, Injectable } from "@nestjs/common";
+import { HttpException, Inject, Injectable } from "@nestjs/common";
 import { type AxiosError, isAxiosError } from "axios";
 import { type WeatherError } from "../types/types.js";
 import { ErrorMessage, ErrorStatusCode } from "../../../libs/enums/enums.js";
 import { FileLogger } from "./file-logger.helper.js";
-import { WeatherErrors } from "../enums/enums.js";
+import { WEATHER_INJECTION_TOKENS, WeatherErrors } from "../enums/enums.js";
 
 @Injectable()
 class WeatherErrorHandler {
-  public handleError(error: unknown, providerName: string): never {
-    const logger = new FileLogger(providerName);
+  constructor(
+    @Inject(WEATHER_INJECTION_TOKENS.FILE_LOGGER)
+    private readonly fileLogger: FileLogger
+  ) {}
 
+  public handleError(error: unknown, providerName: string): never {
     if (!(error instanceof Error)) {
-      logger.unknownError(error);
+      this.fileLogger.unknownError(error, providerName);
 
       throw new HttpException(
         ErrorMessage.UNKNOWN_ERROR,
@@ -27,7 +30,7 @@ class WeatherErrorHandler {
     }
 
     if (error.message === WeatherErrors.CITY_NOT_FOUND) {
-      logger.invalidCity(error.message);
+      this.fileLogger.invalidCity(error.message, providerName);
 
       throw new HttpException(
         WeatherErrors.CITY_NOT_FOUND,
@@ -36,7 +39,7 @@ class WeatherErrorHandler {
     }
 
     if (error.message === WeatherErrors.PROVIDERS_NOT_AVAILABLE) {
-      logger.allProvidersFailed(error.message);
+      this.fileLogger.allProvidersFailed(error.message, providerName);
 
       throw new HttpException(
         WeatherErrors.PROVIDERS_NOT_AVAILABLE,
@@ -61,11 +64,10 @@ class WeatherErrorHandler {
     axiosError: AxiosError<WeatherError>,
     providerName: string
   ): never {
-    const logger = new FileLogger(providerName);
-
     if (axiosError.response?.status === ErrorStatusCode.BAD_REQUEST) {
-      logger.invalidCity(
-        this.extractErrorMessage(axiosError.response.data.error)
+      this.fileLogger.invalidCity(
+        this.extractErrorMessage(axiosError.response.data.error),
+        providerName
       );
 
       throw new HttpException(axiosError.message, ErrorStatusCode.BAD_REQUEST);
@@ -79,7 +81,7 @@ class WeatherErrorHandler {
     const statusCode =
       axiosError.response?.status ?? ErrorStatusCode.INTERNAL_SERVER_ERROR;
 
-    logger.apiError(statusCode, errorMessage);
+    this.fileLogger.apiError(statusCode, errorMessage, providerName);
 
     throw new HttpException(errorMessage, statusCode);
   }

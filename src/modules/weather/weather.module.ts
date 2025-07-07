@@ -16,22 +16,28 @@ import { FileLogger, WeatherErrorHandler } from "./helpers/helpers.js";
   imports: [HttpModule],
   providers: [
     WeatherService,
-    WeatherErrorHandler,
     {
       provide: WEATHER_INJECTION_TOKENS.FILE_LOGGER,
-      useFactory: () => (context: string) => new FileLogger(context),
+      useClass: FileLogger,
+    },
+    {
+      provide: WeatherErrorHandler,
+      useFactory: (fileLogger: FileLogger) => {
+        return new WeatherErrorHandler(fileLogger);
+      },
+      inject: [WEATHER_INJECTION_TOKENS.FILE_LOGGER],
     },
     ...WEATHER_PROVIDER_CONFIGS.map(({ token, url, key, providerClass }) => ({
       provide: token,
       useFactory: (
         httpService: HttpService,
         configService: ConfigService,
-        weatherErrorHandler: WeatherErrorHandler,
-        fileLogger: (context: string) => FileLogger
+        fileLogger: FileLogger,
+        weatherErrorHandler: WeatherErrorHandler
       ) => {
         const apiUrl = configService.get(url) as string;
         const apiKey = configService.get(key) as string;
-        const logger = fileLogger(providerClass.name);
+        const logger = fileLogger;
 
         return new providerClass(
           httpService,
@@ -43,8 +49,8 @@ import { FileLogger, WeatherErrorHandler } from "./helpers/helpers.js";
       inject: [
         HttpService,
         ConfigService,
-        WeatherErrorHandler,
         WEATHER_INJECTION_TOKENS.FILE_LOGGER,
+        WeatherErrorHandler,
       ],
     })),
     {
