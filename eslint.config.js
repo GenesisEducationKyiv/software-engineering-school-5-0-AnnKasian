@@ -9,8 +9,6 @@ import explicitGenericsPlugin from "eslint-plugin-require-explicit-generics";
 import sonarjsPlugin from "eslint-plugin-sonarjs";
 import globals from "globals";
 
-const JS_MAX_PARAMS_ALLOWED = 4;
-
 /** @typedef {import("eslint").Linter.Config} */
 let FlatConfig;
 
@@ -38,7 +36,6 @@ const jsConfig = {
     "arrow-parens": ["error", "always"],
     curly: ["warn", "all"],
     eqeqeq: ["error", "always"],
-    "max-params": ["warn", JS_MAX_PARAMS_ALLOWED],
     "no-console": ["warn"],
     "no-undef": "off",
     "no-multiple-empty-lines": [

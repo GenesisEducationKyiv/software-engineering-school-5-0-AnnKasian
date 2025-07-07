@@ -1,6 +1,4 @@
 import { Module } from "@nestjs/common";
-import { Cache } from "cache-manager";
-import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import { getRepositoryToken, TypeOrmModule } from "@nestjs/typeorm";
 import { SubscriptionEntity } from "./entities/entities.js";
 import { SubscriptionController } from "./subscription.controller.js";
@@ -25,23 +23,17 @@ import { ConfigKeys } from "../../libs/enums/enums.js";
       useFactory: (
         configService: ConfigService,
         mailerService: MailerService,
-        weatherService: WeatherService,
-        cacheManager: Cache
+        weatherService: WeatherService
       ) => {
         const baseUrl = configService.get(ConfigKeys.BASE_URL) as string;
-        const cacheTTL = configService.get(ConfigKeys.CACHE_TTL) as number;
 
         return new SubscriptionEmailService(
           mailerService,
-          {
-            baseUrl,
-            cacheTTL,
-          },
-          weatherService,
-          cacheManager
+          baseUrl,
+          weatherService
         );
       },
-      inject: [ConfigService, MailerService, WeatherService, CACHE_MANAGER],
+      inject: [ConfigService, MailerService, WeatherService],
     },
     {
       provide: SUBSCRIPTION_INJECTION_TOKENS.SUBSCRIPTION_REPOSITORY,
