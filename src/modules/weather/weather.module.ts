@@ -1,12 +1,15 @@
 import { Module } from "@nestjs/common";
 import { HttpModule, HttpService } from "@nestjs/axios";
-
+import {
+  WEATHER_INJECTION_TOKENS,
+  WEATHER_PROVIDER_CONFIGS,
+} from "./enums/enums.js";
 import { WeatherController } from "./weather.controller.js";
-import { WeatherRepository } from "./weather.repository.js";
 import { WeatherService } from "./weather.service.js";
-import { WEATHER_INJECTION_TOKENS } from "./enums/weather-injection-tokens.enum.js";
 import { ConfigService } from "@nestjs/config";
-import { ConfigKeys } from "../../libs/enums/enums.js";
+import { IWeatherProvider } from "./interfaces/interfaces.js";
+import { WeatherRepository } from "./weather.repository.js";
+import { FileLogger, WeatherErrorHandler } from "./helpers/helpers.js";
 
 @Module({
   controllers: [WeatherController],
@@ -14,14 +17,60 @@ import { ConfigKeys } from "../../libs/enums/enums.js";
   providers: [
     WeatherService,
     {
-      provide: WEATHER_INJECTION_TOKENS.WEATHER_REPOSITORY,
-      useFactory: (httpService: HttpService, configService: ConfigService) => {
-        const apiUrl = configService.get(ConfigKeys.API_URL) as string;
-        const apiKey = configService.get(ConfigKeys.API_KEY) as string;
-
-        return new WeatherRepository(httpService, { apiUrl, apiKey });
+      provide: WEATHER_INJECTION_TOKENS.FILE_LOGGER,
+      useClass: FileLogger,
+    },
+    {
+      provide: WeatherErrorHandler,
+      useFactory: (fileLogger: FileLogger) => {
+        return new WeatherErrorHandler(fileLogger);
       },
-      inject: [HttpService, ConfigService],
+      inject: [WEATHER_INJECTION_TOKENS.FILE_LOGGER],
+    },
+    ...WEATHER_PROVIDER_CONFIGS.map(({ token, url, key, providerClass }) => ({
+      provide: token,
+      useFactory: (
+        httpService: HttpService,
+        configService: ConfigService,
+        fileLogger: FileLogger,
+        weatherErrorHandler: WeatherErrorHandler
+      ) => {
+        const apiUrl = configService.get(url) as string;
+        const apiKey = configService.get(key) as string;
+        const logger = fileLogger;
+
+        return new providerClass(
+          httpService,
+          { apiUrl, apiKey },
+          weatherErrorHandler,
+          logger
+        );
+      },
+      inject: [
+        HttpService,
+        ConfigService,
+        WEATHER_INJECTION_TOKENS.FILE_LOGGER,
+        WeatherErrorHandler,
+      ],
+    })),
+    {
+      provide: WEATHER_INJECTION_TOKENS.WEATHER_REPOSITORY,
+      useFactory: (
+        weatherApiProvider: IWeatherProvider,
+        weatherbitProvider: IWeatherProvider,
+        weatherstackProvider: IWeatherProvider
+      ) => {
+        weatherApiProvider
+          .setNext(weatherbitProvider)
+          .setNext(weatherstackProvider);
+
+        return new WeatherRepository(weatherApiProvider);
+      },
+      inject: [
+        WEATHER_INJECTION_TOKENS.WEATHER_API_PROVIDER,
+        WEATHER_INJECTION_TOKENS.WEATHERBIT_PROVIDER,
+        WEATHER_INJECTION_TOKENS.WEATHERSTACK_PROVIDER,
+      ],
     },
   ],
   exports: [WeatherService],

@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { WeatherDto } from "./types/types";
 import { WEATHER_INJECTION_TOKENS } from "./enums/weather-injection-tokens.enum.js";
 import { IWeatherRepository } from "./interfaces/interfaces.js";
@@ -11,13 +11,7 @@ class WeatherService {
   ) {}
 
   public async get(city: string): Promise<WeatherDto> {
-    const weather = await this.weatherRepository.get(city);
-
-    if (!weather) {
-      throw new NotFoundException("City not found");
-    }
-
-    return weather;
+    return await this.weatherRepository.get(city);
   }
 }
 
