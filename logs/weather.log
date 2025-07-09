@@ -1,0 +1,12 @@
+{"className":"WeatherApiProvider","response":"Response : city - \"{\\\"description\\\":\\\"Sunny\\\",\\\"humidity\\\":79,\\\"temperature\\\":29.3}\""}
+{"className":"WeatherApiProvider","response":"Response : city6 - \"{\\\"description\\\":\\\"Sunny\\\",\\\"humidity\\\":79,\\\"temperature\\\":29.3}\""}
+{"className":"WeatherApiProvider","response":"Invalid city: No matching location found."}
+{"className":"WeatherbitProvider","response":"Invalid city: Invalid Parameters supplied."}
+{"className":"WeatherstackProvider","response":"Invalid city: City not found"}
+{"className":"WeatherstackProvider","response":"Invalid city: City not found"}
+{"className":"WeatherApiProvider","response":"API Error: (401) - API key is invalid."}
+{"className":"WeatherbitProvider","response":"API Error: (403) - API key not valid, or not yet activated. If you recently signed up for an account or created this key, please allow up to 30 minutes for key to activate."}
+{"className":"WeatherstackProvider","response":"All providers failed: No weather providers available"}
+{"className":"WeatherApiProvider","response":"API Error: (401) - API key is invalid."}
+{"className":"WeatherbitProvider","response":"API Error: (403) - API key not valid, or not yet activated. If you recently signed up for an account or created this key, please allow up to 30 minutes for key to activate."}
+{"className":"WeatherstackProvider","response":"All providers failed: No weather providers available"}

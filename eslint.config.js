@@ -59,7 +59,7 @@ const jsConfig = {
       },
       {
         message: "TS features are forbidden.",
-        selector: "TSEnumDeclaration,ClassDeclaration[abstract=true]",
+        selector: "TSEnumDeclaration",
       },
       {
         message:
