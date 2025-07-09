@@ -1,6 +1,6 @@
-type WeatherLog = {
+type WeatherLogType = {
   className: string;
   response: string;
 };
 
-export { type WeatherLog };
+export { type WeatherLogType };

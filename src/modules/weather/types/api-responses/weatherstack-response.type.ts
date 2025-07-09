@@ -1,4 +1,4 @@
-type WeatherstackResponseDto = {
+type WeatherstackResponseType = {
   current?: {
     temperature: number;
     weather_descriptions: string[];
@@ -11,4 +11,4 @@ type WeatherstackResponseDto = {
   };
 };
 
-export { type WeatherstackResponseDto };
+export { type WeatherstackResponseType };

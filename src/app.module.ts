@@ -9,7 +9,7 @@ import { ServeStaticModule } from "@nestjs/serve-static";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { databaseConfig } from "../database.config.js";
 import { RedisConfig } from "../redis.config.js";
-import { ConfigKeys } from "./libs/enums/config.enum.js";
+import { CONFIG_KEYS } from "./libs/enums/config.enum.js";
 import { SubscriptionModule } from "./modules/subscription/subscription.module.js";
 
 @Module({
@@ -22,7 +22,7 @@ import { SubscriptionModule } from "./modules/subscription/subscription.module.j
       useFactory: (configService: ConfigService) => [
         {
           rootPath: path.join(import.meta.dirname, "..", "..", "public"),
-          serveRoot: configService.get(ConfigKeys.SERVE_ROOT),
+          serveRoot: configService.get(CONFIG_KEYS.SERVE_ROOT),
           serveStaticOptions: {
             index: "index.html",
             extensions: ["html"],
@@ -41,16 +41,16 @@ import { SubscriptionModule } from "./modules/subscription/subscription.module.j
       useFactory: (configService: ConfigService) => {
         return {
           transport: {
-            host: configService.get(ConfigKeys.EMAIL_HOST),
-            port: configService.get(ConfigKeys.EMAIL_PORT),
+            host: configService.get(CONFIG_KEYS.EMAIL_HOST),
+            port: configService.get(CONFIG_KEYS.EMAIL_PORT),
             secure: false,
             auth: {
-              user: configService.get(ConfigKeys.EMAIL_USER),
-              pass: configService.get(ConfigKeys.EMAIL_PASS),
+              user: configService.get(CONFIG_KEYS.EMAIL_USER),
+              pass: configService.get(CONFIG_KEYS.EMAIL_PASS),
             },
           },
           defaults: {
-            from: configService.get(ConfigKeys.EMAIL_FROM),
+            from: configService.get(CONFIG_KEYS.EMAIL_FROM),
           },
           template: {
             dir: process.cwd() + "/email-templates/",

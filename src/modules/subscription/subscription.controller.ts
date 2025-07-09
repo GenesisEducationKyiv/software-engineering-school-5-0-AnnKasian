@@ -6,6 +6,7 @@ import {
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
+import { httpErrorHandler } from "../../libs/helpers/helpers.js";
 import { MessageDto } from "../../libs/types/types.js";
 import { SubscriptionService } from "./subscription.service.js";
 import {
@@ -14,7 +15,7 @@ import {
   SwaggerParam,
   SwaggerResponse,
 } from "./swagger-docs/swagger-docs.js";
-import { SubscribeResponseDto,SubscriptionDto } from "./types/types.js";
+import { SubscriptionDto, SubscribeResponseType } from "./types/types.js";
 
 @ApiTags("subscription")
 @Controller()
@@ -29,10 +30,14 @@ class SubscriptionController {
   @ApiResponse(SwaggerResponse.SUBSCRIPTION_SUCCESSFUL)
   @ApiResponse(SwaggerResponse.SUBSCRIPTION_FAILED)
   @ApiResponse(SwaggerResponse.SUBSCRIPTION_ALREADY_EXISTS)
-  public subscribe(
+  public async subscribe(
     @Body() data: SubscriptionDto
-  ): Promise<SubscribeResponseDto> {
-    return this.subscriptionService.subscribe(data);
+  ): Promise<SubscribeResponseType> {
+    try {
+      return await this.subscriptionService.subscribe(data);
+    } catch (error: unknown) {
+      return httpErrorHandler(error);
+    }
   }
 
   @Get("/confirm/:token")
@@ -42,9 +47,16 @@ class SubscriptionController {
   @ApiResponse(SwaggerResponse.INVALID_TOKEN)
   @ApiResponse(SwaggerResponse.TOKEN_NOT_FOUND)
   public async confirm(@Param("token") token: string): Promise<MessageDto> {
-    await this.subscriptionService.confirm(token);
+    try {
+      await this.subscriptionService.confirm(token);
 
-    return { message: "Subscription confirmed successfully.", statusCode: 200 };
+      return {
+        message: "Subscription confirmed successfully.",
+        statusCode: 200,
+      };
+    } catch (error: unknown) {
+      return httpErrorHandler(error);
+    }
   }
 
   @Get("/unsubscribe/:token")
@@ -53,12 +65,16 @@ class SubscriptionController {
   @ApiResponse(SwaggerResponse.INVALID_TOKEN)
   @ApiResponse(SwaggerResponse.TOKEN_NOT_FOUND)
   public async unsubscribe(@Param("token") token: string): Promise<MessageDto> {
-    await this.subscriptionService.unsubscribe(token);
+    try {
+      await this.subscriptionService.unsubscribe(token);
 
-    return {
-      message: "Subscription unsubscribed successfully.",
-      statusCode: 200,
-    };
+      return {
+        message: "Subscription unsubscribed successfully.",
+        statusCode: 200,
+      };
+    } catch (error: unknown) {
+      return httpErrorHandler(error);
+    }
   }
 }
 
