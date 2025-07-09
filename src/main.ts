@@ -3,8 +3,8 @@ import { ConfigService } from "@nestjs/config";
 import { NestFactory } from "@nestjs/core";
 import { type NestExpressApplication } from "@nestjs/platform-express";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
-import { ConfigKeys } from "./libs/enums/enums.js";
 import { AppModule } from "./app.module.js";
+import { ConfigKeys } from "./libs/enums/enums.js";
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);

@@ -1,10 +1,9 @@
-import { WeatherDto } from "./types/types.js";
-
+import { Injectable } from "@nestjs/common";
 import {
   IWeatherProvider,
   IWeatherRepository,
 } from "./interfaces/interfaces.js";
-import { Injectable } from "@nestjs/common";
+import { WeatherDto } from "./types/types.js";
 
 @Injectable()
 class WeatherRepository implements IWeatherRepository {

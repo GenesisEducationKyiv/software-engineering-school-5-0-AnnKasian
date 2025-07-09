@@ -1,11 +1,11 @@
 import { ConfigKeys } from "../../../libs/enums/enums.js";
-import { type WeatherProviderConfig } from "../types/types.js";
-import { WEATHER_INJECTION_TOKENS } from "./weather-injection-tokens.enum.js";
 import {
   WeatherApiProvider,
   WeatherbitProvider,
   WeatherstackProvider,
 } from "../providers/providers.js";
+import { type WeatherProviderConfig } from "../types/types.js";
+import { WEATHER_INJECTION_TOKENS } from "./weather-injection-tokens.enum.js";
 
 const WEATHER_PROVIDER_CONFIGS: WeatherProviderConfig[] = [
   {
