@@ -1,26 +1,25 @@
-import { Injectable } from "@nestjs/common";
-import { WeatherService } from "../weather/weather.service.js";
-import { SubscriptionEntity } from "./entities/entities.js";
-import { EmailSubject, EmailTemplate } from "./email-data/email-data.js";
-import { SubscriptionConfig } from "./types/subscription-config.type.js";
 import { MailerService } from "@nestjs-modules/mailer";
-
-import { SubscriptionEmailErrorHandler } from "./helpers/helpers.js";
+import { Injectable } from "@nestjs/common";
+import { ERROR_MESSAGES } from "../../libs/enums/enums.js";
+import { WeatherService } from "../weather/weather.service.js";
+import { EmailSubject, EmailTemplate } from "./email-data/email-data.js";
 import { SUBSCRIPTION_EMAIL_STATUS } from "./enums/enums.js";
+import { EmailSendFailException } from "./exceptions/exceptions.js";
+import { Subscription } from "./types/types.js";
 
 @Injectable()
 class SubscriptionEmailService {
   public constructor(
     private readonly mailerService: MailerService,
-    private readonly config: SubscriptionConfig,
+    private readonly baseUrl: string,
     private readonly weatherService: WeatherService
   ) {}
 
   async sendWeatherEmail(
     city: string,
-    subscriptions: SubscriptionEntity[]
+    subscriptions: Subscription[]
   ): Promise<void> {
-    const weather = await this.weatherService.get(city);
+    const weather = await this.weatherService.get({ city });
 
     const currentDate = new Date();
 
@@ -36,7 +35,7 @@ class SubscriptionEmailService {
             humidity: weather.humidity,
             description: weather.description,
             year: currentDate.getFullYear(),
-            unsubscribeUrl: `${this.config.baseUrl}/action.html?action=unsubscribe&token=${subscription.token}`,
+            unsubscribeUrl: `${this.baseUrl}/action.html?action=unsubscribe&token=${subscription.token}`,
           },
         })
       )
@@ -45,7 +44,7 @@ class SubscriptionEmailService {
     this.handleEmailFailures(results);
   }
 
-  async sendConfirmationEmail(subscription: SubscriptionEntity) {
+  async sendConfirmationEmail(subscription: Subscription) {
     const currentDate = new Date();
 
     try {
@@ -55,16 +54,20 @@ class SubscriptionEmailService {
         template: EmailTemplate.CONFIRM,
         context: {
           year: currentDate.getFullYear(),
-          confirmUrl: `${this.config.baseUrl}/action.html?action=confirm&token=${subscription.token}`,
+          confirmUrl: `${this.baseUrl}/action.html?action=confirm&token=${subscription.token}`,
         },
       });
     } catch (error: unknown) {
-      SubscriptionEmailErrorHandler(error);
+      if (error instanceof Error) {
+        throw new EmailSendFailException(error.message);
+      }
+
+      throw new EmailSendFailException(ERROR_MESSAGES.UNKNOWN_ERROR);
     }
   }
 
-  async sendEmails(subscriptions: SubscriptionEntity[]): Promise<void> {
-    const cities: Record<string, SubscriptionEntity[]> = {};
+  async sendEmails(subscriptions: Subscription[]): Promise<void> {
+    const cities: Record<string, Subscription[]> = {};
     subscriptions.forEach((subscription) => {
       cities[subscription.city] ??= [];
       cities[subscription.city].push(subscription);
@@ -85,7 +88,7 @@ class SubscriptionEmailService {
     if (failures.length) {
       const firstError = failures[0].reason as Error;
 
-      SubscriptionEmailErrorHandler(firstError);
+      throw new EmailSendFailException(firstError.message);
     }
   }
 }

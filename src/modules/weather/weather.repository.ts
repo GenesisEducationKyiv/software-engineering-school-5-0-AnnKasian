@@ -1,49 +1,51 @@
-import { firstValueFrom } from "rxjs";
-import { HttpException, Injectable } from "@nestjs/common";
-import { HttpService } from "@nestjs/axios";
-import { AxiosError } from "axios";
-import { ErrorMessage, ErrorStatusCode } from "../../libs/enums/enums.js";
+import { Cache } from "cache-manager";
+import { Injectable, Logger } from "@nestjs/common";
+import { CACHE_PREFIX_KEY } from "./enums/enums.js";
 import {
-  WeatherApiResponseDto,
-  WeatherConfig,
-  WeatherDto,
-  WeatherError,
-} from "./types/types.js";
-import { WeatherErrorCode } from "./enums/enums.js";
-import { IWeatherRepository } from "./interfaces/interfaces.js";
+  IWeatherProvider,
+  IWeatherRepository,
+} from "./interfaces/interfaces.js";
+import { WeatherType , WeatherDto } from "./types/types.js";
 
 @Injectable()
 class WeatherRepository implements IWeatherRepository {
-  public constructor(
-    private readonly httpService: HttpService,
-    private readonly config: WeatherConfig
-  ) {}
+  private readonly logger: Logger;
 
-  public async get(city: string): Promise<WeatherDto | null> {
-    try {
-      const { data } = await firstValueFrom(
-        this.httpService.get<WeatherApiResponseDto>(this.config.apiUrl, {
-          params: { key: this.config.apiKey, q: city },
-        })
-      );
+  constructor(
+    private readonly provider: IWeatherProvider,
+    private readonly cacheManager: Cache,
+    private readonly cacheTTL: number
+  ) {
+    this.logger = new Logger(WeatherRepository.name);
+  }
 
-      return {
-        description: data.current?.condition.text,
-        humidity: data.current?.humidity,
-        temperature: data.current?.temp_c,
-      };
-    } catch (error: unknown) {
-      const axiosError = error as AxiosError<WeatherError>;
+  async get(city: string): Promise<WeatherDto> {
+    const cachedWeather = await this.getCachedWeather(
+      `${CACHE_PREFIX_KEY.CURRENT_WEATHER}-${city}`
+    );
+    const weather = cachedWeather ?? (await this.provider.getWeather(city));
 
-      if (axiosError.response?.data.error.code === WeatherErrorCode.NOT_FOUND) {
-        return null;
-      }
+    this.logger.log(
+      cachedWeather
+        ? `Current weather loaded from cache for ${city}`
+        : `Current weather fetched from API for ${city}`
+    );
 
-      throw new HttpException(
-        axiosError.response?.data.error.message ?? ErrorMessage.UNKNOWN_ERROR,
-        axiosError.status ?? ErrorStatusCode.INTERNAL_SERVER_ERROR
-      );
+    if (!cachedWeather) {
+      await this.cacheWeather(city, weather);
     }
+
+    return weather;
+  }
+
+  private async cacheWeather(city: string, weather: WeatherType) {
+    await this.cacheManager.set(city, weather, this.cacheTTL);
+  }
+
+  private async getCachedWeather(city: string): Promise<WeatherType | null> {
+    const cachedData = await this.cacheManager.get<WeatherType>(city);
+
+    return cachedData ?? null;
   }
 }
 

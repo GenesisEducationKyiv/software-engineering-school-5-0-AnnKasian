@@ -1,13 +1,13 @@
-import { SubscriptionIntegrationMock } from "./mock-data/subscription.integration.mock.js";
-import { Test, type TestingModule } from "@nestjs/testing";
-import { ConfigModule, ConfigService } from "@nestjs/config";
-import { SubscriptionEmailService } from "../../src/modules/subscription/subscription-email.service.js";
-import ms from "smtp-tester";
-import { WeatherService } from "../../src/modules/weather/weather.js";
-import { WeatherMock } from "../weather/mock-data/mock-data.js";
 import { MailerModule, MailerService } from "@nestjs-modules/mailer";
 import { HandlebarsAdapter } from "@nestjs-modules/mailer/dist/adapters/handlebars.adapter.js";
-import { HttpException } from "@nestjs/common";
+import ms from "smtp-tester";
+import { ConfigModule, ConfigService } from "@nestjs/config";
+import { Test, type TestingModule } from "@nestjs/testing";
+import { EmailSendFailException } from "../../src/modules/subscription/exceptions/exceptions.js";
+import { SubscriptionEmailService } from "../../src/modules/subscription/subscription-email.service.js";
+import { WeatherService } from "../../src/modules/weather/weather.js";
+import { WeatherMock } from "../weather/mock-data/mock-data.js";
+import { SubscriptionIntegrationMock } from "./mock-data/subscription.integration.mock.js";
 
 describe("SubscriptionEmailService Integration Tests", () => {
   let module: TestingModule;
@@ -26,6 +26,7 @@ describe("SubscriptionEmailService Integration Tests", () => {
         ConfigModule.forRoot({
           isGlobal: true,
         }),
+
         MailerModule.forRootAsync({
           imports: [ConfigModule],
           inject: [ConfigService],
@@ -61,7 +62,7 @@ describe("SubscriptionEmailService Integration Tests", () => {
           ) => {
             return new SubscriptionEmailService(
               mailerService,
-              { baseUrl },
+              baseUrl,
               weatherService
             );
           },
@@ -86,21 +87,21 @@ describe("SubscriptionEmailService Integration Tests", () => {
       mockWeatherService.get.mockResolvedValue(WeatherMock.response);
 
       await service.sendWeatherEmail(
-        SubscriptionIntegrationMock.newData.subscriptionToConfirm.city,
-        [SubscriptionIntegrationMock.newData.subscriptionToConfirm]
+        SubscriptionIntegrationMock.newData.newSubscription.city,
+        [SubscriptionIntegrationMock.newData.newSubscription]
       );
 
-      expect(mockWeatherService.get).toHaveBeenCalledWith(
-        SubscriptionIntegrationMock.newData.subscriptionToConfirm.city
-      );
+      expect(mockWeatherService.get).toHaveBeenCalledWith({
+        city: SubscriptionIntegrationMock.newData.newSubscription.city,
+      });
 
       const capturedEmail = await mailServer.captureOne(
-        SubscriptionIntegrationMock.newData.subscriptionToConfirm.email,
+        SubscriptionIntegrationMock.newData.newSubscription.email,
         { wait: 5000 }
       );
 
       expect(capturedEmail.email.headers.to).toBe(
-        SubscriptionIntegrationMock.newData.subscriptionToConfirm.email
+        SubscriptionIntegrationMock.newData.newSubscription.email
       );
     });
 
@@ -112,23 +113,23 @@ describe("SubscriptionEmailService Integration Tests", () => {
           SubscriptionIntegrationMock.newData.invalidSubscriptionToConfirm.city,
           [SubscriptionIntegrationMock.newData.invalidSubscriptionToConfirm]
         )
-      ).rejects.toThrow(HttpException);
+      ).rejects.toThrow(EmailSendFailException);
     });
   });
 
   describe("sendConfirmationEmail", () => {
     it("should send confirmatuion email to subscription", async () => {
       await service.sendConfirmationEmail(
-        SubscriptionIntegrationMock.newData.subscriptionToConfirm
+        SubscriptionIntegrationMock.newData.newSubscription
       );
 
       const capturedEmail = await mailServer.captureOne(
-        SubscriptionIntegrationMock.newData.subscriptionToConfirm.email,
+        SubscriptionIntegrationMock.newData.newSubscription.email,
         { wait: 5000 }
       );
 
       expect(capturedEmail.email.headers.to).toBe(
-        SubscriptionIntegrationMock.newData.subscriptionToConfirm.email
+        SubscriptionIntegrationMock.newData.newSubscription.email
       );
     });
 
@@ -137,7 +138,7 @@ describe("SubscriptionEmailService Integration Tests", () => {
         service.sendConfirmationEmail(
           SubscriptionIntegrationMock.newData.invalidSubscriptionToConfirm
         )
-      ).rejects.toThrow(HttpException);
+      ).rejects.toThrow(EmailSendFailException);
     });
   });
 });
