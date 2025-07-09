@@ -1,9 +1,9 @@
-import { HttpException, Inject, Injectable } from "@nestjs/common";
 import { type AxiosError, isAxiosError } from "axios";
-import { type WeatherError } from "../types/types.js";
+import { HttpException, Inject, Injectable } from "@nestjs/common";
 import { ErrorMessage, ErrorStatusCode } from "../../../libs/enums/enums.js";
-import { FileLogger } from "./file-logger.helper.js";
 import { WEATHER_INJECTION_TOKENS, WeatherErrors } from "../enums/enums.js";
+import { type WeatherError } from "../types/types.js";
+import { FileLogger } from "./file-logger.helper.js";
 
 @Injectable()
 class WeatherErrorHandler {

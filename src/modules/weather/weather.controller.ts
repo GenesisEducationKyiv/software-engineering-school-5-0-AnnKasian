@@ -1,14 +1,12 @@
 import { Controller, Get, Query } from "@nestjs/common";
-
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
-
-import { WeatherService } from "./weather.service.js";
-import { WeatherDto, WeatherQueryDto } from "./types/types.js";
 import {
   SwaggerOperation,
   SwaggerQuery,
   SwaggerResponse,
 } from "./swagger-docs/swagger-docs.js";
+import { WeatherDto, WeatherQueryDto } from "./types/types.js";
+import { WeatherService } from "./weather.service.js";
 
 @ApiTags("weather")
 @Controller("weather")

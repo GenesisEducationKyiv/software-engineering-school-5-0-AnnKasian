@@ -1,11 +1,11 @@
-import { WeatherDto } from "./types/types.js";
 import { Cache } from "cache-manager";
+import { Injectable, Logger } from "@nestjs/common";
+import { CACHE_PREFIX_KEY } from "./enums/enums.js";
 import {
   IWeatherProvider,
   IWeatherRepository,
 } from "./interfaces/interfaces.js";
-import { Injectable, Logger } from "@nestjs/common";
-import { CACHE_PREFIX_KEY } from "./enums/enums.js";
+import { WeatherDto } from "./types/types.js";
 
 @Injectable()
 class WeatherRepository implements IWeatherRepository {

@@ -1,18 +1,17 @@
-import { Module } from "@nestjs/common";
 import { HttpModule, HttpService } from "@nestjs/axios";
-import { Cache } from "cache-manager";
+import { Cache, CACHE_MANAGER } from "@nestjs/cache-manager";
+import { Module } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { ConfigKeys } from "../../libs/enums/config.enum.js";
 import {
   WEATHER_INJECTION_TOKENS,
   WEATHER_PROVIDER_CONFIGS,
 } from "./enums/enums.js";
-import { WeatherController } from "./weather.controller.js";
-import { WeatherService } from "./weather.service.js";
-import { ConfigService } from "@nestjs/config";
-import { IWeatherProvider } from "./interfaces/interfaces.js";
-import { WeatherRepository } from "./weather.repository.js";
 import { FileLogger, WeatherErrorHandler } from "./helpers/helpers.js";
-import { CACHE_MANAGER } from "@nestjs/cache-manager";
-import { ConfigKeys } from "../../libs/enums/enums.js";
+import { IWeatherProvider } from "./interfaces/interfaces.js";
+import { WeatherController } from "./weather.controller.js";
+import { WeatherRepository } from "./weather.repository.js";
+import { WeatherService } from "./weather.service.js";
 
 @Module({
   controllers: [WeatherController],

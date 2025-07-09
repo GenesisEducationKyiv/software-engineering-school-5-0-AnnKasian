@@ -1,4 +1,3 @@
-import { ApiProperty } from "@nestjs/swagger";
 import {
   Column,
   CreateDateColumn,
@@ -8,7 +7,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
-
+import { ApiProperty } from "@nestjs/swagger";
 import { Frequency } from "../enums/enums.js";
 
 @Entity("subscription")

@@ -1,27 +1,27 @@
-import { WeatherRepository } from "../../src/modules/weather/weather.repository.js";
-import { Test, type TestingModule } from "@nestjs/testing";
-import { ConfigModule } from "@nestjs/config";
-import nock from "nock";
-import { WeatherMock } from "./mock-data/weather-service.mock.js";
-import { HttpModule, HttpService } from "@nestjs/axios";
 import { type Cache } from "cache-manager";
+import nock from "nock";
+import { HttpModule, HttpService } from "@nestjs/axios";
+import { CACHE_MANAGER, CacheModule } from "@nestjs/cache-manager";
+import { HttpException } from "@nestjs/common";
+import { ConfigModule } from "@nestjs/config";
+import { Test, type TestingModule } from "@nestjs/testing";
 import {
   WEATHER_INJECTION_TOKENS,
   WeatherstackErrorCodes,
 } from "../../src/modules/weather/enums/enums.js";
 import {
+  FileLogger,
+  WeatherErrorHandler,
+} from "../../src/modules/weather/helpers/helpers.js";
+import { type IWeatherProvider } from "../../src/modules/weather/interfaces/interfaces.js";
+import {
   WeatherApiProvider,
   WeatherbitProvider,
   WeatherstackProvider,
 } from "../../src/modules/weather/providers/providers.js";
-import { type IWeatherProvider } from "../../src/modules/weather/interfaces/interfaces.js";
-import {
-  FileLogger,
-  WeatherErrorHandler,
-} from "../../src/modules/weather/helpers/helpers.js";
-import { HttpException } from "@nestjs/common";
-import { CACHE_MANAGER, CacheModule } from "@nestjs/cache-manager";
+import { WeatherRepository } from "../../src/modules/weather/weather.repository.js";
 import { TestRedisConfig } from "../test-redis.config.js";
+import { WeatherMock } from "./mock-data/weather-service.mock.js";
 
 describe("WeatherRepository  Integration Tests", () => {
   let module: TestingModule;

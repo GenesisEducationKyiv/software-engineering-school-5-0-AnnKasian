@@ -5,16 +5,16 @@ import {
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
+import { Cron, CronExpression } from "@nestjs/schedule";
+import { SubscriptionEntity } from "./entities/entities.js";
+import { Frequency, SUBSCRIPTION_INJECTION_TOKENS } from "./enums/enums.js";
+import { ISubscriptionRepository } from "./interfaces/interfaces.js";
+import { SubscriptionEmailService } from "./subscription-email.service.js";
 import {
   SubscribeFilterDto,
   SubscribeResponseDto,
   type SubscriptionDto,
 } from "./types/types.js";
-import { SubscriptionEntity } from "./entities/entities.js";
-import { SubscriptionEmailService } from "./subscription-email.service.js";
-import { Frequency, SUBSCRIPTION_INJECTION_TOKENS } from "./enums/enums.js";
-import { Cron, CronExpression } from "@nestjs/schedule";
-import { ISubscriptionRepository } from "./interfaces/interfaces.js";
 
 @Injectable()
 class SubscriptionService {
