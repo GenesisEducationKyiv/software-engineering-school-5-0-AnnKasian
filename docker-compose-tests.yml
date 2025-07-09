@@ -10,13 +10,18 @@ services:
       POSTGRES_USER: ${DATABASE_TEST_USER}
       POSTGRES_PASSWORD: ${DATABASE_TEST_PASSWORD}
       POSTGRES_DB: ${DATABASE_TEST_NAME}
-    volumes:
-      - postgres_test_data:/var/lib/postgresql/data
     networks:
       - test-network
 
-volumes:
-  postgres_test_data:
+  test_cache:
+    image: redis:7-alpine
+    container_name: weather-test-cache
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+    networks:
+      - test-network
 
 networks:
   test-network:

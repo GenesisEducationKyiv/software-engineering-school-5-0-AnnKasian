@@ -1,6 +1,8 @@
 import { HttpModule, HttpService } from "@nestjs/axios";
+import { Cache, CACHE_MANAGER } from "@nestjs/cache-manager";
 import { Module } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
+import { ConfigKeys } from "../../libs/enums/config.enum.js";
 import {
   WEATHER_INJECTION_TOKENS,
   WEATHER_PROVIDER_CONFIGS,
@@ -58,18 +60,27 @@ import { WeatherService } from "./weather.service.js";
       useFactory: (
         weatherApiProvider: IWeatherProvider,
         weatherbitProvider: IWeatherProvider,
-        weatherstackProvider: IWeatherProvider
+        weatherstackProvider: IWeatherProvider,
+        cacheManager: Cache,
+        configService: ConfigService
       ) => {
+        const cacheTTL = configService.get(ConfigKeys.CACHE_TTL) as number;
         weatherApiProvider
           .setNext(weatherbitProvider)
           .setNext(weatherstackProvider);
 
-        return new WeatherRepository(weatherApiProvider);
+        return new WeatherRepository(
+          weatherApiProvider,
+          cacheManager,
+          cacheTTL
+        );
       },
       inject: [
         WEATHER_INJECTION_TOKENS.WEATHER_API_PROVIDER,
         WEATHER_INJECTION_TOKENS.WEATHERBIT_PROVIDER,
         WEATHER_INJECTION_TOKENS.WEATHERSTACK_PROVIDER,
+        CACHE_MANAGER,
+        ConfigService,
       ],
     },
   ],

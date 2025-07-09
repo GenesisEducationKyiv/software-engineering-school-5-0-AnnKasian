@@ -1,5 +1,7 @@
+import { type Cache } from "cache-manager";
 import nock from "nock";
 import { HttpModule, HttpService } from "@nestjs/axios";
+import { CACHE_MANAGER, CacheModule } from "@nestjs/cache-manager";
 import { HttpException } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { Test, type TestingModule } from "@nestjs/testing";
@@ -18,6 +20,7 @@ import {
   WeatherstackProvider,
 } from "../../src/modules/weather/providers/providers.js";
 import { WeatherRepository } from "../../src/modules/weather/weather.repository.js";
+import { TestRedisConfig } from "../test-redis.config.js";
 import { WeatherMock } from "./mock-data/weather-service.mock.js";
 
 describe("WeatherRepository  Integration Tests", () => {
@@ -27,14 +30,18 @@ describe("WeatherRepository  Integration Tests", () => {
   let weatherbitServer: nock.Scope;
   let weatherstackServer: nock.Scope;
 
+  const cacheTTL = 60;
+
   beforeAll(async () => {
     module = await Test.createTestingModule({
       imports: [
         ConfigModule.forRoot({
           isGlobal: true,
         }),
+        CacheModule.registerAsync({ ...TestRedisConfig, isGlobal: true }),
         HttpModule,
       ],
+
       providers: [
         {
           provide: WEATHER_INJECTION_TOKENS.FILE_LOGGER,
@@ -121,18 +128,24 @@ describe("WeatherRepository  Integration Tests", () => {
           useFactory: (
             weatherApiProvider: IWeatherProvider,
             weatherbitProvider: IWeatherProvider,
-            weatherstackProvider: IWeatherProvider
+            weatherstackProvider: IWeatherProvider,
+            cacheManager: Cache
           ) => {
             weatherApiProvider
               .setNext(weatherbitProvider)
               .setNext(weatherstackProvider);
 
-            return new WeatherRepository(weatherApiProvider);
+            return new WeatherRepository(
+              weatherApiProvider,
+              cacheManager,
+              cacheTTL
+            );
           },
           inject: [
             WEATHER_INJECTION_TOKENS.WEATHER_API_PROVIDER,
             WEATHER_INJECTION_TOKENS.WEATHERBIT_PROVIDER,
             WEATHER_INJECTION_TOKENS.WEATHERSTACK_PROVIDER,
+            CACHE_MANAGER,
           ],
         },
       ],

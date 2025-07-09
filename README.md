@@ -11,6 +11,8 @@ for their cities and receive notifications via email.
 
 2. Build and run docker container: `docker-compose up`
 
+3. Cache check: `docker exec -it weather-cache redis-cli get <key>` - replase key by cacheKey from cached data
+
 ## Deployment
 
 The application is deployed and available at: **[https://weather-notify-idch.onrender.com/](https://weather-notify-idch.onrender.com/)** <br>

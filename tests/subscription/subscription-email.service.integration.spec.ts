@@ -26,6 +26,7 @@ describe("SubscriptionEmailService Integration Tests", () => {
         ConfigModule.forRoot({
           isGlobal: true,
         }),
+
         MailerModule.forRootAsync({
           imports: [ConfigModule],
           inject: [ConfigService],
@@ -61,7 +62,7 @@ describe("SubscriptionEmailService Integration Tests", () => {
           ) => {
             return new SubscriptionEmailService(
               mailerService,
-              { baseUrl },
+              baseUrl,
               weatherService
             );
           },

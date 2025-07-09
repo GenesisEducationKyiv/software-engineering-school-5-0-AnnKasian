@@ -5,13 +5,12 @@ import { EmailSubject, EmailTemplate } from "./email-data/email-data.js";
 import { SubscriptionEntity } from "./entities/entities.js";
 import { SUBSCRIPTION_EMAIL_STATUS } from "./enums/enums.js";
 import { SubscriptionEmailErrorHandler } from "./helpers/helpers.js";
-import { SubscriptionConfig } from "./types/types.js";
 
 @Injectable()
 class SubscriptionEmailService {
   public constructor(
     private readonly mailerService: MailerService,
-    private readonly config: SubscriptionConfig,
+    private readonly baseUrl: string,
     private readonly weatherService: WeatherService
   ) {}
 
@@ -35,7 +34,7 @@ class SubscriptionEmailService {
             humidity: weather.humidity,
             description: weather.description,
             year: currentDate.getFullYear(),
-            unsubscribeUrl: `${this.config.baseUrl}/action.html?action=unsubscribe&token=${subscription.token}`,
+            unsubscribeUrl: `${this.baseUrl}/action.html?action=unsubscribe&token=${subscription.token}`,
           },
         })
       )
@@ -54,7 +53,7 @@ class SubscriptionEmailService {
         template: EmailTemplate.CONFIRM,
         context: {
           year: currentDate.getFullYear(),
-          confirmUrl: `${this.config.baseUrl}/action.html?action=confirm&token=${subscription.token}`,
+          confirmUrl: `${this.baseUrl}/action.html?action=confirm&token=${subscription.token}`,
         },
       });
     } catch (error: unknown) {

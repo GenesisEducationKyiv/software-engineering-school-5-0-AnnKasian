@@ -29,15 +29,12 @@ import { SubscriptionService } from "./subscription.service.js";
 
         return new SubscriptionEmailService(
           mailerService,
-          {
-            baseUrl,
-          },
+          baseUrl,
           weatherService
         );
       },
       inject: [ConfigService, MailerService, WeatherService],
     },
-
     {
       provide: SUBSCRIPTION_INJECTION_TOKENS.SUBSCRIPTION_REPOSITORY,
       useFactory: (repository: Repository<SubscriptionEntity>) => {

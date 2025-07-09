@@ -4,13 +4,15 @@ import ms from "smtp-tester";
 import request from "supertest";
 import { type App } from "supertest/types";
 import { DataSource, type Repository } from "typeorm";
-import { type INestApplication,ValidationPipe } from "@nestjs/common";
+import { CacheModule } from "@nestjs/cache-manager";
+import { type INestApplication, ValidationPipe } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { Test, type TestingModule } from "@nestjs/testing";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { SubscriptionEntity } from "../../src/modules/subscription/subscription.js";
 import { SubscriptionModule } from "../../src/modules/subscription/subscription.module";
 import { WeatherModule } from "../../src/modules/weather/weather.module";
+import { TestRedisConfig } from "../test-redis.config.js";
 import { testDatabaseConfig } from "../text-database.config.js";
 import { SubscriptionE2eMock } from "./mock-data/mock-data.js";
 
@@ -31,6 +33,7 @@ describe("Subscription", () => {
           ...testDatabaseConfig,
           entities: [SubscriptionEntity],
         }),
+        CacheModule.registerAsync(TestRedisConfig),
         MailerModule.forRootAsync({
           imports: [ConfigModule],
           inject: [ConfigService],
