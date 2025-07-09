@@ -1,10 +1,10 @@
-import { Injectable } from "@nestjs/common";
-import { HttpService } from "@nestjs/axios";
 import { firstValueFrom } from "rxjs";
+import { HttpService } from "@nestjs/axios";
+import { Injectable } from "@nestjs/common";
+import { WEATHER_ERROR_MESSAGES } from "../enums/enums.js";
+import { WeatherErrorHandler, FileLogger } from "../helpers/helpers.js";
 import { IWeatherProvider } from "../interfaces/interfaces.js";
 import { WeatherConfigType, WeatherType } from "../types/types.js";
-import { WeatherErrorHandler, FileLogger } from "../helpers/helpers.js";
-import { WEATHER_ERROR_MESSAGES } from "../enums/enums.js";
 
 @Injectable()
 abstract class BaseWeatherProvider<TResponse> implements IWeatherProvider {

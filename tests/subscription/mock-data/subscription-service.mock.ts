@@ -1,5 +1,5 @@
-import { Subscription } from "../../../src/modules/subscription/types/types.js";
 import { Frequency } from "../../../src/modules/subscription/enums/frequency.enum.js";
+import { Subscription } from "../../../src/modules/subscription/types/types.js";
 
 const SubscriptionMock = {
   responsefromRepository: {

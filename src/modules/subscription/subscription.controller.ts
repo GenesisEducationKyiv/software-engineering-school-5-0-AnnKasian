@@ -6,16 +6,16 @@ import {
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
+import { httpErrorHandler } from "../../libs/helpers/helpers.js";
 import { MessageDto } from "../../libs/types/types.js";
+import { SubscriptionService } from "./subscription.service.js";
 import {
   SwaggerBody,
   SwaggerOperation,
   SwaggerParam,
   SwaggerResponse,
 } from "./swagger-docs/swagger-docs.js";
-import { SubscriptionService } from "./subscription.service.js";
 import { SubscriptionDto, SubscribeResponseType } from "./types/types.js";
-import { httpErrorHandler } from "../../libs/helpers/helpers.js";
 
 @ApiTags("subscription")
 @Controller()

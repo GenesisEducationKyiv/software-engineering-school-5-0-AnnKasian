@@ -1,19 +1,19 @@
-import { Inject, Injectable } from "@nestjs/common";
 import { type AxiosError, isAxiosError } from "axios";
-import { type WeatherErrorType } from "../types/types.js";
+import { Inject, Injectable } from "@nestjs/common";
 import { ERROR_MESSAGES } from "../../../libs/enums/enums.js";
-import { FileLogger } from "./file-logger.helper.js";
+import {
+  WEATHER_ERROR_MESSAGES,
+  WEATHER_PROVIDERS_ERROR_CODES,
+  WEATHER_INJECTION_TOKENS,
+} from "../enums/enums.js";
 import {
   CityNotFoundException,
   InvalidRequestException,
   NotAvailableException,
   UnknownErrorException,
 } from "../exceptions/exceptions.js";
-import {
-  WEATHER_ERROR_MESSAGES,
-  WEATHER_PROVIDERS_ERROR_CODES,
-  WEATHER_INJECTION_TOKENS,
-} from "../enums/enums.js";
+import { type WeatherErrorType } from "../types/types.js";
+import { FileLogger } from "./file-logger.helper.js";
 
 @Injectable()
 class WeatherErrorHandler {

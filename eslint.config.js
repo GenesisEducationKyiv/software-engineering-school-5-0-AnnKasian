@@ -97,6 +97,33 @@ const importConfig = {
     "import/newline-after-import": ["warn"],
     "import/no-default-export": ["warn"],
     "import/no-duplicates": ["warn"],
+    "import/order": [
+      "warn",
+      {
+        groups: [
+          "builtin",
+          "external",
+          "internal",
+          "parent",
+          "sibling",
+          "index",
+          "type",
+        ],
+        pathGroups: [
+          {
+            pattern: "@nestjs/**",
+            group: "external",
+            position: "after",
+          },
+        ],
+        pathGroupsExcludedImportTypes: ["builtin"],
+        "newlines-between": "never",
+        alphabetize: {
+          order: "asc",
+          caseInsensitive: true,
+        },
+      },
+    ],
   },
   settings: {
     "import/parsers": {

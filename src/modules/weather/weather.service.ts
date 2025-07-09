@@ -1,7 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { WeatherQueryType, WeatherType } from "./types/types.js";
 import { WEATHER_INJECTION_TOKENS } from "./enums/weather-injection-tokens.enum.js";
 import { IWeatherRepository } from "./interfaces/interfaces.js";
+import { WeatherQueryType, WeatherType } from "./types/types.js";
 
 @Injectable()
 class WeatherService {

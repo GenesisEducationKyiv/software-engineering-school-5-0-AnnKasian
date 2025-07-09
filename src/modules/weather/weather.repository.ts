@@ -1,10 +1,11 @@
-import { WeatherType } from "./types/types.js";
 import { Cache } from "cache-manager";
+import { Injectable, Logger } from "@nestjs/common";
+import { CACHE_PREFIX_KEY } from "./enums/enums.js";
 import {
   IWeatherProvider,
   IWeatherRepository,
 } from "./interfaces/interfaces.js";
-import { Injectable, Logger } from "@nestjs/common";
+import { WeatherType , WeatherDto } from "./types/types.js";
 
 @Injectable()
 class WeatherRepository implements IWeatherRepository {
@@ -18,14 +19,16 @@ class WeatherRepository implements IWeatherRepository {
     this.logger = new Logger(WeatherRepository.name);
   }
 
-  async get(city: string): Promise<WeatherType> {
-    const cachedWeather = await this.getCachedWeather(city);
+  async get(city: string): Promise<WeatherDto> {
+    const cachedWeather = await this.getCachedWeather(
+      `${CACHE_PREFIX_KEY.CURRENT_WEATHER}-${city}`
+    );
     const weather = cachedWeather ?? (await this.provider.getWeather(city));
 
     this.logger.log(
       cachedWeather
-        ? `Weather loaded from cache for ${city}`
-        : `Weather fetched from API for ${city}`
+        ? `Current weather loaded from cache for ${city}`
+        : `Current weather fetched from API for ${city}`
     );
 
     if (!cachedWeather) {

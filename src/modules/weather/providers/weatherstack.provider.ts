@@ -1,11 +1,11 @@
 import { Injectable } from "@nestjs/common";
-import { BaseWeatherProvider } from "./base-weather.provider.js";
-import { WeatherstackResponseType, WeatherType } from "../types/types.js";
 import {
   WEATHER_PROVIDERS,
   WEATHER_ERROR_MESSAGES,
   WEATHER_PROVIDERS_ERROR_CODES,
 } from "../enums/enums.js";
+import { WeatherstackResponseType, WeatherType } from "../types/types.js";
+import { BaseWeatherProvider } from "./base-weather.provider.js";
 
 @Injectable()
 class WeatherstackProvider extends BaseWeatherProvider<WeatherstackResponseType> {

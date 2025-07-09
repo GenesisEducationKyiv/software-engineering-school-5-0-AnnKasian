@@ -1,20 +1,20 @@
 import { Inject, Injectable } from "@nestjs/common";
-import {
-  SubscribeFilterType,
-  SubscribeResponseType,
-  Subscription,
-  type SubscriptionType,
-} from "./types/types.js";
-import { SubscriptionEmailService } from "./subscription-email.service.js";
-import { Frequency, SUBSCRIPTION_INJECTION_TOKENS } from "./enums/enums.js";
 import { Cron, CronExpression } from "@nestjs/schedule";
-import { ISubscriptionRepository } from "./interfaces/interfaces.js";
+import { Frequency, SUBSCRIPTION_INJECTION_TOKENS } from "./enums/enums.js";
 import {
   EmailAlreadyExistsException,
   InvalidTokenException,
   SubscriptionAlreadyConfirmedException,
   TokenNotFoundException,
 } from "./exceptions/exceptions.js";
+import { ISubscriptionRepository } from "./interfaces/interfaces.js";
+import { SubscriptionEmailService } from "./subscription-email.service.js";
+import {
+  SubscribeFilterType,
+  SubscribeResponseType,
+  Subscription,
+  type SubscriptionType,
+} from "./types/types.js";
 
 @Injectable()
 class SubscriptionService {

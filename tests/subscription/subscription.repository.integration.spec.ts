@@ -1,12 +1,12 @@
-import { SubscriptionRepository } from "../../src/modules/subscription/subscription.repository.js";
-import { SubscriptionIntegrationMock } from "./mock-data/subscription.integration.mock.js";
-import { Test, type TestingModule } from "@nestjs/testing";
-import { TypeOrmModule } from "@nestjs/typeorm";
-import { testDatabaseConfig } from "../text-database.config.js";
-import { SubscriptionEntity } from "../../src/modules/subscription/subscription.js";
 import { DataSource, type Repository } from "typeorm";
 import { ConfigModule } from "@nestjs/config";
+import { Test, type TestingModule } from "@nestjs/testing";
+import { TypeOrmModule } from "@nestjs/typeorm";
 import { MapToDomain } from "../../src/modules/subscription/mappers/mappers.js";
+import { SubscriptionEntity } from "../../src/modules/subscription/subscription.js";
+import { SubscriptionRepository } from "../../src/modules/subscription/subscription.repository.js";
+import { testDatabaseConfig } from "../text-database.config.js";
+import { SubscriptionIntegrationMock } from "./mock-data/subscription.integration.mock.js";
 
 describe("SubscriptionRepository Integration Tests", () => {
   let module: TestingModule;

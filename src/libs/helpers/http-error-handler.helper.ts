@@ -1,6 +1,6 @@
 import { HttpException } from "@nestjs/common";
-import { BaseException } from "../exceptions/exceptions.js";
 import { ERROR_MESSAGES, ERROR_STATUS_CODES } from "../enums/enums.js";
+import { BaseException } from "../exceptions/exceptions.js";
 
 const httpErrorHandler = (error: unknown): never => {
   if (error instanceof BaseException) {

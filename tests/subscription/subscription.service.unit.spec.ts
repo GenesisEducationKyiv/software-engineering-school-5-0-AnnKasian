@@ -1,19 +1,19 @@
-import { Test } from "@nestjs/testing";
-import { SubscriptionService } from "../../src/modules/subscription/subscription.js";
-import {
-  SUBSCRIPTION_INJECTION_TOKENS,
-  Frequency,
-} from "../../src/modules/subscription/enums/enums.js";
-import { SubscriptionMock } from "./mock-data/mock-data.js";
 import { ConfigService } from "@nestjs/config";
-import { SubscriptionEmailService } from "../../src/modules/subscription/subscription-email.service.js";
-import { WeatherService } from "../../src/modules/weather/weather.service.js";
+import { Test } from "@nestjs/testing";
+import {
+  Frequency,
+  SUBSCRIPTION_INJECTION_TOKENS,
+} from "../../src/modules/subscription/enums/enums.js";
 import {
   EmailAlreadyExistsException,
   InvalidTokenException,
   SubscriptionAlreadyConfirmedException,
   TokenNotFoundException,
 } from "../../src/modules/subscription/exceptions/exceptions.js";
+import { SubscriptionEmailService } from "../../src/modules/subscription/subscription-email.service.js";
+import { SubscriptionService } from "../../src/modules/subscription/subscription.js";
+import { WeatherService } from "../../src/modules/weather/weather.service.js";
+import { SubscriptionMock } from "./mock-data/mock-data.js";
 
 describe("SubscriptionService", () => {
   let subscriptionService: SubscriptionService;

@@ -1,6 +1,6 @@
+import { redisStore } from "cache-manager-redis-store";
 import { type CacheModuleAsyncOptions } from "@nestjs/cache-manager";
 import { ConfigModule, ConfigService } from "@nestjs/config";
-import { redisStore } from "cache-manager-redis-store";
 import { CONFIG_KEYS } from "./src/libs/enums/config.enum.js";
 
 const RedisConfig: CacheModuleAsyncOptions = {
