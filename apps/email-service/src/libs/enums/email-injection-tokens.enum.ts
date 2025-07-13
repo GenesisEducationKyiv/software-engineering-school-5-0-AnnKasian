@@ -1,0 +1,5 @@
+const EMAIL_INJECTION_TOKENS = {
+  WEATHER_SERVICE: Symbol("WEATHER_SERVICE"),
+} as const;
+
+export { EMAIL_INJECTION_TOKENS };

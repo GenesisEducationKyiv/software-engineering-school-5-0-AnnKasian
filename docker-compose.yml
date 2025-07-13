@@ -1,21 +1,55 @@
 version: "3.9"
 
 services:
-  api:
+  subscription-service:
     build:
       context: .
-      dockerfile: deployment/Dockerfile
+      dockerfile: apps/subscription-service/Dockerfile
     env_file:
       - .env
     ports:
-      - "${PORT}:7081"
+      - "${HTTP_SUBSCRIPTION_SERVICE_PORT}:7082"
     depends_on:
       - db
-      - cache
+      - email-service
+      - weather-service
     volumes:
-      - ./logs:/app/logs
+      - ./shared:/app/shared:ro
     networks:
       - app-network
+    restart: unless-stopped
+
+  email-service:
+    build:
+      context: .
+      dockerfile: apps/email-service/Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "${GRPC_EMAIL_SERVICE_PORT}:7081"
+    volumes:
+      - ./shared:/app/shared:ro
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  weather-service:
+    build:
+      context: .
+      dockerfile: apps/weather-service/Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "${HTTP_WEATHER_SERVICE_PORT}:7083"
+      - "${GRPC_WEATHER_SERVICE_PORT}:7084"
+    depends_on:
+      - cache
+    volumes:
+      - ./apps/weather-service/logs:/app/logs
+      - ./shared:/app/shared:ro
+    networks:
+      - app-network
+    restart: unless-stopped
 
   db:
     image: postgres:16.4
