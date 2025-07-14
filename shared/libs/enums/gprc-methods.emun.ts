@@ -1,6 +1,7 @@
-const EMAIL_GRPC_METHODS = {
+const GRPC_METHODS = {
   SEND_EMAILS: "SendEmails",
   SEND_CONFIRMATION_EMAIL: "SendConfirmationEmail",
+  GET_WEATHER: "GetWeather",
 } as const;
 
-export { EMAIL_GRPC_METHODS };
+export { GRPC_METHODS };
