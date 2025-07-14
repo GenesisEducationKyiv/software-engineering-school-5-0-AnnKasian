@@ -25,10 +25,7 @@ class WeatherRepository implements IWeatherRepository {
       `${CACHE_PREFIX_KEY.CURRENT_WEATHER}-${city}`
     );
 
-    await this.provider.getWeather(city);
-
     const weather = cachedWeather ?? (await this.provider.getWeather(city));
-
     this.logger.log(
       cachedWeather
         ? `Current weather loaded from cache for ${city}`

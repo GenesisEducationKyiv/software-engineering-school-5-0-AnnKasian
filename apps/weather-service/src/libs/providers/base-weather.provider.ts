@@ -39,6 +39,7 @@ abstract class BaseWeatherProvider<TResponse> implements IWeatherProvider {
   ): Promise<WeatherType> {
     try {
       const weather = await this.fetchWeatherFromApi(city);
+
       this.logger.response(
         city,
         JSON.stringify(weather),
