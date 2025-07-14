@@ -1,31 +1,29 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { SUBSCRIPTION_INJECTION_TOKENS } from "../../libs/enums/enums.js";
 import { Cron, CronExpression } from "@nestjs/schedule";
-import {
-  IEmailService,
-  ISubscriptionRepository,
-} from "../../libs/interfaces/interfaces.js";
+import { Frequency } from "../../../../../shared/libs/enums/enums.js";
+import { Subscription } from "../../../../../shared/libs/types/types.js";
+import { SUBSCRIPTION_INJECTION_TOKENS } from "../../libs/enums/enums.js";
 import {
   EmailAlreadyExistsException,
   InvalidTokenException,
   SubscriptionAlreadyConfirmedException,
   TokenNotFoundException,
 } from "../../libs/exceptions/exceptions.js";
+import { ISubscriptionRepository } from "../../libs/interfaces/interfaces.js";
 import {
   SubscribeFilterType,
   SubscribeResponseType,
   type SubscriptionType,
 } from "../../libs/types/types.js";
-import { Subscription } from "../../../../../shared/libs/types/types.js";
-import { Frequency } from "../../../../../shared/libs/enums/enums.js";
+import { SubscriptionEmailClient } from "./subscription-email.client.js";
 
 @Injectable()
 class SubscriptionService {
   public constructor(
     @Inject(SUBSCRIPTION_INJECTION_TOKENS.SUBSCRIPTION_REPOSITORY)
     private readonly subscriptionRepository: ISubscriptionRepository,
-    @Inject(SUBSCRIPTION_INJECTION_TOKENS.EMAIL_SERVICE)
-    private readonly subscriptionEmailService: IEmailService
+    @Inject(SUBSCRIPTION_INJECTION_TOKENS.SUBSCRIPTION_EMAIL_CLIENT)
+    private readonly subscriptionEmailService: SubscriptionEmailClient
   ) {}
 
   @Cron(CronExpression.EVERY_HOUR)
@@ -64,6 +62,7 @@ class SubscriptionService {
     }
 
     const subscription = await this.subscriptionRepository.create(data);
+
     await this.subscriptionEmailService.sendConfirmationEmail(subscription);
 
     return { token: subscription.token };

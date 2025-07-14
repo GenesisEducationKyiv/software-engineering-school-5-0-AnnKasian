@@ -1,4 +1,4 @@
-import { Frequency } from "../../../../../shared/libs/enums/enums.js";
+import { type Frequency } from "../../../../../shared/libs/enums/enums.js";
 
 type SubscriptionType = {
   email: string;

@@ -7,3 +7,4 @@ export {
   InvalidRequestException,
   CityNotFoundException,
 } from "./weather.exception.js";
+export { WeatherLogException } from "./weather-log.exception.js";

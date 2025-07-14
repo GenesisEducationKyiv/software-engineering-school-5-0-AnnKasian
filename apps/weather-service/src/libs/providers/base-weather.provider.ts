@@ -1,11 +1,12 @@
 import { firstValueFrom } from "rxjs";
 import { HttpService } from "@nestjs/axios";
 import { Injectable } from "@nestjs/common";
+import { WeatherType } from "../../../../../shared/libs/types/types.js";
 import { WEATHER_ERROR_MESSAGES } from "../enums/enums.js";
+import { WeatherLogException } from "../exceptions/exceptions.js";
 import { WeatherErrorHandler, FileLogger } from "../helpers/helpers.js";
 import { IWeatherProvider } from "../interfaces/interfaces.js";
 import { WeatherConfigType } from "../types/types.js";
-import { WeatherType } from "../../../../../shared/libs/types/types.js";
 
 @Injectable()
 abstract class BaseWeatherProvider<TResponse> implements IWeatherProvider {
@@ -46,6 +47,10 @@ abstract class BaseWeatherProvider<TResponse> implements IWeatherProvider {
 
       return weather;
     } catch (error: unknown) {
+      if (error instanceof WeatherLogException) {
+        return this.weatherErrorHandler.handleError(error.message, error.name);
+      }
+
       const allErrors = [...previousErrors, error];
 
       return await this.tryNextProvider(city, allErrors);

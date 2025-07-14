@@ -1,10 +1,10 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { WEATHER_INJECTION_TOKENS } from "../../libs/enums/weather-injection-tokens.enum.js";
-import { IWeatherRepository } from "../../libs/interfaces/interfaces.js";
 import {
   WeatherQueryType,
   WeatherType,
 } from "../../../../../shared/libs/types/types.js";
+import { WEATHER_INJECTION_TOKENS } from "../../libs/enums/weather-injection-tokens.enum.js";
+import { IWeatherRepository } from "../../libs/interfaces/interfaces.js";
 
 @Injectable()
 class WeatherService {

@@ -1,5 +1,5 @@
-import { Subscription } from "../../../../../shared/libs/types/types.js";
 import { Frequency } from "../../../../../shared/libs/enums/enums.js";
+import { Subscription } from "../../../../../shared/libs/types/types.js";
 
 const SubscriptionIntegrationMock = {
   newData: {

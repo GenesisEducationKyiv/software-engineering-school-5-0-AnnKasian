@@ -2,6 +2,7 @@ import { HttpModule, HttpService } from "@nestjs/axios";
 import { Cache, CACHE_MANAGER } from "@nestjs/cache-manager";
 import { Module } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
+import { CONFIG_KEYS } from "../../../../../shared/libs/enums/enums.js";
 import {
   WEATHER_INJECTION_TOKENS,
   WEATHER_PROVIDER_CONFIGS,
@@ -11,7 +12,6 @@ import { IWeatherProvider } from "../../libs/interfaces/interfaces.js";
 import { WeatherController } from "./weather.controller.js";
 import { WeatherRepository } from "./weather.repository.js";
 import { WeatherService } from "./weather.service.js";
-import { CONFIG_KEYS } from "../../../../../shared/libs/enums/enums.js";
 
 @Module({
   controllers: [WeatherController],

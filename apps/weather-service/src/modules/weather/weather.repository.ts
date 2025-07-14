@@ -1,12 +1,12 @@
 import { Cache } from "cache-manager";
 import { Injectable, Logger } from "@nestjs/common";
+import { WeatherType } from "../../../../../shared/libs/types/types.js";
 import { CACHE_PREFIX_KEY } from "../../libs/enums/enums.js";
 import {
   IWeatherProvider,
   IWeatherRepository,
 } from "../../libs/interfaces/interfaces.js";
 import { WeatherDto } from "../../libs/types/types.js";
-import { WeatherType } from "../../../../../shared/libs/types/types.js";
 
 @Injectable()
 class WeatherRepository implements IWeatherRepository {
@@ -24,6 +24,14 @@ class WeatherRepository implements IWeatherRepository {
     const cachedWeather = await this.getCachedWeather(
       `${CACHE_PREFIX_KEY.CURRENT_WEATHER}-${city}`
     );
+
+    try {
+      const data = await this.provider.getWeather(city);
+      console.log(1, data);
+    } catch (error) {
+      console.log(2, error);
+    }
+
     const weather = cachedWeather ?? (await this.provider.getWeather(city));
 
     this.logger.log(
@@ -33,19 +41,25 @@ class WeatherRepository implements IWeatherRepository {
     );
 
     if (!cachedWeather) {
-      await this.cacheWeather(city, weather);
+      await this.cacheWeather(
+        `${CACHE_PREFIX_KEY.CURRENT_WEATHER}-${city}`,
+        weather
+      );
     }
+
+    console.log(weather);
 
     return weather;
   }
 
-  private async cacheWeather(city: string, weather: WeatherType) {
-    await this.cacheManager.set(city, weather, this.cacheTTL);
+  private async cacheWeather(key: string, weather: WeatherType) {
+    await this.cacheManager.set(key, weather, this.cacheTTL);
   }
 
-  private async getCachedWeather(city: string): Promise<WeatherType | null> {
-    const cachedData = await this.cacheManager.get<WeatherType>(city);
+  private async getCachedWeather(key: string): Promise<WeatherType | null> {
+    const cachedData = await this.cacheManager.get<WeatherType>(key);
 
+    console.log(cachedData);
     return cachedData ?? null;
   }
 }

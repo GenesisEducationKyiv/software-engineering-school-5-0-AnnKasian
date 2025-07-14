@@ -1,20 +1,36 @@
-export const encodeFrequency = {
+export const enum FrequencyProto {
+  daily = "daily",
+  hourly = "hourly",
+}
+
+export const encodeFrequencyProto: { [key: string]: number } = {
   daily: 0,
   hourly: 1,
 };
 
-export const decodeFrequency = {
-  0: "daily",
-  1: "hourly",
+export const decodeFrequencyProto: { [key: number]: FrequencyProto } = {
+  0: FrequencyProto.daily,
+  1: FrequencyProto.hourly,
 };
 
-export function encodeSubscriptionProto(message) {
+export interface SubscriptionProto {
+  id: string;
+  email: string;
+  city: string;
+  frequency: FrequencyProto;
+  token: string;
+  confirmed: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export function encodeSubscriptionProto(message: SubscriptionProto): Uint8Array {
   let bb = popByteBuffer();
   _encodeSubscriptionProto(message, bb);
   return toUint8Array(bb);
 }
 
-function _encodeSubscriptionProto(message, bb) {
+function _encodeSubscriptionProto(message: SubscriptionProto, bb: ByteBuffer): void {
   // required string id = 1;
   let $id = message.id;
   if ($id !== undefined) {
@@ -36,11 +52,11 @@ function _encodeSubscriptionProto(message, bb) {
     writeString(bb, $city);
   }
 
-  // required Frequency frequency = 4;
+  // required FrequencyProto frequency = 4;
   let $frequency = message.frequency;
   if ($frequency !== undefined) {
     writeVarint32(bb, 32);
-    writeVarint32(bb, encodeFrequency[$frequency]);
+    writeVarint32(bb, encodeFrequencyProto[$frequency]);
   }
 
   // required string token = 5;
@@ -72,12 +88,12 @@ function _encodeSubscriptionProto(message, bb) {
   }
 }
 
-export function decodeSubscriptionProto(binary) {
+export function decodeSubscriptionProto(binary: Uint8Array): SubscriptionProto {
   return _decodeSubscriptionProto(wrapByteBuffer(binary));
 }
 
-function _decodeSubscriptionProto(bb) {
-  let message = {};
+function _decodeSubscriptionProto(bb: ByteBuffer): SubscriptionProto {
+  let message: SubscriptionProto = {} as any;
 
   end_of_message: while (!isAtEnd(bb)) {
     let tag = readVarint32(bb);
@@ -104,9 +120,9 @@ function _decodeSubscriptionProto(bb) {
         break;
       }
 
-      // required Frequency frequency = 4;
+      // required FrequencyProto frequency = 4;
       case 4: {
-        message.frequency = decodeFrequency[readVarint32(bb)];
+        message.frequency = decodeFrequencyProto[readVarint32(bb)];
         break;
       }
 
@@ -166,13 +182,17 @@ function _decodeSubscriptionProto(bb) {
   return message;
 }
 
-export function encodeSendEmailsRequest(message) {
+export interface SendEmailsRequest {
+  subscription?: SubscriptionProto[];
+}
+
+export function encodeSendEmailsRequest(message: SendEmailsRequest): Uint8Array {
   let bb = popByteBuffer();
   _encodeSendEmailsRequest(message, bb);
   return toUint8Array(bb);
 }
 
-function _encodeSendEmailsRequest(message, bb) {
+function _encodeSendEmailsRequest(message: SendEmailsRequest, bb: ByteBuffer): void {
   // repeated SubscriptionProto subscription = 1;
   let array$subscription = message.subscription;
   if (array$subscription !== undefined) {
@@ -187,12 +207,12 @@ function _encodeSendEmailsRequest(message, bb) {
   }
 }
 
-export function decodeSendEmailsRequest(binary) {
+export function decodeSendEmailsRequest(binary: Uint8Array): SendEmailsRequest {
   return _decodeSendEmailsRequest(wrapByteBuffer(binary));
 }
 
-function _decodeSendEmailsRequest(bb) {
-  let message = {};
+function _decodeSendEmailsRequest(bb: ByteBuffer): SendEmailsRequest {
+  let message: SendEmailsRequest = {} as any;
 
   end_of_message: while (!isAtEnd(bb)) {
     let tag = readVarint32(bb);
@@ -218,21 +238,24 @@ function _decodeSendEmailsRequest(bb) {
   return message;
 }
 
-export function encodeSendEmailsResponse(message) {
+export interface SendEmailsResponse {
+}
+
+export function encodeSendEmailsResponse(message: SendEmailsResponse): Uint8Array {
   let bb = popByteBuffer();
   _encodeSendEmailsResponse(message, bb);
   return toUint8Array(bb);
 }
 
-function _encodeSendEmailsResponse(message, bb) {
+function _encodeSendEmailsResponse(message: SendEmailsResponse, bb: ByteBuffer): void {
 }
 
-export function decodeSendEmailsResponse(binary) {
+export function decodeSendEmailsResponse(binary: Uint8Array): SendEmailsResponse {
   return _decodeSendEmailsResponse(wrapByteBuffer(binary));
 }
 
-function _decodeSendEmailsResponse(bb) {
-  let message = {};
+function _decodeSendEmailsResponse(bb: ByteBuffer): SendEmailsResponse {
+  let message: SendEmailsResponse = {} as any;
 
   end_of_message: while (!isAtEnd(bb)) {
     let tag = readVarint32(bb);
@@ -249,13 +272,17 @@ function _decodeSendEmailsResponse(bb) {
   return message;
 }
 
-export function encodeSendConfirmationEmailRequest(message) {
+export interface SendConfirmationEmailRequest {
+  subscription: SubscriptionProto;
+}
+
+export function encodeSendConfirmationEmailRequest(message: SendConfirmationEmailRequest): Uint8Array {
   let bb = popByteBuffer();
   _encodeSendConfirmationEmailRequest(message, bb);
   return toUint8Array(bb);
 }
 
-function _encodeSendConfirmationEmailRequest(message, bb) {
+function _encodeSendConfirmationEmailRequest(message: SendConfirmationEmailRequest, bb: ByteBuffer): void {
   // required SubscriptionProto subscription = 1;
   let $subscription = message.subscription;
   if ($subscription !== undefined) {
@@ -268,12 +295,12 @@ function _encodeSendConfirmationEmailRequest(message, bb) {
   }
 }
 
-export function decodeSendConfirmationEmailRequest(binary) {
+export function decodeSendConfirmationEmailRequest(binary: Uint8Array): SendConfirmationEmailRequest {
   return _decodeSendConfirmationEmailRequest(wrapByteBuffer(binary));
 }
 
-function _decodeSendConfirmationEmailRequest(bb) {
-  let message = {};
+function _decodeSendConfirmationEmailRequest(bb: ByteBuffer): SendConfirmationEmailRequest {
+  let message: SendConfirmationEmailRequest = {} as any;
 
   end_of_message: while (!isAtEnd(bb)) {
     let tag = readVarint32(bb);
@@ -301,21 +328,24 @@ function _decodeSendConfirmationEmailRequest(bb) {
   return message;
 }
 
-export function encodeSendEmailConfirmationResponse(message) {
+export interface SendEmailConfirmationResponse {
+}
+
+export function encodeSendEmailConfirmationResponse(message: SendEmailConfirmationResponse): Uint8Array {
   let bb = popByteBuffer();
   _encodeSendEmailConfirmationResponse(message, bb);
   return toUint8Array(bb);
 }
 
-function _encodeSendEmailConfirmationResponse(message, bb) {
+function _encodeSendEmailConfirmationResponse(message: SendEmailConfirmationResponse, bb: ByteBuffer): void {
 }
 
-export function decodeSendEmailConfirmationResponse(binary) {
+export function decodeSendEmailConfirmationResponse(binary: Uint8Array): SendEmailConfirmationResponse {
   return _decodeSendEmailConfirmationResponse(wrapByteBuffer(binary));
 }
 
-function _decodeSendEmailConfirmationResponse(bb) {
-  let message = {};
+function _decodeSendEmailConfirmationResponse(bb: ByteBuffer): SendEmailConfirmationResponse {
+  let message: SendEmailConfirmationResponse = {} as any;
 
   end_of_message: while (!isAtEnd(bb)) {
     let tag = readVarint32(bb);
@@ -332,14 +362,26 @@ function _decodeSendEmailConfirmationResponse(bb) {
   return message;
 }
 
-function pushTemporaryLength(bb) {
+export interface Long {
+  low: number;
+  high: number;
+  unsigned: boolean;
+}
+
+interface ByteBuffer {
+  bytes: Uint8Array;
+  offset: number;
+  limit: number;
+}
+
+function pushTemporaryLength(bb: ByteBuffer): number {
   let length = readVarint32(bb);
   let limit = bb.limit;
   bb.limit = bb.offset + length;
   return limit;
 }
 
-function skipUnknownField(bb, type) {
+function skipUnknownField(bb: ByteBuffer, type: number): void {
   switch (type) {
     case 0: while (readByte(bb) & 0x80) { } break;
     case 2: skip(bb, readVarint32(bb)); break;
@@ -349,7 +391,7 @@ function skipUnknownField(bb, type) {
   }
 }
 
-function stringToLong(value) {
+function stringToLong(value: string): Long {
   return {
     low: value.charCodeAt(0) | (value.charCodeAt(1) << 16),
     high: value.charCodeAt(2) | (value.charCodeAt(3) << 16),
@@ -357,7 +399,7 @@ function stringToLong(value) {
   };
 }
 
-function longToString(value) {
+function longToString(value: Long): string {
   let low = value.low;
   let high = value.high;
   return String.fromCharCode(
@@ -376,7 +418,7 @@ let f32_u8 = new Uint8Array(f32.buffer);
 let f64 = new Float64Array(1);
 let f64_u8 = new Uint8Array(f64.buffer);
 
-function intToLong(value) {
+function intToLong(value: number): Long {
   value |= 0;
   return {
     low: value,
@@ -385,41 +427,41 @@ function intToLong(value) {
   };
 }
 
-let bbStack = [];
+let bbStack: ByteBuffer[] = [];
 
-function popByteBuffer() {
+function popByteBuffer(): ByteBuffer {
   const bb = bbStack.pop();
   if (!bb) return { bytes: new Uint8Array(64), offset: 0, limit: 0 };
   bb.offset = bb.limit = 0;
   return bb;
 }
 
-function pushByteBuffer(bb) {
+function pushByteBuffer(bb: ByteBuffer): void {
   bbStack.push(bb);
 }
 
-function wrapByteBuffer(bytes) {
+function wrapByteBuffer(bytes: Uint8Array): ByteBuffer {
   return { bytes, offset: 0, limit: bytes.length };
 }
 
-function toUint8Array(bb) {
+function toUint8Array(bb: ByteBuffer): Uint8Array {
   let bytes = bb.bytes;
   let limit = bb.limit;
   return bytes.length === limit ? bytes : bytes.subarray(0, limit);
 }
 
-function skip(bb, offset) {
+function skip(bb: ByteBuffer, offset: number): void {
   if (bb.offset + offset > bb.limit) {
     throw new Error('Skip past limit');
   }
   bb.offset += offset;
 }
 
-function isAtEnd(bb) {
+function isAtEnd(bb: ByteBuffer): boolean {
   return bb.offset >= bb.limit;
 }
 
-function grow(bb, count) {
+function grow(bb: ByteBuffer, count: number): number {
   let bytes = bb.bytes;
   let offset = bb.offset;
   let limit = bb.limit;
@@ -436,7 +478,7 @@ function grow(bb, count) {
   return offset;
 }
 
-function advance(bb, count) {
+function advance(bb: ByteBuffer, count: number): number {
   let offset = bb.offset;
   if (offset + count > bb.limit) {
     throw new Error('Read past limit');
@@ -445,17 +487,17 @@ function advance(bb, count) {
   return offset;
 }
 
-function readBytes(bb, count) {
+function readBytes(bb: ByteBuffer, count: number): Uint8Array {
   let offset = advance(bb, count);
   return bb.bytes.subarray(offset, offset + count);
 }
 
-function writeBytes(bb, buffer) {
+function writeBytes(bb: ByteBuffer, buffer: Uint8Array): void {
   let offset = grow(bb, buffer.length);
   bb.bytes.set(buffer, offset);
 }
 
-function readString(bb, count) {
+function readString(bb: ByteBuffer, count: number): string {
   // Sadly a hand-coded UTF8 decoder is much faster than subarray+TextDecoder in V8
   let offset = advance(bb, count);
   let fromCharCode = String.fromCharCode;
@@ -464,7 +506,7 @@ function readString(bb, count) {
   let text = '';
 
   for (let i = 0; i < count; i++) {
-    let c1 = bytes[i + offset], c2, c3, c4, c;
+    let c1 = bytes[i + offset], c2: number, c3: number, c4: number, c: number;
 
     // 1 byte
     if ((c1 & 0x80) === 0) {
@@ -532,7 +574,7 @@ function readString(bb, count) {
   return text;
 }
 
-function writeString(bb, text) {
+function writeString(bb: ByteBuffer, text: string): void {
   // Sadly a hand-coded UTF8 encoder is much faster than TextEncoder+set in V8
   let n = text.length;
   let byteCount = 0;
@@ -575,7 +617,7 @@ function writeString(bb, text) {
   }
 }
 
-function writeByteBuffer(bb, buffer) {
+function writeByteBuffer(bb: ByteBuffer, buffer: ByteBuffer): void {
   let offset = grow(bb, buffer.limit);
   let from = bb.bytes;
   let to = buffer.bytes;
@@ -586,16 +628,16 @@ function writeByteBuffer(bb, buffer) {
   }
 }
 
-function readByte(bb) {
+function readByte(bb: ByteBuffer): number {
   return bb.bytes[advance(bb, 1)];
 }
 
-function writeByte(bb, value) {
+function writeByte(bb: ByteBuffer, value: number): void {
   let offset = grow(bb, 1);
   bb.bytes[offset] = value;
 }
 
-function readFloat(bb) {
+function readFloat(bb: ByteBuffer): number {
   let offset = advance(bb, 4);
   let bytes = bb.bytes;
 
@@ -607,7 +649,7 @@ function readFloat(bb) {
   return f32[0];
 }
 
-function writeFloat(bb, value) {
+function writeFloat(bb: ByteBuffer, value: number): void {
   let offset = grow(bb, 4);
   let bytes = bb.bytes;
   f32[0] = value;
@@ -619,7 +661,7 @@ function writeFloat(bb, value) {
   bytes[offset++] = f32_u8[3];
 }
 
-function readDouble(bb) {
+function readDouble(bb: ByteBuffer): number {
   let offset = advance(bb, 8);
   let bytes = bb.bytes;
 
@@ -635,7 +677,7 @@ function readDouble(bb) {
   return f64[0];
 }
 
-function writeDouble(bb, value) {
+function writeDouble(bb: ByteBuffer, value: number): void {
   let offset = grow(bb, 8);
   let bytes = bb.bytes;
   f64[0] = value;
@@ -651,7 +693,7 @@ function writeDouble(bb, value) {
   bytes[offset++] = f64_u8[7];
 }
 
-function readInt32(bb) {
+function readInt32(bb: ByteBuffer): number {
   let offset = advance(bb, 4);
   let bytes = bb.bytes;
   return (
@@ -662,7 +704,7 @@ function readInt32(bb) {
   );
 }
 
-function writeInt32(bb, value) {
+function writeInt32(bb: ByteBuffer, value: number): void {
   let offset = grow(bb, 4);
   let bytes = bb.bytes;
   bytes[offset] = value;
@@ -671,7 +713,7 @@ function writeInt32(bb, value) {
   bytes[offset + 3] = value >> 24;
 }
 
-function readInt64(bb, unsigned) {
+function readInt64(bb: ByteBuffer, unsigned: boolean): Long {
   return {
     low: readInt32(bb),
     high: readInt32(bb),
@@ -679,15 +721,15 @@ function readInt64(bb, unsigned) {
   };
 }
 
-function writeInt64(bb, value) {
+function writeInt64(bb: ByteBuffer, value: Long): void {
   writeInt32(bb, value.low);
   writeInt32(bb, value.high);
 }
 
-function readVarint32(bb) {
+function readVarint32(bb: ByteBuffer): number {
   let c = 0;
   let value = 0;
-  let b;
+  let b: number;
   do {
     b = readByte(bb);
     if (c < 32) value |= (b & 0x7F) << c;
@@ -696,7 +738,7 @@ function readVarint32(bb) {
   return value;
 }
 
-function writeVarint32(bb, value) {
+function writeVarint32(bb: ByteBuffer, value: number): void {
   value >>>= 0;
   while (value >= 0x80) {
     writeByte(bb, (value & 0x7f) | 0x80);
@@ -705,11 +747,11 @@ function writeVarint32(bb, value) {
   writeByte(bb, value);
 }
 
-function readVarint64(bb, unsigned) {
+function readVarint64(bb: ByteBuffer, unsigned: boolean): Long {
   let part0 = 0;
   let part1 = 0;
   let part2 = 0;
-  let b;
+  let b: number;
 
   b = readByte(bb); part0 = (b & 0x7F); if (b & 0x80) {
     b = readByte(bb); part0 |= (b & 0x7F) << 7; if (b & 0x80) {
@@ -740,7 +782,7 @@ function readVarint64(bb, unsigned) {
   };
 }
 
-function writeVarint64(bb, value) {
+function writeVarint64(bb: ByteBuffer, value: Long): void {
   let part0 = value.low >>> 0;
   let part1 = ((value.low >>> 28) | (value.high << 4)) >>> 0;
   let part2 = value.high >>> 24;
@@ -774,19 +816,19 @@ function writeVarint64(bb, value) {
   }
 }
 
-function readVarint32ZigZag(bb) {
+function readVarint32ZigZag(bb: ByteBuffer): number {
   let value = readVarint32(bb);
 
   // ref: src/google/protobuf/wire_format_lite.h
   return (value >>> 1) ^ -(value & 1);
 }
 
-function writeVarint32ZigZag(bb, value) {
+function writeVarint32ZigZag(bb: ByteBuffer, value: number): void {
   // ref: src/google/protobuf/wire_format_lite.h
   writeVarint32(bb, (value << 1) ^ (value >> 31));
 }
 
-function readVarint64ZigZag(bb) {
+function readVarint64ZigZag(bb: ByteBuffer): Long {
   let value = readVarint64(bb, /* unsigned */ false);
   let low = value.low;
   let high = value.high;
@@ -800,7 +842,7 @@ function readVarint64ZigZag(bb) {
   };
 }
 
-function writeVarint64ZigZag(bb, value) {
+function writeVarint64ZigZag(bb: ByteBuffer, value: Long): void {
   let low = value.low;
   let high = value.high;
   let flip = high >> 31;

@@ -2,7 +2,7 @@ syntax = "proto2";
 
 package email;
 
-enum Frequency {
+enum FrequencyProto {
   daily = 0;
   hourly = 1;
 }
@@ -11,7 +11,7 @@ message SubscriptionProto {
   required string id = 1;
   required string email = 2;
   required string city = 3;
-  required Frequency frequency = 4;
+  required FrequencyProto frequency = 4;
   required string token = 5;
   required bool confirmed = 6;
   required string createdAt = 7; 
@@ -20,7 +20,7 @@ message SubscriptionProto {
 
 service EmailService {
   rpc SendEmails (SendEmailsRequest) returns (SendEmailsResponse);
-  rpc sendConfirmationEmail (SendConfirmationEmailRequest) returns (SendEmailConfirmationResponse);
+  rpc SendConfirmationEmail (SendConfirmationEmailRequest) returns (SendEmailConfirmationResponse);
 }
 
 message SendEmailsRequest {

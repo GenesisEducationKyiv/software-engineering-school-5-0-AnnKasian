@@ -1,5 +1,6 @@
 import { type AxiosError, isAxiosError } from "axios";
 import { Inject, Injectable } from "@nestjs/common";
+import { ERROR_MESSAGES } from "../../../../../shared/libs/enums/enums.js";
 import {
   WEATHER_ERROR_MESSAGES,
   WEATHER_PROVIDERS_ERROR_CODES,
@@ -13,7 +14,6 @@ import {
 } from "../exceptions/exceptions.js";
 import { type WeatherErrorType } from "../types/types.js";
 import { FileLogger } from "./file-logger.helper.js";
-import { ERROR_MESSAGES } from "../../../../../shared/libs/enums/enums.js";
 
 @Injectable()
 class WeatherErrorHandler {

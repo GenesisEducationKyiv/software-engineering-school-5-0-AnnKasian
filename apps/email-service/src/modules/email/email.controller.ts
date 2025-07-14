@@ -1,15 +1,15 @@
 import { Controller } from "@nestjs/common";
-import { EmailService } from "./email.service.js";
 import { GrpcMethod } from "@nestjs/microservices";
 import {
   SendEmailsRequest,
   SendEmailsResponse,
   SendConfirmationEmailRequest,
   SendEmailConfirmationResponse,
-} from "../../../generated/email.js";
+} from "../../../../../shared/generated/email.js";
 import { grpcErrorHandler } from "../../../../../shared/libs/helpers/helpers.js";
-import { MapToDomainFromProto } from "../../libs/mappers/mappers.js";
+import { MapSubscriptionToDomainFromProto } from "../../../../../shared/libs/mappers/mappers.js";
 import { DataIsRequiredException } from "../../libs/exceptions/exceptions.js";
+import { EmailService } from "./email.service.js";
 
 @Controller()
 class EmailController {
@@ -20,9 +20,9 @@ class EmailController {
     payload: SendEmailsRequest
   ): Promise<SendEmailsResponse> {
     try {
-      if (payload.subscription && payload.subscription.length > 0) {
+      if (payload.subscription) {
         const subscriptions = payload.subscription.map((subscription) =>
-          MapToDomainFromProto(subscription)
+          MapSubscriptionToDomainFromProto(subscription)
         );
 
         await this.emailService.sendEmails(subscriptions);
@@ -36,12 +36,14 @@ class EmailController {
     }
   }
 
-  @GrpcMethod("EmailService", "sendConfirmationEmail")
-  public async sendConfirmationEmail(
+  @GrpcMethod("EmailService", "SendConfirmationEmail")
+  public async SendConfirmationEmail(
     payload: SendConfirmationEmailRequest
   ): Promise<SendEmailConfirmationResponse> {
     try {
-      const subscription = MapToDomainFromProto(payload.subscription);
+      const subscription = MapSubscriptionToDomainFromProto(
+        payload.subscription
+      );
       await this.emailService.sendConfirmationEmail(subscription);
 
       return {};

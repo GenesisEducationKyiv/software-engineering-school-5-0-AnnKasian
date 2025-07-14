@@ -1,13 +1,14 @@
+import path from "path";
 import { MailerModule, MailerService } from "@nestjs-modules/mailer";
 import { HandlebarsAdapter } from "@nestjs-modules/mailer/dist/adapters/handlebars.adapter.js";
 import ms from "smtp-tester";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { Test, type TestingModule } from "@nestjs/testing";
-import { EmailService } from "../../src/modules/email/email.service.js";
-import { EmailSendFailException } from "../../src/libs/exceptions/exceptions.js";
-import { EmailIntegrationMock } from "./mock-data/mock-data.js";
 import { EMAIL_INJECTION_TOKENS } from "../../src/libs/enums/enums.js";
-import { IWeatherService } from "../../src/libs/interfaces/interfaces.js";
+import { EmailSendFailException } from "../../src/libs/exceptions/exceptions.js";
+import { type EmailWeatherClient } from "../../src/modules/email/email-weather.client.js";
+import { EmailService } from "../../src/modules/email/email.service.js";
+import { EmailIntegrationMock } from "./mock-data/mock-data.js";
 
 describe("EmailService Integration Tests", () => {
   let module: TestingModule;
@@ -40,7 +41,10 @@ describe("EmailService Integration Tests", () => {
               from: "test@example.com",
             },
             template: {
-              dir: process.cwd() + "/email-templates/",
+              dir: path.join(
+                process.cwd(),
+                "apps/email-service/email-templates"
+              ),
               adapter: new HandlebarsAdapter(),
               options: {
                 strict: true,
@@ -55,10 +59,14 @@ describe("EmailService Integration Tests", () => {
           useValue: mockWeatherService,
         },
         {
+          provide: EMAIL_INJECTION_TOKENS.EMAIL_WEATHER_CLIENT,
+          useValue: mockWeatherService,
+        },
+        {
           provide: EmailService,
           useFactory: (
             mailerService: MailerService,
-            weatherService: IWeatherService
+            weatherService: EmailWeatherClient
           ) => {
             return new EmailService(mailerService, baseUrl, weatherService);
           },
@@ -87,9 +95,9 @@ describe("EmailService Integration Tests", () => {
         [EmailIntegrationMock.newData.newSubscription]
       );
 
-      expect(mockWeatherService.get).toHaveBeenCalledWith({
-        city: EmailIntegrationMock.newData.newSubscription.city,
-      });
+      expect(mockWeatherService.get).toHaveBeenCalledWith(
+        EmailIntegrationMock.newData.newSubscription.city
+      );
 
       const capturedEmail = await mailServer.captureOne(
         EmailIntegrationMock.newData.newSubscription.email,

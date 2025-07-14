@@ -1,5 +1,5 @@
+import { type Subscription } from "../../../../../shared/libs/types/types.js";
 import { SubscriptionEntity } from "../../modules/subscription/entities/entities.js";
-import { Subscription } from "../../../../../shared/libs/types/types.js";
 
 const MapToEntity = (domain: Subscription): SubscriptionEntity => {
   return new SubscriptionEntity({

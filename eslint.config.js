@@ -23,10 +23,10 @@ const ignoresConfig = {
     "node_modules",
     "dist",
     "build",
-    "apps",
     "packages",
-    "public",
+    "shared/public/",
     ".dependency-cruiser.cjs",
+    "shared/generated/",
   ],
 };
 
@@ -200,6 +200,7 @@ const typescriptConfig = {
         fixStyle: "inline-type-imports",
       },
     ],
+    "@typescript-eslint/no-empty-object-type": "off",
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/no-magic-numbers": [
       "warn",
@@ -207,6 +208,7 @@ const typescriptConfig = {
         ignoreEnums: true,
         ignoreReadonlyClassProperties: true,
         ignoreArrayIndexes: true,
+        ignore: [0, 1],
       },
     ],
     "@typescript-eslint/return-await": ["warn", "always"],

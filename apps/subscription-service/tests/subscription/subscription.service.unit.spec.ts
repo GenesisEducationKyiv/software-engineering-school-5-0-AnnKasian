@@ -1,7 +1,7 @@
 import { ConfigService } from "@nestjs/config";
 import { Test } from "@nestjs/testing";
+import { Frequency } from "../../../../shared/libs/enums/enums.js";
 import { SUBSCRIPTION_INJECTION_TOKENS } from "../../src/libs/enums/enums.js";
-import { SubscriptionMock } from "./mock-data/mock-data.js";
 import {
   EmailAlreadyExistsException,
   InvalidTokenException,
@@ -9,7 +9,7 @@ import {
   TokenNotFoundException,
 } from "../../src/libs/exceptions/exceptions.js";
 import { SubscriptionService } from "../../src/modules/subscription/subscription.service.js";
-import { Frequency } from "../../../../shared/libs/enums/enums.js";
+import { SubscriptionMock } from "./mock-data/mock-data.js";
 
 describe("SubscriptionService", () => {
   let subscriptionService: SubscriptionService;
@@ -26,7 +26,7 @@ describe("SubscriptionService", () => {
     get: jest.fn(),
   };
 
-  const mockEmailService = {
+  const mockSubscriptionEmailClient = {
     sendConfirmationEmail: jest.fn(),
     sendEmails: jest.fn(),
   };
@@ -44,8 +44,8 @@ describe("SubscriptionService", () => {
           useValue: mockConfigService,
         },
         {
-          provide: SUBSCRIPTION_INJECTION_TOKENS.EMAIL_SERVICE,
-          useValue: mockEmailService,
+          provide: SUBSCRIPTION_INJECTION_TOKENS.SUBSCRIPTION_EMAIL_CLIENT,
+          useValue: mockSubscriptionEmailClient,
         },
       ],
     }).compile();
@@ -68,7 +68,9 @@ describe("SubscriptionService", () => {
         SubscriptionMock.request.emailNotExist
       );
 
-      expect(mockEmailService.sendConfirmationEmail).toHaveBeenCalledWith(
+      expect(
+        mockSubscriptionEmailClient.sendConfirmationEmail
+      ).toHaveBeenCalledWith(
         SubscriptionMock.responsefromRepository.emailNotExist
       );
 
@@ -84,7 +86,9 @@ describe("SubscriptionService", () => {
         SubscriptionMock.request.emailExist
       );
 
-      expect(mockEmailService.sendConfirmationEmail).toHaveBeenCalledWith(
+      expect(
+        mockSubscriptionEmailClient.sendConfirmationEmail
+      ).toHaveBeenCalledWith(
         SubscriptionMock.responsefromRepository.emailExist
       );
 
@@ -196,7 +200,7 @@ describe("SubscriptionService", () => {
         Frequency.HOURLY
       );
 
-      expect(mockEmailService.sendEmails).toHaveBeenCalledWith(
+      expect(mockSubscriptionEmailClient.sendEmails).toHaveBeenCalledWith(
         SubscriptionMock.responsefromRepository.hourly
       );
     });
@@ -214,7 +218,7 @@ describe("SubscriptionService", () => {
         Frequency.DAILY
       );
 
-      expect(mockEmailService.sendEmails).toHaveBeenCalledWith(
+      expect(mockSubscriptionEmailClient.sendEmails).toHaveBeenCalledWith(
         SubscriptionMock.responsefromRepository.daily
       );
     });

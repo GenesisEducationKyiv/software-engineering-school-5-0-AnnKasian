@@ -1,8 +1,8 @@
-import { NestFactory } from "@nestjs/core";
-import { AppModule } from "./app.module.js";
-import { MicroserviceOptions, Transport } from "@nestjs/microservices";
 import path from "path";
 import { ValidationPipe } from "@nestjs/common";
+import { NestFactory } from "@nestjs/core";
+import { type MicroserviceOptions, Transport } from "@nestjs/microservices";
+import { AppModule } from "./app.module.js";
 
 async function bootstrap(): Promise<void> {
   try {
@@ -20,9 +20,8 @@ async function bootstrap(): Promise<void> {
 
     app.useGlobalPipes(new ValidationPipe({ transform: true }));
     await app.listen();
-  } catch (error) {
-    console.error("Failed to start microservice:", error);
-    process.exit(1);
+  } catch (error: unknown) {
+    throw new Error(`Failed to start microservice: ${error as string}`);
   }
 }
 

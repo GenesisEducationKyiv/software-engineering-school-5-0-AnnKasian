@@ -5,6 +5,7 @@ const action = urlParams.get("action");
 async function processAction() {
   if (!token || !action) {
     showError("Invalid link. Missing required parameters.");
+
     return;
   }
 
@@ -23,6 +24,7 @@ async function processAction() {
       actionClass = "unsubscribe-action";
     } else {
       showError("Invalid action specified.");
+
       return;
     }
 

@@ -1,5 +1,14 @@
 import { Controller, Get, Query } from "@nestjs/common";
+import { GrpcMethod } from "@nestjs/microservices";
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
+import {
+  GetWeatherRequest,
+  GetWeatherResponse,
+} from "../../../../../shared/generated/weather.js";
+import {
+  httpErrorHandler,
+  grpcErrorHandler,
+} from "../../../../../shared/libs/helpers/helpers.js";
 import {
   SwaggerOperation,
   SwaggerQuery,
@@ -7,15 +16,7 @@ import {
 } from "../../libs/swagger-docs/swagger-docs.js";
 import { WeatherDto, WeatherQueryDto } from "../../libs/types/types.js";
 import { WeatherService } from "./weather.service.js";
-import {
-  httpErrorHandler,
-  grpcErrorHandler,
-} from "../../../../../shared/libs/helpers/helpers.js";
-import { GrpcMethod } from "@nestjs/microservices";
-import {
-  GetWeatherRequest,
-  GetWeatherResponse,
-} from "../../../generated/weather.js";
+
 @ApiTags("weather")
 @Controller("weather")
 class WeatherController {

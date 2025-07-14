@@ -1,11 +1,11 @@
+import path from "path";
 import { ValidationPipe } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { NestFactory } from "@nestjs/core";
+import { type MicroserviceOptions, Transport } from "@nestjs/microservices";
 import { type NestExpressApplication } from "@nestjs/platform-express";
-import { AppModule } from "./app.module.js";
 import { CONFIG_KEYS } from "../../../shared/libs/enums/enums.js";
-import { MicroserviceOptions, Transport } from "@nestjs/microservices";
-import path from "path";
+import { AppModule } from "./app.module.js";
 
 async function bootstrap(): Promise<void> {
   try {
@@ -37,9 +37,8 @@ async function bootstrap(): Promise<void> {
 
     await app.startAllMicroservices();
     await app.listen(httpPort);
-  } catch (error) {
-    console.error("Failed to start services:", error);
-    process.exit(1);
+  } catch (error: unknown) {
+    throw new Error(`Failed to start services: ${error as string}`);
   }
 }
 

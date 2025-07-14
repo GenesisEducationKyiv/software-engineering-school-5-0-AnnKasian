@@ -45,7 +45,7 @@ services:
     depends_on:
       - cache
     volumes:
-      - ./apps/weather-service/logs:/app/logs
+      - ./apps/weather-service/logs:/app/apps/weather-service/logs
       - ./shared:/app/shared:ro
     networks:
       - app-network

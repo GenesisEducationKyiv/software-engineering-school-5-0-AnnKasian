@@ -4,6 +4,7 @@ const WEATHER_ERROR_MESSAGES = {
   API_REQUEST_FAILED: "API request failed.",
   PROVIDERS_NOT_AVAILABLE: "Providers not available.",
   API_ERROR: "No data returned from API",
+  WEATHER_LOG_EXCEPTION: "Logger error.",
 } as const;
 
 type WEATHER_ERROR_MESSAGES =

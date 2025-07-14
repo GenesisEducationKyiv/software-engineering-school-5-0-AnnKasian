@@ -1,8 +1,8 @@
 import { Injectable } from "@nestjs/common";
+import { WeatherType } from "../../../../../shared/libs/types/types.js";
 import { WEATHER_PROVIDERS } from "../enums/enums.js";
 import { WeatherApiResponseType } from "../types/types.js";
 import { BaseWeatherProvider } from "./base-weather.provider.js";
-import { WeatherType } from "../../../../../shared/libs/types/types.js";
 
 @Injectable()
 class WeatherApiProvider extends BaseWeatherProvider<WeatherApiResponseType> {
@@ -21,7 +21,7 @@ class WeatherApiProvider extends BaseWeatherProvider<WeatherApiResponseType> {
     return {
       description: data.current?.condition?.text,
       humidity: data.current?.humidity,
-      temperature: data.current?.temp_c,
+      temperature: Number(data.current?.temp_c.toFixed()),
     };
   }
 }

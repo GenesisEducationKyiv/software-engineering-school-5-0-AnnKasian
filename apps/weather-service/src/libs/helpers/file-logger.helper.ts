@@ -1,5 +1,7 @@
 import * as fs from "fs";
+import path from "path";
 import { Injectable } from "@nestjs/common";
+import { WeatherLogException } from "../exceptions/exceptions.js";
 import { type WeatherLogType } from "../types/types.js";
 
 @Injectable()
@@ -41,9 +43,14 @@ class FileLogger {
         fs.mkdirSync("logs", { recursive: true });
       }
 
-      fs.appendFileSync("logs/weather.log", `${JSON.stringify(message)}\n`);
+      fs.appendFileSync(
+        path.resolve(process.cwd(), "apps/weather-service/logs/weather.log"),
+        JSON.stringify(message) + "\n"
+      );
     } catch (error) {
-      throw new Error(`Error logging to file: ${error as string}`);
+      throw new WeatherLogException(
+        `Error logging to file: ${error as string}`
+      );
     }
   }
 }

@@ -1,10 +1,11 @@
+import { type Observable } from "rxjs";
 import {
-  WeatherType,
-  WeatherQueryType,
-} from "../../../../../shared/libs/types/types.js";
+  type GetWeatherRequest,
+  type GetWeatherResponse,
+} from "../../../../../shared/generated/weather.js";
 
 interface IWeatherService {
-  get(city: WeatherQueryType): Promise<WeatherType>;
+  getWeather(city: GetWeatherRequest): Observable<GetWeatherResponse>;
 }
 
 export { type IWeatherService };

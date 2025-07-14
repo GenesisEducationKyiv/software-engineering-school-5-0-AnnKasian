@@ -4,6 +4,7 @@ const SUBSCRIPTION_ERROR_MESSAGES = {
   SUBSCRIPTION_ALREADY_CONFIRMED: "Subscription already confirmed.",
   TOKEN_NOT_FOUND: "Token not found.",
   INVALID_TOKEN: "Invalid token.",
+  EMAIL_SERVICE_ERROR: "Email service error.",
 } as const;
 
 export { SUBSCRIPTION_ERROR_MESSAGES };

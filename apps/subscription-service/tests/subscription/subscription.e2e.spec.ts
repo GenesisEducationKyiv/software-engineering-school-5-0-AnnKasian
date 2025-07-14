@@ -9,7 +9,7 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { Test, type TestingModule } from "@nestjs/testing";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { SubscriptionEntity } from "../../src/modules/subscription/subscription.js";
-import { SubscriptionModule } from "../../src/modules/subscription/subscription.module";
+import { SubscriptionModule } from "../../src/modules/subscription/subscription.module.js";
 import { testDatabaseConfig } from "../text-database.config.js";
 import { SubscriptionE2eMock } from "./mock-data/mock-data.js";
 
@@ -43,7 +43,8 @@ describe("Subscription", () => {
               from: "test@example.com",
             },
             template: {
-              dir: process.cwd() + "/email-templates/",
+              dir:
+                process.cwd() + "/apps/email-service/src/libs/email-templates/",
               adapter: new HandlebarsAdapter(),
               options: {
                 strict: true,

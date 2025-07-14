@@ -1,9 +1,9 @@
 import { ERROR_STATUS_CODES } from "../../../../../shared/libs/enums/enums.js";
+import { BaseException } from "../../../../../shared/libs/exceptions/exceptions.js";
 import {
   SUBSCRIPTION_ERROR_CODES,
   SUBSCRIPTION_ERROR_MESSAGES,
 } from "../enums/enums.js";
-import { BaseException } from "../../../../../shared/libs/exceptions/exceptions.js";
 
 class InvalidSubscriptionInputException extends BaseException {
   public code = SUBSCRIPTION_ERROR_CODES.INVALID_INPUT;
@@ -54,10 +54,22 @@ class InvalidTokenException extends BaseException {
   }
 }
 
+class EmailServiceException extends BaseException {
+  public code = SUBSCRIPTION_ERROR_CODES.EMAIL_SERVICE_ERROR;
+  public statusCode = ERROR_STATUS_CODES.INTERNAL_SERVER_ERROR;
+
+  constructor(
+    message: string = SUBSCRIPTION_ERROR_MESSAGES.EMAIL_SERVICE_ERROR
+  ) {
+    super(message);
+  }
+}
+
 export {
   InvalidSubscriptionInputException,
   EmailAlreadyExistsException,
   TokenNotFoundException,
   InvalidTokenException,
   SubscriptionAlreadyConfirmedException,
+  EmailServiceException,
 };

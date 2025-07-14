@@ -10,3 +10,77 @@
 {"className":"WeatherApiProvider","response":"API Error: (401) - API key is invalid."}
 {"className":"WeatherbitProvider","response":"API Error: (403) - API key not valid, or not yet activated. If you recently signed up for an account or created this key, please allow up to 30 minutes for key to activate."}
 {"className":"WeatherstackProvider","response":"All providers failed: No weather providers available"}
+{"className":"WeatherApiProvider","response":"Response : Lviv - \"{\\\"description\\\":\\\"Sunny\\\",\\\"humidity\\\":50,\\\"temperature\\\":20}\""}
+{"className":"WeatherApiProvider","response":"API Error: (500) - Unknown error."}
+{"className":"WeatherbitProvider","response":"Response : Lviv - \"{\\\"description\\\":\\\"Sunny\\\",\\\"humidity\\\":50,\\\"temperature\\\":20}\""}
+{"className":"WeatherApiProvider","response":"API Error: (500) - Unknown error."}
+{"className":"WeatherbitProvider","response":"API Error: (500) - Unknown error."}
+{"className":"WeatherstackProvider","response":"Response : Lviv - \"{\\\"description\\\":\\\"Sunny\\\",\\\"humidity\\\":50,\\\"temperature\\\":20}\""}
+{"className":"WeatherApiProvider","response":"Invalid city: [object Object]"}
+{"className":"WeatherbitProvider","response":"Invalid city: Unknown error."}
+{"className":"WeatherstackProvider","response":"Invalid city: City not found."}
+{"className":"WeatherstackProvider","response":"Invalid city: City not found."}
+{"className":"WeatherApiProvider","response":"API Error: (500) - Unknown error."}
+{"className":"WeatherbitProvider","response":"API Error: (500) - Unknown error."}
+{"className":"WeatherstackProvider","response":"API Error: (500) - Unknown error."}
+{"className":"WeatherstackProvider","response":"All providers failed: Providers not available."}
+{"className":"WeatherApiProvider","response":"Response : Lviv - \"{\\\"description\\\":\\\"Sunny\\\",\\\"humidity\\\":50,\\\"temperature\\\":20}\""}
+{"className":"WeatherApiProvider","response":"API Error: (500) - Unknown error."}
+{"className":"WeatherbitProvider","response":"Response : Lviv - \"{\\\"description\\\":\\\"Sunny\\\",\\\"humidity\\\":50,\\\"temperature\\\":20}\""}
+{"className":"WeatherApiProvider","response":"API Error: (500) - Unknown error."}
+{"className":"WeatherbitProvider","response":"API Error: (500) - Unknown error."}
+{"className":"WeatherstackProvider","response":"Response : Lviv - \"{\\\"description\\\":\\\"Sunny\\\",\\\"humidity\\\":50,\\\"temperature\\\":20}\""}
+{"className":"WeatherApiProvider","response":"Invalid city: [object Object]"}
+{"className":"WeatherbitProvider","response":"Invalid city: Unknown error."}
+{"className":"WeatherstackProvider","response":"Invalid city: City not found."}
+{"className":"WeatherstackProvider","response":"Invalid city: City not found."}
+{"className":"WeatherApiProvider","response":"API Error: (500) - Unknown error."}
+{"className":"WeatherbitProvider","response":"API Error: (500) - Unknown error."}
+{"className":"WeatherstackProvider","response":"API Error: (500) - Unknown error."}
+{"className":"WeatherstackProvider","response":"All providers failed: Providers not available."}
+{"className":"WeatherApiProvider","response":"Response : Lviv - \"{\\\"description\\\":\\\"Sunny\\\",\\\"humidity\\\":50,\\\"temperature\\\":20}\""}
+{"className":"WeatherApiProvider","response":"API Error: (500) - Unknown error."}
+{"className":"WeatherbitProvider","response":"Response : Lviv - \"{\\\"description\\\":\\\"Sunny\\\",\\\"humidity\\\":50,\\\"temperature\\\":20}\""}
+{"className":"WeatherApiProvider","response":"API Error: (500) - Unknown error."}
+{"className":"WeatherbitProvider","response":"API Error: (500) - Unknown error."}
+{"className":"WeatherstackProvider","response":"Response : Lviv - \"{\\\"description\\\":\\\"Sunny\\\",\\\"humidity\\\":50,\\\"temperature\\\":20}\""}
+{"className":"WeatherApiProvider","response":"Invalid city: [object Object]"}
+{"className":"WeatherbitProvider","response":"Invalid city: Unknown error."}
+{"className":"WeatherstackProvider","response":"Invalid city: City not found."}
+{"className":"WeatherstackProvider","response":"Invalid city: City not found."}
+{"className":"WeatherApiProvider","response":"API Error: (500) - Unknown error."}
+{"className":"WeatherbitProvider","response":"API Error: (500) - Unknown error."}
+{"className":"WeatherstackProvider","response":"API Error: (500) - Unknown error."}
+{"className":"WeatherstackProvider","response":"All providers failed: Providers not available."}
+{"className":"WeatherApiProvider","response":"Response : Lviv - \"{\\\"description\\\":\\\"Sunny\\\",\\\"humidity\\\":50,\\\"temperature\\\":20}\""}
+{"className":"WeatherApiProvider","response":"API Error: (500) - Unknown error."}
+{"className":"WeatherbitProvider","response":"Response : Lviv - \"{\\\"description\\\":\\\"Sunny\\\",\\\"humidity\\\":50,\\\"temperature\\\":20}\""}
+{"className":"WeatherApiProvider","response":"API Error: (500) - Unknown error."}
+{"className":"WeatherbitProvider","response":"API Error: (500) - Unknown error."}
+{"className":"WeatherstackProvider","response":"Response : Lviv - \"{\\\"description\\\":\\\"Sunny\\\",\\\"humidity\\\":50,\\\"temperature\\\":20}\""}
+{"className":"WeatherApiProvider","response":"Invalid city: [object Object]"}
+{"className":"WeatherbitProvider","response":"Invalid city: Unknown error."}
+{"className":"WeatherstackProvider","response":"Invalid city: City not found."}
+{"className":"WeatherstackProvider","response":"Invalid city: City not found."}
+{"className":"WeatherApiProvider","response":"API Error: (500) - Unknown error."}
+{"className":"WeatherbitProvider","response":"API Error: (500) - Unknown error."}
+{"className":"WeatherstackProvider","response":"API Error: (500) - Unknown error."}
+{"className":"WeatherstackProvider","response":"All providers failed: Providers not available."}
+{"className":"WeatherApiProvider","response":"Response : 22 - \"{\\\"description\\\":\\\"Fog\\\",\\\"humidity\\\":98,\\\"temperature\\\":21}\""}
+{"className":"WeatherApiProvider","response":"Response : Kyiv - \"{\\\"description\\\":\\\"Sunny\\\",\\\"humidity\\\":28,\\\"temperature\\\":30.1}\""}
+{"className":"WeatherApiProvider","response":"Response : 22 - \"{\\\"description\\\":\\\"Fog\\\",\\\"humidity\\\":98,\\\"temperature\\\":21}\""}
+{"className":"WeatherApiProvider","response":"Response : Kyiv - \"{\\\"description\\\":\\\"Sunny\\\",\\\"humidity\\\":28,\\\"temperature\\\":30.1}\""}
+{"className":"WeatherApiProvider","response":"Response : Kyiv - \"{\\\"description\\\":\\\"Sunny\\\",\\\"humidity\\\":28,\\\"temperature\\\":30.1}\""}
+{"className":"WeatherApiProvider","response":"Response : 22 - \"{\\\"description\\\":\\\"Fog\\\",\\\"humidity\\\":98,\\\"temperature\\\":21}\""}
+{"className":"WeatherApiProvider","response":"Response : 22 - \"{\\\"description\\\":\\\"Fog\\\",\\\"humidity\\\":98,\\\"temperature\\\":21.6}\""}
+{"className":"WeatherApiProvider","response":"Response : Kyiv - \"{\\\"description\\\":\\\"Sunny\\\",\\\"humidity\\\":28,\\\"temperature\\\":30.4}\""}
+{"className":"WeatherApiProvider","response":"Response : 22 - \"{\\\"description\\\":\\\"Fog\\\",\\\"humidity\\\":98,\\\"temperature\\\":21.6}\""}
+{"className":"WeatherApiProvider","response":"Response : Kyiv - \"{\\\"description\\\":\\\"Sunny\\\",\\\"humidity\\\":28,\\\"temperature\\\":30.4}\""}
+{"className":"WeatherApiProvider","response":"Response : Kyiv - \"{\\\"description\\\":\\\"Sunny\\\",\\\"humidity\\\":28,\\\"temperature\\\":30.4}\""}
+{"className":"WeatherApiProvider","response":"Response : 22 - \"{\\\"description\\\":\\\"Fog\\\",\\\"humidity\\\":98,\\\"temperature\\\":21.6}\""}
+{"className":"WeatherApiProvider","response":"Response : Kyiv - \"{\\\"description\\\":\\\"Sunny\\\",\\\"humidity\\\":28,\\\"temperature\\\":30.4}\""}
+{"className":"WeatherApiProvider","response":"Response : 22 - \"{\\\"description\\\":\\\"Fog\\\",\\\"humidity\\\":98,\\\"temperature\\\":21.6}\""}
+{"className":"WeatherApiProvider","response":"Response : 22 - \"{\\\"description\\\":\\\"Fog\\\",\\\"humidity\\\":98,\\\"temperature\\\":21.6}\""}
+{"className":"WeatherApiProvider","response":"Response : Kyiv - \"{\\\"description\\\":\\\"Sunny\\\",\\\"humidity\\\":28,\\\"temperature\\\":30.4}\""}
+{"className":"WeatherApiProvider","response":"Response : Kyiv - \"{\\\"description\\\":\\\"Sunny\\\",\\\"humidity\\\":28,\\\"temperature\\\":30}\""}
+{"className":"WeatherApiProvider","response":"Response : Kyiv - \"{\\\"description\\\":\\\"Sunny\\\",\\\"humidity\\\":28,\\\"temperature\\\":30}\""}

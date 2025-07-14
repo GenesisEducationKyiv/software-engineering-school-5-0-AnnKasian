@@ -1,15 +1,15 @@
 import { Repository } from "typeorm";
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { SubscriptionEntity } from "./entities/entities.js";
+import { Frequency } from "../../../../../shared/libs/enums/enums.js";
+import { Subscription } from "../../../../../shared/libs/types/types.js";
 import { ISubscriptionRepository } from "../../libs/interfaces/interfaces.js";
 import { MapToDomain, MapToEntity } from "../../libs/mappers/mappers.js";
 import {
   SubscriptionType,
   SubscribeFilterType,
 } from "../../libs/types/types.js";
-import { Subscription } from "../../../../../shared/libs/types/types.js";
-import { Frequency } from "../../../../../shared/libs/enums/enums.js";
+import { SubscriptionEntity } from "./entities/entities.js";
 
 @Injectable()
 class SubscriptionRepository implements ISubscriptionRepository {

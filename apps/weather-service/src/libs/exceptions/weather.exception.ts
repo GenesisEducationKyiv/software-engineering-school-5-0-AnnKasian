@@ -1,6 +1,6 @@
+import { ERROR_STATUS_CODES } from "../../../../../shared/libs/enums/enums.js";
 import { BaseException } from "../../../../../shared/libs/exceptions/exceptions.js";
 import { WEATHER_ERROR_CODES, WEATHER_ERROR_MESSAGES } from "../enums/enums.js";
-import { ERROR_STATUS_CODES } from "../../../../../shared/libs/enums/enums.js";
 
 class InvalidRequestException extends BaseException {
   public code = WEATHER_ERROR_CODES.INVALID_REQUEST;

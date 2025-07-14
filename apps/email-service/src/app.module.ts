@@ -1,9 +1,14 @@
+import path from "path";
+import { fileURLToPath } from "url";
 import { MailerModule } from "@nestjs-modules/mailer";
 import { HandlebarsAdapter } from "@nestjs-modules/mailer/dist/adapters/handlebars.adapter.js";
 import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { CONFIG_KEYS } from "../../../shared/libs/enums/enums.js";
 import { EmailModule } from "./modules/email/email.module.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 @Module({
   imports: [
@@ -29,7 +34,7 @@ import { EmailModule } from "./modules/email/email.module.js";
             from: configService.get(CONFIG_KEYS.EMAIL_FROM),
           },
           template: {
-            dir: process.cwd() + "/email-templates/",
+            dir: path.join(__dirname, "..", "email-templates"),
             adapter: new HandlebarsAdapter(),
             options: {
               strict: true,

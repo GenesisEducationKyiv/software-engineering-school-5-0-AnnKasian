@@ -1,8 +1,8 @@
 import { Injectable } from "@nestjs/common";
+import { WeatherType } from "../../../../../shared/libs/types/types.js";
 import { WEATHER_PROVIDERS } from "../enums/enums.js";
 import { WeatherbitResponseType } from "../types/types.js";
 import { BaseWeatherProvider } from "./base-weather.provider.js";
-import { WeatherType } from "../../../../../shared/libs/types/types.js";
 
 @Injectable()
 class WeatherbitProvider extends BaseWeatherProvider<WeatherbitResponseType> {
@@ -21,7 +21,7 @@ class WeatherbitProvider extends BaseWeatherProvider<WeatherbitResponseType> {
     return {
       description: data.data?.[0].weather?.description,
       humidity: data.data?.[0].rh,
-      temperature: data.data?.[0].temp,
+      temperature: Number(data.data?.[0].temp.toFixed()),
     };
   }
 }

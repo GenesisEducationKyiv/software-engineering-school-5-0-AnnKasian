@@ -1,25 +1,26 @@
+import { MailerService } from "@nestjs-modules/mailer";
 import { Inject, Injectable } from "@nestjs/common";
+import { ERROR_MESSAGES } from "../../../../../shared/libs/enums/enums.js";
+import { Subscription } from "../../../../../shared/libs/types/types.js";
 import {
   EmailSubject,
   EmailTemplate,
 } from "../../libs/email-data/email-data.js";
-import { MailerService } from "@nestjs-modules/mailer";
-import { EmailSendFailException } from "../../libs/exceptions/exceptions.js";
 import {
   EMAIL_INJECTION_TOKENS,
   EMAIL_STATUS,
+  EMAIL_URLS,
 } from "../../libs/enums/enums.js";
-import { ERROR_MESSAGES } from "../../../../../shared/libs/enums/enums.js";
-import { IWeatherService } from "../../libs/interfaces/interfaces.js";
-import { Subscription } from "../../../../../shared/libs/types/types.js";
+import { EmailSendFailException } from "../../libs/exceptions/exceptions.js";
+import { EmailWeatherClient } from "./email-weather.client.js";
 
 @Injectable()
 class EmailService {
   public constructor(
     private readonly mailerService: MailerService,
     private readonly baseUrl: string,
-    @Inject(EMAIL_INJECTION_TOKENS.WEATHER_SERVICE)
-    private readonly weatherService: IWeatherService
+    @Inject(EMAIL_INJECTION_TOKENS.EMAIL_WEATHER_CLIENT)
+    private readonly emaiWeatherClient: EmailWeatherClient
   ) {}
 
   async sendConfirmationEmail(subscription: Subscription) {
@@ -32,7 +33,7 @@ class EmailService {
         template: EmailTemplate.CONFIRM,
         context: {
           year: currentDate.getFullYear(),
-          confirmUrl: `${this.baseUrl}/action.html?action=confirm&token=${subscription.token}`,
+          confirmUrl: `${this.baseUrl}${EMAIL_URLS.CONFIRM}${subscription.token}`,
         },
       });
     } catch (error: unknown) {
@@ -62,7 +63,7 @@ class EmailService {
     city: string,
     subscriptions: Subscription[]
   ): Promise<void> {
-    const weather = await this.weatherService.get({ city });
+    const weather = await this.emaiWeatherClient.get(city);
 
     const currentDate = new Date();
 
@@ -78,7 +79,7 @@ class EmailService {
             humidity: weather.humidity,
             description: weather.description,
             year: currentDate.getFullYear(),
-            unsubscribeUrl: `${this.baseUrl}/action.html?action=unsubscribe&token=${subscription.token}`,
+            unsubscribeUrl: `${this.baseUrl}${EMAIL_URLS.UNSUBSCRIBE}${subscription.token}`,
           },
         })
       )
