@@ -3,8 +3,8 @@ syntax = "proto2";
 package email;
 
 enum FrequencyProto {
-  daily = 0;
-  hourly = 1;
+   daily = 0;
+   hourly = 1;
 }
 
 message SubscriptionProto {

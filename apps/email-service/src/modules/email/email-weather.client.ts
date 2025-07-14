@@ -12,11 +12,7 @@ class EmailWeatherClient {
   ) {}
   async get(city: string) {
     try {
-      const res = await firstValueFrom(
-        this.weatherService.getWeather({ city })
-      );
-      console.log(res);
-      return res;
+      return await firstValueFrom(this.weatherService.getWeather({ city }));
     } catch (error: unknown) {
       if (error instanceof RpcException) {
         throw new WeatherServiceException(error.message);

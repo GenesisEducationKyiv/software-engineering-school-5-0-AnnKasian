@@ -2,13 +2,19 @@ import {
   FrequencyProto,
   type SubscriptionProto,
 } from "../../generated/email.js";
-import { Frequency } from "../enums/enums.js";
+import { type Frequency } from "../enums/enums.js";
 import { Subscription } from "../types/types.js";
 
-const frequencyMap: Record<FrequencyProto, Frequency> = {
-  [FrequencyProto.hourly]: Frequency.HOURLY,
-  [FrequencyProto.daily]: Frequency.DAILY,
-};
+function mapFrequency(protoFreq: unknown): Frequency {
+  if (
+    protoFreq !== FrequencyProto.daily &&
+    protoFreq !== FrequencyProto.hourly
+  ) {
+    throw new Error(`Invalid frequency: ${protoFreq as string}`);
+  }
+
+  return protoFreq as Frequency;
+}
 
 const MapSubscriptionToDomainFromProto = (
   proto: SubscriptionProto
@@ -17,7 +23,7 @@ const MapSubscriptionToDomainFromProto = (
     proto.id,
     proto.email,
     proto.city,
-    frequencyMap[proto.frequency as FrequencyProto],
+    mapFrequency(proto.frequency),
     proto.token,
     proto.confirmed || false,
     new Date(proto.createdAt),

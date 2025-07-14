@@ -25,12 +25,7 @@ class WeatherRepository implements IWeatherRepository {
       `${CACHE_PREFIX_KEY.CURRENT_WEATHER}-${city}`
     );
 
-    try {
-      const data = await this.provider.getWeather(city);
-      console.log(1, data);
-    } catch (error) {
-      console.log(2, error);
-    }
+    await this.provider.getWeather(city);
 
     const weather = cachedWeather ?? (await this.provider.getWeather(city));
 
@@ -47,8 +42,6 @@ class WeatherRepository implements IWeatherRepository {
       );
     }
 
-    console.log(weather);
-
     return weather;
   }
 
@@ -59,7 +52,6 @@ class WeatherRepository implements IWeatherRepository {
   private async getCachedWeather(key: string): Promise<WeatherType | null> {
     const cachedData = await this.cacheManager.get<WeatherType>(key);
 
-    console.log(cachedData);
     return cachedData ?? null;
   }
 }
