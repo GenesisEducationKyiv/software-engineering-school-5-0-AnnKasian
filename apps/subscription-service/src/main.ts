@@ -4,6 +4,7 @@ import { NestFactory } from "@nestjs/core";
 import { type NestExpressApplication } from "@nestjs/platform-express";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { CONFIG_KEYS } from "../../../shared/libs/enums/config.enum.js";
+import { HandleErrorMiddleware } from "../../../shared/libs/middlewares/middlewares.js";
 import { AppModule } from "./app.module.js";
 
 async function bootstrap(): Promise<void> {
@@ -36,6 +37,7 @@ async function bootstrap(): Promise<void> {
   SwaggerModule.setup("api", app, document);
 
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  app.useGlobalFilters(new HandleErrorMiddleware());
   await app.listen(port);
 }
 

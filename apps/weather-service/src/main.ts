@@ -5,6 +5,7 @@ import { NestFactory } from "@nestjs/core";
 import { type MicroserviceOptions, Transport } from "@nestjs/microservices";
 import { type NestExpressApplication } from "@nestjs/platform-express";
 import { CONFIG_KEYS } from "../../../shared/libs/enums/enums.js";
+import { HandleErrorMiddleware } from "../../../shared/libs/middlewares/middlewares.js";
 import { AppModule } from "./app.module.js";
 
 async function bootstrap(): Promise<void> {
@@ -33,7 +34,9 @@ async function bootstrap(): Promise<void> {
         url: `weather-service:${grpcPort}`,
       },
     });
+
     app.useGlobalPipes(new ValidationPipe({ transform: true }));
+    app.useGlobalFilters(new HandleErrorMiddleware());
 
     await app.startAllMicroservices();
     await app.listen(httpPort);

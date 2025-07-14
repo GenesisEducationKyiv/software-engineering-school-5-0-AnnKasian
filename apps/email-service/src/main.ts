@@ -2,6 +2,7 @@ import path from "path";
 import { ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { type MicroserviceOptions, Transport } from "@nestjs/microservices";
+import { HandleErrorMiddleware } from "../../../shared/libs/middlewares/middlewares.js";
 import { AppModule } from "./app.module.js";
 
 async function bootstrap(): Promise<void> {
@@ -19,6 +20,7 @@ async function bootstrap(): Promise<void> {
     );
 
     app.useGlobalPipes(new ValidationPipe({ transform: true }));
+    app.useGlobalFilters(new HandleErrorMiddleware());
     await app.listen();
   } catch (error: unknown) {
     throw new Error(`Failed to start microservice: ${error as string}`);

@@ -6,7 +6,6 @@ import {
   SendConfirmationEmailRequest,
   SendEmailConfirmationResponse,
 } from "../../../../../shared/generated/email.js";
-import { grpcErrorHandler } from "../../../../../shared/libs/helpers/helpers.js";
 import { MapSubscriptionToDomainFromProto } from "../../../../../shared/libs/mappers/mappers.js";
 import { DataIsRequiredException } from "../../libs/exceptions/exceptions.js";
 import { EmailService } from "./email.service.js";
@@ -19,20 +18,16 @@ class EmailController {
   public async SendEmails(
     payload: SendEmailsRequest
   ): Promise<SendEmailsResponse> {
-    try {
-      if (payload.subscription) {
-        const subscriptions = payload.subscription.map((subscription) =>
-          MapSubscriptionToDomainFromProto(subscription)
-        );
+    if (payload.subscription) {
+      const subscriptions = payload.subscription.map((subscription) =>
+        MapSubscriptionToDomainFromProto(subscription)
+      );
 
-        await this.emailService.sendEmails(subscriptions);
+      await this.emailService.sendEmails(subscriptions);
 
-        return {};
-      } else {
-        throw new DataIsRequiredException();
-      }
-    } catch (error: unknown) {
-      return grpcErrorHandler(error);
+      return {};
+    } else {
+      throw new DataIsRequiredException();
     }
   }
 
@@ -40,16 +35,10 @@ class EmailController {
   public async SendConfirmationEmail(
     payload: SendConfirmationEmailRequest
   ): Promise<SendEmailConfirmationResponse> {
-    try {
-      const subscription = MapSubscriptionToDomainFromProto(
-        payload.subscription
-      );
-      await this.emailService.sendConfirmationEmail(subscription);
+    const subscription = MapSubscriptionToDomainFromProto(payload.subscription);
+    await this.emailService.sendConfirmationEmail(subscription);
 
-      return {};
-    } catch (error: unknown) {
-      return grpcErrorHandler(error);
-    }
+    return {};
   }
 }
 

@@ -6,10 +6,6 @@ import {
   GetWeatherResponse,
 } from "../../../../../shared/generated/weather.js";
 import {
-  httpErrorHandler,
-  grpcErrorHandler,
-} from "../../../../../shared/libs/helpers/helpers.js";
-import {
   SwaggerOperation,
   SwaggerQuery,
   SwaggerResponse,
@@ -29,22 +25,14 @@ class WeatherController {
   @ApiResponse(SwaggerResponse.FAILED)
   @ApiResponse(SwaggerResponse.NOT_FOUND)
   public async getOne(@Query() payload: WeatherQueryDto): Promise<WeatherDto> {
-    try {
-      return await this.weatherService.get(payload);
-    } catch (error: unknown) {
-      return httpErrorHandler(error);
-    }
+    return await this.weatherService.get(payload);
   }
 
   @GrpcMethod("WeatherService", "GetWeather")
   public async GetWeather(
     payload: GetWeatherRequest
   ): Promise<GetWeatherResponse> {
-    try {
-      return await this.weatherService.get(payload);
-    } catch (error: unknown) {
-      return grpcErrorHandler(error);
-    }
+    return await this.weatherService.get(payload);
   }
 }
 

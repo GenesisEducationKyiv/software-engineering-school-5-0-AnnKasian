@@ -21,7 +21,7 @@ class WeatherApiProvider extends BaseWeatherProvider<WeatherApiResponseType> {
     return {
       description: data.current?.condition?.text,
       humidity: data.current?.humidity,
-      temperature: Number(data.current?.temp_c.toFixed()),
+      temperature: data.current?.temp_c,
     };
   }
 }

@@ -21,7 +21,7 @@ class WeatherbitProvider extends BaseWeatherProvider<WeatherbitResponseType> {
     return {
       description: data.data?.[0].weather?.description,
       humidity: data.data?.[0].rh,
-      temperature: Number(data.data?.[0].temp.toFixed()),
+      temperature: data.data?.[0].temp,
     };
   }
 }

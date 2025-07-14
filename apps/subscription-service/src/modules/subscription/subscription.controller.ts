@@ -6,7 +6,6 @@ import {
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
-import { httpErrorHandler } from "../../../../../shared/libs/helpers/helpers.js";
 import {
   SwaggerBody,
   SwaggerOperation,
@@ -36,11 +35,7 @@ class SubscriptionController {
   public async subscribe(
     @Body() data: SubscriptionDto
   ): Promise<SubscribeResponseType> {
-    try {
-      return await this.subscriptionService.subscribe(data);
-    } catch (error: unknown) {
-      return httpErrorHandler(error);
-    }
+    return await this.subscriptionService.subscribe(data);
   }
 
   @Get("/confirm/:token")
@@ -50,16 +45,12 @@ class SubscriptionController {
   @ApiResponse(SwaggerResponse.INVALID_TOKEN)
   @ApiResponse(SwaggerResponse.TOKEN_NOT_FOUND)
   public async confirm(@Param("token") token: string): Promise<MessageDto> {
-    try {
-      await this.subscriptionService.confirm(token);
+    await this.subscriptionService.confirm(token);
 
-      return {
-        message: "Subscription confirmed successfully.",
-        statusCode: 200,
-      };
-    } catch (error: unknown) {
-      return httpErrorHandler(error);
-    }
+    return {
+      message: SwaggerResponse.CONFIRMED_SUCCESSFULLY.description,
+      statusCode: SwaggerResponse.CONFIRMED_SUCCESSFULLY.status,
+    };
   }
 
   @Get("/unsubscribe/:token")
@@ -68,16 +59,12 @@ class SubscriptionController {
   @ApiResponse(SwaggerResponse.INVALID_TOKEN)
   @ApiResponse(SwaggerResponse.TOKEN_NOT_FOUND)
   public async unsubscribe(@Param("token") token: string): Promise<MessageDto> {
-    try {
-      await this.subscriptionService.unsubscribe(token);
+    await this.subscriptionService.unsubscribe(token);
 
-      return {
-        message: "Subscription unsubscribed successfully.",
-        statusCode: 200,
-      };
-    } catch (error: unknown) {
-      return httpErrorHandler(error);
-    }
+    return {
+      message: SwaggerResponse.UNSUBSCRIBED_SUCCESSFULLY.description,
+      statusCode: SwaggerResponse.UNSUBSCRIBED_SUCCESSFULLY.status,
+    };
   }
 }
 

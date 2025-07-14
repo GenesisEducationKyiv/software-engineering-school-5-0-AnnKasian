@@ -36,7 +36,7 @@ class WeatherstackProvider extends BaseWeatherProvider<WeatherstackResponseType>
     return {
       description: data.current?.weather_descriptions[0],
       humidity: data.current?.humidity,
-      temperature: Number(data.current?.temperature.toFixed()),
+      temperature: data.current?.temperature,
     };
   }
 }
