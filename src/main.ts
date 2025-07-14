@@ -5,6 +5,7 @@ import { type NestExpressApplication } from "@nestjs/platform-express";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { AppModule } from "./app.module.js";
 import { CONFIG_KEYS } from "./libs/enums/enums.js";
+import { HandleErrorMiddleware } from "./libs/middlewares/middlewares.js";
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -34,6 +35,7 @@ async function bootstrap(): Promise<void> {
   SwaggerModule.setup("api", app, document);
 
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  app.useGlobalFilters(new HandleErrorMiddleware());
   await app.listen(port);
 }
 
