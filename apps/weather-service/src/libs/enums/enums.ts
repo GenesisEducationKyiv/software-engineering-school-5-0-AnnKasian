@@ -5,3 +5,5 @@ export { CACHE_PREFIX_KEY } from "./cache-prefix-key.enum.js";
 export { WEATHER_ERROR_CODES } from "./weather-error-codes.enum.js";
 export { WEATHER_ERROR_MESSAGES } from "./weather-error-messages.enum.js";
 export { WEATHER_PROVIDERS_ERROR_CODES } from "./weather-providers-error-codes.enum.js";
+export { WEATHER_GRPC_SERVICES } from "./weather-gprc-services.emun.js";
+export { WEATHER_GRPC_METHODS } from "./weather-gprc-methods.emun.js";

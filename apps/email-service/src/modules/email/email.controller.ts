@@ -7,6 +7,8 @@ import {
   SendEmailConfirmationResponse,
 } from "../../../../../shared/generated/email.js";
 import { MapSubscriptionToDomainFromProto } from "../../../../../shared/libs/mappers/mappers.js";
+import { EMAIL_GRPC_SERVICES } from "../../libs/enums/email-gprc-services.emun.js";
+import { EMAIL_GRPC_METHODS } from "../../libs/enums/enums.js";
 import { DataIsRequiredException } from "../../libs/exceptions/exceptions.js";
 import { EmailService } from "./email.service.js";
 
@@ -14,7 +16,7 @@ import { EmailService } from "./email.service.js";
 class EmailController {
   constructor(private readonly emailService: EmailService) {}
 
-  @GrpcMethod("EmailService", "SendEmails")
+  @GrpcMethod(EMAIL_GRPC_SERVICES.EMAIL_SERVICE, EMAIL_GRPC_METHODS.SEND_EMAILS)
   public async SendEmails(
     payload: SendEmailsRequest
   ): Promise<SendEmailsResponse> {
@@ -31,7 +33,10 @@ class EmailController {
     }
   }
 
-  @GrpcMethod("EmailService", "SendConfirmationEmail")
+  @GrpcMethod(
+    EMAIL_GRPC_SERVICES.EMAIL_SERVICE,
+    EMAIL_GRPC_METHODS.SEND_CONFIRMATION_EMAIL
+  )
   public async SendConfirmationEmail(
     payload: SendConfirmationEmailRequest
   ): Promise<SendEmailConfirmationResponse> {

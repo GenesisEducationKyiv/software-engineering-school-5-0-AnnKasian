@@ -6,6 +6,10 @@ import {
   GetWeatherResponse,
 } from "../../../../../shared/generated/weather.js";
 import {
+  WEATHER_GRPC_METHODS,
+  WEATHER_GRPC_SERVICES,
+} from "../../libs/enums/enums.js";
+import {
   SwaggerOperation,
   SwaggerQuery,
   SwaggerResponse,
@@ -28,7 +32,10 @@ class WeatherController {
     return await this.weatherService.get(payload);
   }
 
-  @GrpcMethod("WeatherService", "GetWeather")
+  @GrpcMethod(
+    WEATHER_GRPC_SERVICES.WEATHER_SERVICE,
+    WEATHER_GRPC_METHODS.GET_WEATHER
+  )
   public async GetWeather(
     payload: GetWeatherRequest
   ): Promise<GetWeatherResponse> {
