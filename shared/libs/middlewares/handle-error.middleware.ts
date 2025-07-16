@@ -1,7 +1,11 @@
 import { Response } from "express";
 import { ExceptionFilter, Catch, ArgumentsHost } from "@nestjs/common";
 import { RpcException } from "@nestjs/microservices";
-import { ERROR_MESSAGES, ERROR_STATUS_CODES } from "../enums/enums.js";
+import {
+  ERROR_MESSAGES,
+  ERROR_STATUS_CODES,
+  CONTEXT_TYPE,
+} from "../enums/enums.js";
 import { BaseException } from "../exceptions/exceptions.js";
 
 @Catch()
@@ -9,9 +13,9 @@ class HandleErrorMiddleware implements ExceptionFilter {
   catch(error: unknown, host: ArgumentsHost) {
     const contextType = host.getType();
 
-    if (contextType === "http") {
+    if (contextType === CONTEXT_TYPE.HTTP) {
       return this.handleHttpException(error, host);
-    } else if (contextType === "rpc") {
+    } else if (contextType === CONTEXT_TYPE.RPC) {
       return this.handleRpcException(error);
     }
 

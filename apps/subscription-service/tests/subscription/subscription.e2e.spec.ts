@@ -8,6 +8,7 @@ import { type INestApplication, ValidationPipe } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { Test, type TestingModule } from "@nestjs/testing";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import { TIMEOUT } from "../../../../shared/libs/enums/enums.js";
 import { SubscriptionEntity } from "../../src/modules/subscription/subscription.js";
 import { SubscriptionModule } from "../../src/modules/subscription/subscription.module.js";
 import { testDatabaseConfig } from "../text-database.config.js";
@@ -116,7 +117,7 @@ describe("Subscription", () => {
 
       const capturedEmail = await mailServer.captureOne(
         SubscriptionE2eMock.newSubscription.email,
-        { wait: 5000 }
+        { wait: TIMEOUT.MAILER_TIMEOUT }
       );
 
       expect(capturedEmail.email.headers.to).toBe(

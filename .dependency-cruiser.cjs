@@ -34,25 +34,16 @@ module.exports = {
       to: { path: "apps/.+/src/.+/.*\\.controller\\.(ts|js)$" },
     },
     {
-      name: "cross-module-through-interfaces",
+      name: "no-cross-module-repository-imports",
       severity: "error",
       comment:
-        "Cross-module dependencies should use interfaces, not direct implementation",
-      from: { path: "src/modules/subscription/" },
-      to: {
-        path: "src/modules/weather/.*(repository)\\.(ts|js)$",
-        pathNot: "src/modules/weather/interfaces/",
+        "Do not import repositories from other modules directly. Use interfaces instead.",
+      from: {
+        path: "^src/modules/([^/]+)/",
       },
-    },
-    {
-      name: "cross-module-through-interfaces-reverse",
-      severity: "error",
-      comment:
-        "Cross-module dependencies should use interfaces, not direct implementation",
-      from: { path: "src/modules/weather/" },
       to: {
-        path: "src/modules/subscription/.*(repository)\\.(ts|js)$",
-        pathNot: "src/modules/subscription/interfaces/",
+        path: "^src/modules/(?!\\1)([^/]+)/.*repository\\.(ts|js)$",
+        pathNot: "^src/modules/\\2/interfaces/",
       },
     },
     {
