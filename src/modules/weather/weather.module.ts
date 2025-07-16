@@ -2,7 +2,7 @@ import { HttpModule, HttpService } from "@nestjs/axios";
 import { Cache, CACHE_MANAGER } from "@nestjs/cache-manager";
 import { Module } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { ConfigKeys } from "../../libs/enums/config.enum.js";
+import { CONFIG_KEYS } from "../../libs/enums/enums.js";
 import {
   WEATHER_INJECTION_TOKENS,
   WEATHER_PROVIDER_CONFIGS,
@@ -64,7 +64,7 @@ import { WeatherService } from "./weather.service.js";
         cacheManager: Cache,
         configService: ConfigService
       ) => {
-        const cacheTTL = configService.get(ConfigKeys.CACHE_TTL) as number;
+        const cacheTTL = configService.get(CONFIG_KEYS.CACHE_TTL) as number;
         weatherApiProvider
           .setNext(weatherbitProvider)
           .setNext(weatherstackProvider);

@@ -5,7 +5,7 @@ import {
   IWeatherProvider,
   IWeatherRepository,
 } from "./interfaces/interfaces.js";
-import { WeatherDto } from "./types/types.js";
+import { WeatherType , WeatherDto } from "./types/types.js";
 
 @Injectable()
 class WeatherRepository implements IWeatherRepository {
@@ -38,12 +38,12 @@ class WeatherRepository implements IWeatherRepository {
     return weather;
   }
 
-  private async cacheWeather(city: string, weather: WeatherDto) {
+  private async cacheWeather(city: string, weather: WeatherType) {
     await this.cacheManager.set(city, weather, this.cacheTTL);
   }
 
-  private async getCachedWeather(city: string): Promise<WeatherDto | null> {
-    const cachedData = await this.cacheManager.get<WeatherDto>(city);
+  private async getCachedWeather(city: string): Promise<WeatherType | null> {
+    const cachedData = await this.cacheManager.get<WeatherType>(city);
 
     return cachedData ?? null;
   }

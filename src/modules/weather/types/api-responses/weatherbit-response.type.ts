@@ -1,4 +1,4 @@
-type WeatherbitResponseDto = {
+type WeatherbitResponseType = {
   data?: [
     {
       temp: number;
@@ -10,4 +10,4 @@ type WeatherbitResponseDto = {
   ];
 };
 
-export { type WeatherbitResponseDto };
+export { type WeatherbitResponseType };

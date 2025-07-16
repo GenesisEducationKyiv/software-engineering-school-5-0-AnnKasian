@@ -14,7 +14,7 @@ import {
   SwaggerParam,
   SwaggerResponse,
 } from "./swagger-docs/swagger-docs.js";
-import { SubscribeResponseDto,SubscriptionDto } from "./types/types.js";
+import { SubscriptionDto, SubscribeResponseType } from "./types/types.js";
 
 @ApiTags("subscription")
 @Controller()
@@ -29,10 +29,10 @@ class SubscriptionController {
   @ApiResponse(SwaggerResponse.SUBSCRIPTION_SUCCESSFUL)
   @ApiResponse(SwaggerResponse.SUBSCRIPTION_FAILED)
   @ApiResponse(SwaggerResponse.SUBSCRIPTION_ALREADY_EXISTS)
-  public subscribe(
+  public async subscribe(
     @Body() data: SubscriptionDto
-  ): Promise<SubscribeResponseDto> {
-    return this.subscriptionService.subscribe(data);
+  ): Promise<SubscribeResponseType> {
+    return await this.subscriptionService.subscribe(data);
   }
 
   @Get("/confirm/:token")
@@ -44,7 +44,10 @@ class SubscriptionController {
   public async confirm(@Param("token") token: string): Promise<MessageDto> {
     await this.subscriptionService.confirm(token);
 
-    return { message: "Subscription confirmed successfully.", statusCode: 200 };
+    return {
+      message: SwaggerResponse.CONFIRMED_SUCCESSFULLY.description,
+      statusCode: SwaggerResponse.CONFIRMED_SUCCESSFULLY.status,
+    };
   }
 
   @Get("/unsubscribe/:token")
@@ -56,8 +59,8 @@ class SubscriptionController {
     await this.subscriptionService.unsubscribe(token);
 
     return {
-      message: "Subscription unsubscribed successfully.",
-      statusCode: 200,
+      message: SwaggerResponse.UNSUBSCRIBED_SUCCESSFULLY.description,
+      statusCode: SwaggerResponse.UNSUBSCRIBED_SUCCESSFULLY.status,
     };
   }
 }

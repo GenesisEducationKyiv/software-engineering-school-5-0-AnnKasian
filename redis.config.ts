@@ -1,7 +1,7 @@
 import { redisStore } from "cache-manager-redis-store";
 import { type CacheModuleAsyncOptions } from "@nestjs/cache-manager";
 import { ConfigModule, ConfigService } from "@nestjs/config";
-import { ConfigKeys } from "./src/libs/enums/config.enum.js";
+import { CONFIG_KEYS } from "./src/libs/enums/config.enum.js";
 
 const RedisConfig: CacheModuleAsyncOptions = {
   isGlobal: true,
@@ -9,9 +9,9 @@ const RedisConfig: CacheModuleAsyncOptions = {
   useFactory: async (configService: ConfigService) => {
     const store = await redisStore({
       socket: {
-        host: configService.get<string>(ConfigKeys.REDIS_HOST),
+        host: configService.get<string>(CONFIG_KEYS.REDIS_HOST),
         port: Number.parseInt(
-          configService.get<string>(ConfigKeys.REDIS_PORT) as string
+          configService.get<string>(CONFIG_KEYS.REDIS_PORT) as string
         ),
       },
     });

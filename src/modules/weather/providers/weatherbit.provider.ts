@@ -1,10 +1,10 @@
 import { Injectable } from "@nestjs/common";
 import { WEATHER_PROVIDERS } from "../enums/enums.js";
-import { WeatherbitResponseDto, WeatherDto } from "../types/types.js";
+import { WeatherbitResponseType, WeatherType } from "../types/types.js";
 import { BaseWeatherProvider } from "./base-weather.provider.js";
 
 @Injectable()
-class WeatherbitProvider extends BaseWeatherProvider<WeatherbitResponseDto> {
+class WeatherbitProvider extends BaseWeatherProvider<WeatherbitResponseType> {
   getProviderName(): string {
     return WEATHER_PROVIDERS.WEATHERBIT_PROVIDER;
   }
@@ -16,7 +16,7 @@ class WeatherbitProvider extends BaseWeatherProvider<WeatherbitResponseDto> {
     };
   }
 
-  parseResponse(data: WeatherbitResponseDto): WeatherDto {
+  parseResponse(data: WeatherbitResponseType): WeatherType {
     return {
       description: data.data?.[0].weather?.description,
       humidity: data.data?.[0].rh,
