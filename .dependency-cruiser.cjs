@@ -34,16 +34,16 @@ module.exports = {
       to: { path: "src/.+/.*\\.controller\\.(ts|js)$" },
     },
     {
-      name: "cross-module-through-interfaces",
+      name: "no-cross-module-repository-imports",
       severity: "error",
       comment:
-        "Cross-module dependencies should use interfaces, not direct implementations",
+        "Do not import repositories from other modules directly. Use interfaces instead.",
       from: {
         path: "^src/modules/([^/]+)/",
       },
       to: {
-        path: "^src/modules/([^/]+)/.*(repository)\\.(ts|js)$",
-        pathNot: "^src/modules/\\1/interfaces/",
+        path: "^src/modules/(?!\\1)([^/]+)/.*repository\\.(ts|js)$",
+        pathNot: "^src/modules/\\2/interfaces/",
       },
     },
     {
