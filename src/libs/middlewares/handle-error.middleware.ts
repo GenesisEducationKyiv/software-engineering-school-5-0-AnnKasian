@@ -5,7 +5,11 @@ import {
   ArgumentsHost,
   HttpException,
 } from "@nestjs/common";
-import { ERROR_MESSAGES, ERROR_STATUS_CODES } from "../enums/enums.js";
+import {
+  ERROR_MESSAGES,
+  ERROR_STATUS_CODES,
+  CONTEXT_TYPE,
+} from "../enums/enums.js";
 import { BaseException } from "../exceptions/exceptions.js";
 
 @Catch()
@@ -13,11 +17,11 @@ class HandleErrorMiddleware implements ExceptionFilter {
   catch(error: unknown, host: ArgumentsHost) {
     const contextType = host.getType();
 
-    if (contextType === "http") {
-      return this.handleHttpException(error, host);
+    if (contextType !== CONTEXT_TYPE.HTTP) {
+      throw error;
     }
 
-    throw error;
+    return this.handleHttpException(error, host);
   }
 
   private handleHttpException(error: unknown, host: ArgumentsHost) {

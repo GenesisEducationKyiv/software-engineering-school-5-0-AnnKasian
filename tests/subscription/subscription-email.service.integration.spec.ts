@@ -3,6 +3,7 @@ import { HandlebarsAdapter } from "@nestjs-modules/mailer/dist/adapters/handleba
 import ms from "smtp-tester";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { Test, type TestingModule } from "@nestjs/testing";
+import { TIMEOUT } from "../../src/libs/enums/enums.js";
 import { EmailSendFailException } from "../../src/modules/subscription/exceptions/exceptions.js";
 import { SubscriptionEmailService } from "../../src/modules/subscription/subscription-email.service.js";
 import { WeatherService } from "../../src/modules/weather/weather.js";
@@ -97,7 +98,7 @@ describe("SubscriptionEmailService Integration Tests", () => {
 
       const capturedEmail = await mailServer.captureOne(
         SubscriptionIntegrationMock.newData.newSubscription.email,
-        { wait: 5000 }
+        { wait: TIMEOUT.MAILER_TIMEOUT }
       );
 
       expect(capturedEmail.email.headers.to).toBe(
@@ -125,7 +126,7 @@ describe("SubscriptionEmailService Integration Tests", () => {
 
       const capturedEmail = await mailServer.captureOne(
         SubscriptionIntegrationMock.newData.newSubscription.email,
-        { wait: 5000 }
+        { wait: TIMEOUT.MAILER_TIMEOUT }
       );
 
       expect(capturedEmail.email.headers.to).toBe(
