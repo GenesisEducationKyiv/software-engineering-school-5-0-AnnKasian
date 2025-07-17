@@ -10,8 +10,14 @@ class InvalidSubscriptionInputException extends BaseException {
   public code = SUBSCRIPTION_ERROR_CODES.INVALID_INPUT;
   public statusCode = ERROR_STATUS_CODES.BAD_REQUEST;
 
-  constructor(message: string = SUBSCRIPTION_ERROR_MESSAGES.INVALID_INPUT) {
+  constructor(
+    errors: ValidationError[],
+    message: string = SUBSCRIPTION_ERROR_MESSAGES.INVALID_INPUT
+  ) {
     super(message);
+    errors.forEach((error) => {
+      this.details.push(JSON.stringify(error.constraints));
+    });
   }
 }
 
@@ -66,21 +72,6 @@ class EmailServiceException extends BaseException {
   }
 }
 
-class ValidationException extends BaseException {
-  public code = SUBSCRIPTION_ERROR_CODES.VALIDATION_EXCEPTION;
-  public statusCode = ERROR_STATUS_CODES.BAD_REQUEST;
-
-  constructor(
-    errors: ValidationError[],
-    message: string = SUBSCRIPTION_ERROR_MESSAGES.VALIDATION_EXCEPTION
-  ) {
-    super(message);
-    errors.forEach((error) => {
-      this.details.push(JSON.stringify(error.constraints));
-    });
-  }
-}
-
 export {
   InvalidSubscriptionInputException,
   EmailAlreadyExistsException,
@@ -88,5 +79,4 @@ export {
   InvalidTokenException,
   SubscriptionAlreadyConfirmedException,
   EmailServiceException,
-  ValidationException,
 };

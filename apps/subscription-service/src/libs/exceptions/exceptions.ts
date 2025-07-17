@@ -5,5 +5,4 @@ export {
   InvalidTokenException,
   SubscriptionAlreadyConfirmedException,
   EmailServiceException,
-  ValidationException,
 } from "./subscription.exception.js";

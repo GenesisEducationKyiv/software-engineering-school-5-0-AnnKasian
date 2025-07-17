@@ -6,7 +6,7 @@ import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { CONFIG_KEYS } from "../../../shared/libs/enums/config.enum.js";
 import { HandleErrorMiddleware } from "../../../shared/libs/middlewares/middlewares.js";
 import { AppModule } from "./app.module.js";
-import { ValidationException } from "./libs/exceptions/exceptions.js";
+import { InvalidSubscriptionInputException } from "./libs/exceptions/exceptions.js";
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -40,7 +40,8 @@ async function bootstrap(): Promise<void> {
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
-      exceptionFactory: (errors) => new ValidationException(errors),
+      exceptionFactory: (errors) =>
+        new InvalidSubscriptionInputException(errors),
     })
   );
   app.useGlobalFilters(new HandleErrorMiddleware());
