@@ -1,0 +1,18 @@
+syntax = "proto2";
+
+package weather;
+
+service WeatherService {
+ rpc GetWeather (GetWeatherRequest) returns (GetWeatherResponse);
+}
+
+ message GetWeatherRequest {
+    required string city = 1;
+}
+
+message GetWeatherResponse {
+    optional string description = 1;
+    optional float temperature = 2;  
+    optional float humidity = 3;
+} 
+
