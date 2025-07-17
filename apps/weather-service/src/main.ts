@@ -31,7 +31,7 @@ async function bootstrap(): Promise<void> {
       options: {
         package: "weather",
         protoPath: path.join(process.cwd(), "shared/proto/weather.proto"),
-        url: `weather-service:${grpcPort}`,
+        url: `${process.env[CONFIG_KEYS.WEATHER_SERVICE_HOST]}:${grpcPort}`,
       },
     });
 

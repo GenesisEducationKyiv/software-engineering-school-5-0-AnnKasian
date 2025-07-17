@@ -1,90 +1,47 @@
-import { MailerModule } from "@nestjs-modules/mailer";
-import { HandlebarsAdapter } from "@nestjs-modules/mailer/dist/adapters/handlebars.adapter";
-import ms from "smtp-tester";
+import { decode } from "quoted-printable";
 import request from "supertest";
-import { type App } from "supertest/types";
 import { DataSource, type Repository } from "typeorm";
-import { type INestApplication, ValidationPipe } from "@nestjs/common";
-import { ConfigModule, ConfigService } from "@nestjs/config";
 import { Test, type TestingModule } from "@nestjs/testing";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { TIMEOUT } from "../../../../shared/libs/enums/enums.js";
 import { SubscriptionEntity } from "../../src/modules/subscription/subscription.js";
-import { SubscriptionModule } from "../../src/modules/subscription/subscription.module.js";
+import { MailHogClient } from "../mailhog.client.js";
 import { testDatabaseConfig } from "../text-database.config.js";
 import { SubscriptionE2eMock } from "./mock-data/mock-data.js";
 
 describe("Subscription", () => {
-  let app: INestApplication<App>;
   let module: TestingModule;
   let db: Repository<SubscriptionEntity>;
   let dataSource: DataSource;
-  let mailServer: ms.MailServer;
+  let mailHog: MailHogClient;
+
+  const baseUrl = "http://localhost:7072";
 
   beforeAll(async () => {
     module = await Test.createTestingModule({
       imports: [
-        ConfigModule.forRoot({
-          isGlobal: true,
-        }),
         TypeOrmModule.forRoot({
           ...testDatabaseConfig,
           entities: [SubscriptionEntity],
         }),
-        MailerModule.forRootAsync({
-          imports: [ConfigModule],
-          inject: [ConfigService],
-          useFactory: () => ({
-            transport: {
-              host: "localhost",
-              port: 7081,
-              secure: false,
-            },
-            defaults: {
-              from: "test@example.com",
-            },
-            template: {
-              dir:
-                process.cwd() + "/apps/email-service/src/libs/email-templates/",
-              adapter: new HandlebarsAdapter(),
-              options: {
-                strict: true,
-              },
-            },
-          }),
-        }),
         TypeOrmModule.forFeature([SubscriptionEntity]),
-        SubscriptionModule,
       ],
     }).compile();
 
-    app = module.createNestApplication();
     dataSource = module.get<DataSource>(DataSource);
     db = dataSource.getRepository(SubscriptionEntity);
-    app.useGlobalPipes(
-      new ValidationPipe({
-        whitelist: true,
-        forbidNonWhitelisted: true,
-        transform: true,
-      })
-    );
-    mailServer = ms.init(7081);
-
-    await app.init();
+    mailHog = new MailHogClient();
   });
 
   beforeEach(async () => {
     await dataSource.dropDatabase();
     await dataSource.synchronize();
+    await mailHog.clearMessages();
   });
 
   afterAll(async () => {
     await dataSource.destroy();
     await module.close();
-    await app.close();
-    await new Promise<void>((resolve) => {
-      mailServer.stop(resolve);
-    });
   });
 
   const createTestSubscription = (
@@ -98,7 +55,7 @@ describe("Subscription", () => {
 
   describe("/POST subscription", () => {
     it("should create subscription, send email, and return token", async () => {
-      const response = await request(app.getHttpServer())
+      const response = await request(baseUrl)
         .post("/subscribe")
         .send(SubscriptionE2eMock.newSubscription)
         .expect(201);
@@ -115,14 +72,19 @@ describe("Subscription", () => {
         token: result?.token,
       });
 
-      const capturedEmail = await mailServer.captureOne(
+      const capturedEmail = await mailHog.waitForMessage(
         SubscriptionE2eMock.newSubscription.email,
-        { wait: TIMEOUT.MAILER_TIMEOUT }
+        TIMEOUT.MAILER_TIMEOUT
       );
 
-      expect(capturedEmail.email.headers.to).toBe(
-        SubscriptionE2eMock.newSubscription.email
+      expect(capturedEmail).toBeDefined();
+      expect(capturedEmail.To[0].Mailbox).toBe(
+        SubscriptionE2eMock.newSubscription.email.split("@")[0]
       );
+
+      const decodedBody = decode(capturedEmail.Content.Body).toString();
+
+      expect(decodedBody).toContain(result?.token);
     });
 
     it("should return a message that email already confirmed", async () => {
@@ -131,7 +93,7 @@ describe("Subscription", () => {
         confirmed: true,
       });
 
-      const response = await request(app.getHttpServer())
+      const response = await request(baseUrl)
         .post("/subscribe")
         .send(SubscriptionE2eMock.newSubscription)
         .expect(409);
@@ -143,14 +105,15 @@ describe("Subscription", () => {
     });
 
     it("should return a message that data is invalid", async () => {
-      const response = await request(app.getHttpServer())
+      const response = await request(baseUrl)
         .post("/subscribe")
         .send(SubscriptionE2eMock.invalidData)
         .expect(400);
 
       expect(response.body).toMatchObject({
         statusCode: 400,
-        message: expect.any(Array),
+        message: expect.any(String),
+        details: expect.any(Array),
       });
     });
   });
@@ -159,7 +122,7 @@ describe("Subscription", () => {
     it("should confirm subscription", async () => {
       const subscription = await createTestSubscription();
 
-      const response = await request(app.getHttpServer())
+      const response = await request(baseUrl)
         .get(`/confirm/${subscription.token}`)
         .send(subscription.token)
         .expect(200);
@@ -185,7 +148,7 @@ describe("Subscription", () => {
         confirmed: true,
       });
 
-      const response = await request(app.getHttpServer())
+      const response = await request(baseUrl)
         .get(`/confirm/${subscription.token}`)
         .send(subscription.token)
         .expect(409);
@@ -197,7 +160,7 @@ describe("Subscription", () => {
     });
 
     it("should return a message that token is invalid", async () => {
-      const response = await request(app.getHttpServer())
+      const response = await request(baseUrl)
         .get(`/confirm/${SubscriptionE2eMock.invalidToken}`)
         .send(SubscriptionE2eMock.invalidToken)
         .expect(400);
@@ -213,7 +176,7 @@ describe("Subscription", () => {
     it("should delete subscription", async () => {
       const subscription = await createTestSubscription();
 
-      const response = await request(app.getHttpServer())
+      const response = await request(baseUrl)
         .get(`/unsubscribe/${subscription.token}`)
         .send(subscription.token)
         .expect(200);
@@ -233,7 +196,7 @@ describe("Subscription", () => {
     });
 
     it("should return a message that token not found", async () => {
-      const response = await request(app.getHttpServer())
+      const response = await request(baseUrl)
         .get(`/unsubscribe/${SubscriptionE2eMock.token}`)
         .send(SubscriptionE2eMock.token)
         .expect(404);
@@ -245,7 +208,7 @@ describe("Subscription", () => {
     });
 
     it("should return a message that token is invalid", async () => {
-      const response = await request(app.getHttpServer())
+      const response = await request(baseUrl)
         .get(`/unsubscribe/${SubscriptionE2eMock.invalidToken}`)
         .send(SubscriptionE2eMock.invalidToken)
         .expect(400);

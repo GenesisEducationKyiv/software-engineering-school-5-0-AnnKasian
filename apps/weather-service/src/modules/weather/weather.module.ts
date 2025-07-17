@@ -37,8 +37,8 @@ import { WeatherService } from "./weather.service.js";
         fileLogger: FileLogger,
         weatherErrorHandler: WeatherErrorHandler
       ) => {
-        const apiUrl = configService.get(url) as string;
-        const apiKey = configService.get(key) as string;
+        const apiUrl = configService.get<string>(url) as string;
+        const apiKey = configService.get<string>(key) as string;
         const logger = fileLogger;
 
         return new providerClass(
@@ -64,7 +64,9 @@ import { WeatherService } from "./weather.service.js";
         cacheManager: Cache,
         configService: ConfigService
       ) => {
-        const cacheTTL = configService.get(CONFIG_KEYS.CACHE_TTL) as number;
+        const cacheTTL = configService.get<number>(
+          CONFIG_KEYS.CACHE_TTL
+        ) as number;
         weatherApiProvider
           .setNext(weatherbitProvider)
           .setNext(weatherstackProvider);

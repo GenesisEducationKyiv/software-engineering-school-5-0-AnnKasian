@@ -27,18 +27,20 @@ class HandleErrorMiddleware implements ExceptionFilter {
 
     let status: number = ERROR_STATUS_CODES.INTERNAL_SERVER_ERROR;
     let message: string = ERROR_MESSAGES.UNKNOWN_ERROR;
+    let details: string[] = [];
 
     if (error instanceof BaseException) {
       status = error.statusCode;
-      const { message: errorMessage } = error;
+      const { message: errorMessage, details: errorDetails } = error;
       message = errorMessage;
+      details = errorDetails;
     } else if (error instanceof Error) {
       status = ERROR_STATUS_CODES.INTERNAL_SERVER_ERROR;
       const { message: errorMessage } = error;
       message = errorMessage;
     }
 
-    response.status(status).json({ message, statusCode: status });
+    response.status(status).json({ message, statusCode: status, details });
   }
 
   private handleRpcException(error: unknown) {

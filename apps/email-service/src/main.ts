@@ -2,6 +2,7 @@ import path from "path";
 import { ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { type MicroserviceOptions, Transport } from "@nestjs/microservices";
+import { CONFIG_KEYS } from "../../../shared/libs/enums/enums.js";
 import { HandleErrorMiddleware } from "../../../shared/libs/middlewares/middlewares.js";
 import { AppModule } from "./app.module.js";
 
@@ -14,7 +15,9 @@ async function bootstrap(): Promise<void> {
         options: {
           package: "email",
           protoPath: path.join(process.cwd(), "shared/proto/email.proto"),
-          url: `email-service:${process.env.GRPC_EMAIL_SERVICE_PORT}`,
+          url: `${process.env[CONFIG_KEYS.EMAIL_SERVICE_HOST]}:${
+            process.env[CONFIG_KEYS.GRPC_EMAIL_SERVICE_PORT]
+          }`,
         },
       }
     );

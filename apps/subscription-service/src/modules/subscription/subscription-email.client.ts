@@ -4,7 +4,7 @@ import { RpcException } from "@nestjs/microservices";
 import { MapSubscriptionToProtoFromDomain } from "../../../../../shared/libs/mappers/mappers.js";
 import { Subscription } from "../../../../../shared/libs/types/types.js";
 import { SUBSCRIPTION_INJECTION_TOKENS } from "../../libs/enums/enums.js";
-import { EmailServiceException } from "../../libs/exceptions/subscription.exception.js";
+import { EmailServiceException } from "../../libs/exceptions/exceptions.js";
 import { IEmailService } from "../../libs/interfaces/interfaces.js";
 
 class SubscriptionEmailClient {

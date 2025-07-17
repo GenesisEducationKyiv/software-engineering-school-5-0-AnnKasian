@@ -20,18 +20,29 @@ const __dirname = path.dirname(__filename);
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
+        const emailUser = configService.get<string>(CONFIG_KEYS.EMAIL_USER);
+        const emailPass = configService.get<string>(CONFIG_KEYS.EMAIL_PASS);
+
         return {
           transport: {
-            host: configService.get(CONFIG_KEYS.EMAIL_HOST),
-            port: configService.get(CONFIG_KEYS.EMAIL_PORT),
+            host: configService.get<string>(CONFIG_KEYS.EMAIL_HOST),
+            port: configService.get<number>(CONFIG_KEYS.EMAIL_PORT),
             secure: false,
-            auth: {
-              user: configService.get(CONFIG_KEYS.EMAIL_USER),
-              pass: configService.get(CONFIG_KEYS.EMAIL_PASS),
-            },
+            auth:
+              emailUser && emailPass
+                ? {
+                    user: emailUser,
+                    pass: emailPass,
+                  }
+                : undefined,
+          },
+          tls: {
+            rejectUnauthorized: configService.get<boolean>(
+              CONFIG_KEYS.EMAIL_TLS
+            ),
           },
           defaults: {
-            from: configService.get(CONFIG_KEYS.EMAIL_FROM),
+            from: configService.get<string>(CONFIG_KEYS.EMAIL_FROM),
           },
           template: {
             dir: path.join(__dirname, "..", "email-templates"),

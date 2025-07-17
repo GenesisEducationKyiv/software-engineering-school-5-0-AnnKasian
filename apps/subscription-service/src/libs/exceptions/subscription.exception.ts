@@ -1,3 +1,4 @@
+import { type ValidationError } from "class-validator";
 import { ERROR_STATUS_CODES } from "../../../../../shared/libs/enums/enums.js";
 import { BaseException } from "../../../../../shared/libs/exceptions/exceptions.js";
 import {
@@ -65,6 +66,21 @@ class EmailServiceException extends BaseException {
   }
 }
 
+class ValidationException extends BaseException {
+  public code = SUBSCRIPTION_ERROR_CODES.VALIDATION_EXCEPTION;
+  public statusCode = ERROR_STATUS_CODES.BAD_REQUEST;
+
+  constructor(
+    errors: ValidationError[],
+    message: string = SUBSCRIPTION_ERROR_MESSAGES.VALIDATION_EXCEPTION
+  ) {
+    super(message);
+    errors.forEach((error) => {
+      this.details.push(JSON.stringify(error.constraints));
+    });
+  }
+}
+
 export {
   InvalidSubscriptionInputException,
   EmailAlreadyExistsException,
@@ -72,4 +88,5 @@ export {
   InvalidTokenException,
   SubscriptionAlreadyConfirmedException,
   EmailServiceException,
+  ValidationException,
 };

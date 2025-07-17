@@ -84,3 +84,48 @@
 {"className":"WeatherApiProvider","response":"Response : Kyiv - \"{\\\"description\\\":\\\"Sunny\\\",\\\"humidity\\\":28,\\\"temperature\\\":30.4}\""}
 {"className":"WeatherApiProvider","response":"Response : Kyiv - \"{\\\"description\\\":\\\"Sunny\\\",\\\"humidity\\\":28,\\\"temperature\\\":30}\""}
 {"className":"WeatherApiProvider","response":"Response : Kyiv - \"{\\\"description\\\":\\\"Sunny\\\",\\\"humidity\\\":28,\\\"temperature\\\":30}\""}
+{"className":"WeatherApiProvider","response":"Response : Lviv - \"{\\\"description\\\":\\\"Sunny\\\",\\\"humidity\\\":50,\\\"temperature\\\":20}\""}
+{"className":"WeatherApiProvider","response":"Invalid city: [object Object]"}
+{"className":"WeatherbitProvider","response":"Invalid city: Unknown error."}
+{"className":"WeatherstackProvider","response":"Invalid city: City not found."}
+{"className":"WeatherstackProvider","response":"Invalid city: City not found."}
+{"className":"WeatherApiProvider","response":"API Error: (500) - Unknown error."}
+{"className":"WeatherbitProvider","response":"API Error: (500) - Unknown error."}
+{"className":"WeatherstackProvider","response":"API Error: (500) - Unknown error."}
+{"className":"WeatherstackProvider","response":"All providers failed: Providers not available."}
+{"className":"WeatherApiProvider","response":"Response : Lviv - \"{\\\"description\\\":\\\"Sunny\\\",\\\"humidity\\\":50,\\\"temperature\\\":20}\""}
+{"className":"WeatherApiProvider","response":"Invalid city: [object Object]"}
+{"className":"WeatherbitProvider","response":"Invalid city: Unknown error."}
+{"className":"WeatherstackProvider","response":"Invalid city: City not found."}
+{"className":"WeatherstackProvider","response":"Invalid city: City not found."}
+{"className":"WeatherApiProvider","response":"API Error: (500) - Unknown error."}
+{"className":"WeatherbitProvider","response":"API Error: (500) - Unknown error."}
+{"className":"WeatherstackProvider","response":"API Error: (500) - Unknown error."}
+{"className":"WeatherstackProvider","response":"All providers failed: Providers not available."}
+{"className":"WeatherApiProvider","response":"Response : Lviv - \"{\\\"description\\\":\\\"Sunny\\\",\\\"humidity\\\":50,\\\"temperature\\\":20}\""}
+{"className":"WeatherApiProvider","response":"Invalid city: [object Object]"}
+{"className":"WeatherbitProvider","response":"Invalid city: Unknown error."}
+{"className":"WeatherstackProvider","response":"Invalid city: City not found."}
+{"className":"WeatherstackProvider","response":"Invalid city: City not found."}
+{"className":"WeatherApiProvider","response":"API Error: (500) - Unknown error."}
+{"className":"WeatherbitProvider","response":"API Error: (500) - Unknown error."}
+{"className":"WeatherstackProvider","response":"API Error: (500) - Unknown error."}
+{"className":"WeatherstackProvider","response":"All providers failed: Providers not available."}
+{"className":"WeatherApiProvider","response":"Response : Lviv - \"{\\\"description\\\":\\\"Sunny\\\",\\\"humidity\\\":50,\\\"temperature\\\":20}\""}
+{"className":"WeatherApiProvider","response":"Invalid city: [object Object]"}
+{"className":"WeatherbitProvider","response":"Invalid city: Unknown error."}
+{"className":"WeatherstackProvider","response":"Invalid city: City not found."}
+{"className":"WeatherstackProvider","response":"Invalid city: City not found."}
+{"className":"WeatherApiProvider","response":"API Error: (500) - Unknown error."}
+{"className":"WeatherbitProvider","response":"API Error: (500) - Unknown error."}
+{"className":"WeatherstackProvider","response":"API Error: (500) - Unknown error."}
+{"className":"WeatherstackProvider","response":"All providers failed: Providers not available."}
+{"className":"WeatherApiProvider","response":"Response : Lviv - \"{\\\"description\\\":\\\"Sunny\\\",\\\"humidity\\\":50,\\\"temperature\\\":20}\""}
+{"className":"WeatherApiProvider","response":"Invalid city: [object Object]"}
+{"className":"WeatherbitProvider","response":"Invalid city: Unknown error."}
+{"className":"WeatherstackProvider","response":"Invalid city: City not found."}
+{"className":"WeatherstackProvider","response":"Invalid city: City not found."}
+{"className":"WeatherApiProvider","response":"API Error: (500) - Unknown error."}
+{"className":"WeatherbitProvider","response":"API Error: (500) - Unknown error."}
+{"className":"WeatherstackProvider","response":"API Error: (500) - Unknown error."}
+{"className":"WeatherstackProvider","response":"All providers failed: Providers not available."}

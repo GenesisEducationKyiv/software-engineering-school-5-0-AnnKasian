@@ -1,0 +1,111 @@
+version: "3.9"
+
+services:
+  subscription-service:
+    build:
+      context: .
+      dockerfile: apps/subscription-service/Dockerfile
+    environment:
+      - DATABASE_HOST=weather-db-test
+      - DATABASE_PORT=5432
+      - DATABASE_NAME=weather_notify_test
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=postgres
+      - EMAIL_SERVICE_HOST=email-service
+      - GRPC_EMAIL_SERVICE_PORT=7071
+      - HTTP_SUBSCRIPTION_SERVICE_PORT=7072
+      - BASE_URL=http://127.0.0.1:7072
+      - SERVE_ROOT=/
+    ports:
+      - "7072:7072"
+    depends_on:
+      - email-service
+      - weather-service
+      - weather-db-test
+      - weather-test-mailer
+    volumes:
+      - ./shared:/app/shared:ro
+    networks:
+      - test-network
+
+  email-service:
+    build:
+      context: .
+      dockerfile: apps/email-service/Dockerfile
+    environment:
+      - EMAIL_SERVICE_HOST=email-service
+      - GRPC_EMAIL_SERVICE_PORT=7071
+      - WEATHER_SERVICE_HOST=weather-service
+      - GRPC_WEATHER_SERVICE_PORT=7073
+      - EMAIL_HOST=weather-test-mailer
+      - EMAIL_PORT=1025
+      - EMAIL_USER=
+      - EMAIL_PASS=
+      - EMAIL_FROM=test@example.com
+      - EMAIL_TLS=false
+    ports:
+      - "7071:7071"
+    volumes:
+      - ./shared:/app/shared:ro
+    networks:
+      - test-network
+
+  weather-service:
+    build:
+      context: .
+      dockerfile: apps/weather-service/Dockerfile
+    environment:
+      - WEATHER_SERVICE_HOST=weather-service
+      - GRPC_WEATHER_SERVICE_PORT=7073
+      - HTTP_WEATHER_SERVICE_PORT=7074
+      - CACHE_TTL=1000
+      - REDIS_HOST=weather-test-cache
+      - REDIS_PORT=6379
+    ports:
+      - "7073:7073"
+      - "7074:7074"
+    depends_on:
+      - weather-test-cache
+    volumes:
+      - ./apps/weather-service/logs:/app/apps/weather-service/logs
+      - ./shared:/app/shared:ro
+    networks:
+      - test-network
+
+  weather-db-test:
+    image: postgres:16.4
+    container_name: weather-db-test
+    ports:
+      - 5435:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: weather_notify_test
+    networks:
+      - test-network
+
+  weather-test-cache:
+    image: redis:7-alpine
+    container_name: weather-test-cache
+    ports:
+      - "6379:6379"
+    environment:
+      - REDIS_PORT=6379
+      - REDIS_HOST=localhost
+      - CACHE_TTL=60
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+    networks:
+      - test-network
+
+  weather-test-mailer:
+    image: mailhog/mailhog
+    container_name: weather-test-mailer
+    ports:
+      - "8025:8025"
+    networks:
+      - test-network
+
+networks:
+  test-network:
+    driver: bridge

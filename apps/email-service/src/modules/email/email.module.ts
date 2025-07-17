@@ -36,7 +36,9 @@ import { EmailService } from "./email.service.js";
         emaiWeatherClient: EmailWeatherClient,
         configService: ConfigService
       ) => {
-        const baseUrl = configService.get(CONFIG_KEYS.BASE_URL) as string;
+        const baseUrl = configService.get<string>(
+          CONFIG_KEYS.BASE_URL
+        ) as string;
 
         return new EmailService(mailerService, baseUrl, emaiWeatherClient);
       },

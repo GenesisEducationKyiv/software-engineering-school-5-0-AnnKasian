@@ -20,7 +20,7 @@ import { SubscriptionModule } from "./modules/subscription/subscription.module.j
       useFactory: (configService: ConfigService) => [
         {
           rootPath: path.join(process.cwd(), "shared/public"),
-          serveRoot: configService.get(CONFIG_KEYS.SERVE_ROOT),
+          serveRoot: configService.get<string>(CONFIG_KEYS.SERVE_ROOT),
           serveStaticOptions: {
             index: "index.html",
             extensions: ["html"],
