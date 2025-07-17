@@ -1,12 +1,4 @@
 {
-  "include": [
-    "src/**/*",
-    "tests/**/*",
-    "ormconfig.ts",
-    "database.config.js",
-    "jest.config.ts"
-  ],
-  "exclude": ["node_modules"],
   "compilerOptions": {
     "strict": true,
     "module": "ESNext",
@@ -23,9 +15,11 @@
     "target": "ES2021",
     "sourceMap": true,
     "strictNullChecks": true,
-    "outDir": "./dist",
     "incremental": true,
     "skipLibCheck": true,
-    "baseUrl": "."
-  }
+    "baseUrl": ".",
+    "outDir": "./dist"
+  },
+  "include": ["apps/**/*", "libs/**/*", "shared/**/*", "jest.config.ts"],
+  "exclude": ["node_modules", "dist"]
 }
