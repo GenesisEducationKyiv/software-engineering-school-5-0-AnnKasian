@@ -275,6 +275,7 @@ const overridesConfigs = [
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-magic-numbers": "off",
       "@typescript-eslint/no-unsafe-assignment": "off",
+      "no-console": "off",
     },
   },
 ];
