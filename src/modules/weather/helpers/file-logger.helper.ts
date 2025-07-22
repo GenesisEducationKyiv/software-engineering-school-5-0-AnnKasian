@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import { Injectable } from "@nestjs/common";
-import { type WeatherLog } from "../types/types.js";
+import { type WeatherLogType } from "../types/types.js";
 
 @Injectable()
 class FileLogger {
@@ -28,14 +28,14 @@ class FileLogger {
   }
 
   private logResponse(response: string, provider: string) {
-    const log: WeatherLog = {
+    const log: WeatherLogType = {
       className: provider,
       response,
     };
     this.write(log);
   }
 
-  private write(message: WeatherLog) {
+  private write(message: WeatherLogType) {
     try {
       if (!fs.existsSync("logs")) {
         fs.mkdirSync("logs", { recursive: true });

@@ -1,10 +1,11 @@
 import { MailerService } from "@nestjs-modules/mailer";
 import { Injectable } from "@nestjs/common";
+import { ERROR_MESSAGES } from "../../libs/enums/enums.js";
 import { WeatherService } from "../weather/weather.service.js";
 import { EmailSubject, EmailTemplate } from "./email-data/email-data.js";
-import { SubscriptionEntity } from "./entities/entities.js";
 import { SUBSCRIPTION_EMAIL_STATUS } from "./enums/enums.js";
-import { SubscriptionEmailErrorHandler } from "./helpers/helpers.js";
+import { EmailSendFailException } from "./exceptions/exceptions.js";
+import { Subscription } from "./types/types.js";
 
 @Injectable()
 class SubscriptionEmailService {
@@ -16,9 +17,9 @@ class SubscriptionEmailService {
 
   async sendWeatherEmail(
     city: string,
-    subscriptions: SubscriptionEntity[]
+    subscriptions: Subscription[]
   ): Promise<void> {
-    const weather = await this.weatherService.get(city);
+    const weather = await this.weatherService.get({ city });
 
     const currentDate = new Date();
 
@@ -43,7 +44,7 @@ class SubscriptionEmailService {
     this.handleEmailFailures(results);
   }
 
-  async sendConfirmationEmail(subscription: SubscriptionEntity) {
+  async sendConfirmationEmail(subscription: Subscription) {
     const currentDate = new Date();
 
     try {
@@ -57,12 +58,16 @@ class SubscriptionEmailService {
         },
       });
     } catch (error: unknown) {
-      SubscriptionEmailErrorHandler(error);
+      if (error instanceof Error) {
+        throw new EmailSendFailException(error.message);
+      }
+
+      throw new EmailSendFailException(ERROR_MESSAGES.UNKNOWN_ERROR);
     }
   }
 
-  async sendEmails(subscriptions: SubscriptionEntity[]): Promise<void> {
-    const cities: Record<string, SubscriptionEntity[]> = {};
+  async sendEmails(subscriptions: Subscription[]): Promise<void> {
+    const cities: Record<string, Subscription[]> = {};
     subscriptions.forEach((subscription) => {
       cities[subscription.city] ??= [];
       cities[subscription.city].push(subscription);
@@ -83,7 +88,7 @@ class SubscriptionEmailService {
     if (failures.length) {
       const firstError = failures[0].reason as Error;
 
-      SubscriptionEmailErrorHandler(firstError);
+      throw new EmailSendFailException(firstError.message);
     }
   }
 }

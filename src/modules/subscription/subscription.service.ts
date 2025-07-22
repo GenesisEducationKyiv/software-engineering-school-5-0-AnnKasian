@@ -1,19 +1,19 @@
-import {
-  BadRequestException,
-  ConflictException,
-  Inject,
-  Injectable,
-  NotFoundException,
-} from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { Cron, CronExpression } from "@nestjs/schedule";
-import { SubscriptionEntity } from "./entities/entities.js";
 import { Frequency, SUBSCRIPTION_INJECTION_TOKENS } from "./enums/enums.js";
+import {
+  EmailAlreadyExistsException,
+  InvalidTokenException,
+  SubscriptionAlreadyConfirmedException,
+  TokenNotFoundException,
+} from "./exceptions/exceptions.js";
 import { ISubscriptionRepository } from "./interfaces/interfaces.js";
 import { SubscriptionEmailService } from "./subscription-email.service.js";
 import {
-  SubscribeFilterDto,
-  SubscribeResponseDto,
-  type SubscriptionDto,
+  SubscribeFilterType,
+  SubscribeResponseType,
+  Subscription,
+  type SubscriptionType,
 } from "./types/types.js";
 
 @Injectable()
@@ -40,14 +40,16 @@ class SubscriptionService {
     await this.subscriptionEmailService.sendEmails(subscriptions);
   }
 
-  public async subscribe(data: SubscriptionDto): Promise<SubscribeResponseDto> {
+  public async subscribe(
+    data: SubscriptionType
+  ): Promise<SubscribeResponseType> {
     const existingSubscribe = await this.subscriptionRepository.find({
       email: data.email,
     });
 
     if (existingSubscribe) {
-      if (existingSubscribe.confirmed === true) {
-        throw new ConflictException("Email already subscribed.");
+      if (existingSubscribe.isConfirmed()) {
+        throw new EmailAlreadyExistsException();
       }
 
       await this.subscriptionEmailService.sendConfirmationEmail(
@@ -66,11 +68,12 @@ class SubscriptionService {
   public async confirm(token: string): Promise<void> {
     const subscription = await this.findToken({ token });
 
-    if (subscription.confirmed === true) {
-      throw new ConflictException("Email already confirmed.");
+    if (subscription.isConfirmed()) {
+      throw new SubscriptionAlreadyConfirmedException();
     }
 
-    await this.subscriptionRepository.confirm(subscription);
+    const confirmedSubscription = subscription.confirm();
+    await this.subscriptionRepository.save(confirmedSubscription);
   }
 
   public async unsubscribe(token: string): Promise<void> {
@@ -80,19 +83,19 @@ class SubscriptionService {
 
   private async findToken({
     token,
-  }: SubscribeFilterDto): Promise<SubscriptionEntity> {
-    let existingSubscribe: SubscriptionEntity | null = null;
+  }: SubscribeFilterType): Promise<Subscription> {
+    let existingSubscribe: Subscription | null = null;
 
     try {
       existingSubscribe = await this.subscriptionRepository.find({
         token,
       });
     } catch {
-      throw new BadRequestException("Invalid token");
+      throw new InvalidTokenException();
     }
 
     if (!existingSubscribe) {
-      throw new NotFoundException("Token not found.");
+      throw new TokenNotFoundException();
     }
 
     return existingSubscribe;
