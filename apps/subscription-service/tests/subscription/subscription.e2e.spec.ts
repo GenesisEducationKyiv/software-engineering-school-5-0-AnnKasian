@@ -74,7 +74,7 @@ describe("Subscription", () => {
 
       const capturedEmail = await mailHog.waitForMessage(
         SubscriptionE2eMock.newSubscription.email,
-        TIMEOUT.MAILER_TIMEOUT
+        TIMEOUT.DEFAULT_TIMEOUT
       );
 
       expect(capturedEmail).toBeDefined();
