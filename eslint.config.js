@@ -9,8 +9,6 @@ import explicitGenericsPlugin from "eslint-plugin-require-explicit-generics";
 import sonarjsPlugin from "eslint-plugin-sonarjs";
 import globals from "globals";
 
-const JS_MAX_PARAMS_ALLOWED = 4;
-
 /** @typedef {import("eslint").Linter.Config} */
 let FlatConfig;
 
@@ -21,7 +19,15 @@ const filesConfig = {
 
 /** @type {FlatConfig} */
 const ignoresConfig = {
-  ignores: ["node_modules", "dist", "build", "apps", "packages", "public"],
+  ignores: [
+    "node_modules",
+    "dist",
+    "build",
+    "packages",
+    "shared/public/",
+    ".dependency-cruiser.cjs",
+    "shared/generated/",
+  ],
 };
 
 /** @type {FlatConfig} */
@@ -38,7 +44,6 @@ const jsConfig = {
     "arrow-parens": ["error", "always"],
     curly: ["warn", "all"],
     eqeqeq: ["error", "always"],
-    "max-params": ["warn", JS_MAX_PARAMS_ALLOWED],
     "no-console": ["warn"],
     "no-undef": "off",
     "no-multiple-empty-lines": [
@@ -59,7 +64,7 @@ const jsConfig = {
       },
       {
         message: "TS features are forbidden.",
-        selector: "TSEnumDeclaration,ClassDeclaration[abstract=true]",
+        selector: "TSEnumDeclaration",
       },
       {
         message:
@@ -92,6 +97,33 @@ const importConfig = {
     "import/newline-after-import": ["warn"],
     "import/no-default-export": ["warn"],
     "import/no-duplicates": ["warn"],
+    "import/order": [
+      "warn",
+      {
+        groups: [
+          "builtin",
+          "external",
+          "internal",
+          "parent",
+          "sibling",
+          "index",
+          "type",
+        ],
+        pathGroups: [
+          {
+            pattern: "@nestjs/**",
+            group: "external",
+            position: "after",
+          },
+        ],
+        pathGroupsExcludedImportTypes: ["builtin"],
+        "newlines-between": "never",
+        alphabetize: {
+          order: "asc",
+          caseInsensitive: true,
+        },
+      },
+    ],
   },
   settings: {
     "import/parsers": {
@@ -168,6 +200,7 @@ const typescriptConfig = {
         fixStyle: "inline-type-imports",
       },
     ],
+    "@typescript-eslint/no-empty-object-type": "off",
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/no-magic-numbers": [
       "warn",
@@ -175,6 +208,7 @@ const typescriptConfig = {
         ignoreEnums: true,
         ignoreReadonlyClassProperties: true,
         ignoreArrayIndexes: true,
+        ignore: [0, 1],
       },
     ],
     "@typescript-eslint/return-await": ["warn", "always"],
@@ -241,6 +275,7 @@ const overridesConfigs = [
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-magic-numbers": "off",
       "@typescript-eslint/no-unsafe-assignment": "off",
+      "no-console": "off",
     },
   },
 ];

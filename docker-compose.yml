@@ -1,18 +1,55 @@
 version: "3.9"
 
 services:
-  api:
+  subscription-service:
     build:
       context: .
-      dockerfile: deployment/Dockerfile
+      dockerfile: apps/subscription-service/Dockerfile
     env_file:
       - .env
     ports:
-      - "${PORT}:7081"
+      - "${HTTP_SUBSCRIPTION_SERVICE_PORT}:7082"
     depends_on:
       - db
+      - email-service
+      - weather-service
+    volumes:
+      - ./shared:/app/shared:ro
     networks:
       - app-network
+    restart: unless-stopped
+
+  email-service:
+    build:
+      context: .
+      dockerfile: apps/email-service/Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "${GRPC_EMAIL_SERVICE_PORT}:7081"
+    volumes:
+      - ./shared:/app/shared:ro
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  weather-service:
+    build:
+      context: .
+      dockerfile: apps/weather-service/Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "${HTTP_WEATHER_SERVICE_PORT}:7083"
+      - "${GRPC_WEATHER_SERVICE_PORT}:7084"
+    depends_on:
+      - cache
+    volumes:
+      - ./apps/weather-service/logs:/app/apps/weather-service/logs
+      - ./shared:/app/shared:ro
+    networks:
+      - app-network
+    restart: unless-stopped
 
   db:
     image: postgres:16.4
@@ -29,8 +66,21 @@ services:
     networks:
       - app-network
 
+  cache:
+    image: redis:7-alpine
+    container_name: weather-cache
+    ports:
+      - "6379:6379"
+    volumes:
+      - cache_data:/data
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+    networks:
+      - app-network
+
 volumes:
   postgres_data:
+  cache_data:
 
 networks:
   app-network:
