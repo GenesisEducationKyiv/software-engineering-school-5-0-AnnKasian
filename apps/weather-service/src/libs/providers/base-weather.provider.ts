@@ -50,7 +50,7 @@ abstract class BaseWeatherProvider<TResponse> implements IWeatherProvider {
       return weather;
     } catch (error: unknown) {
       if (error instanceof WeatherLogException) {
-        return this.weatherErrorHandler.handleError(error.message, error.name);
+        throw new WeatherLogException(error.message);
       }
 
       const allErrors = [...previousErrors, error];
