@@ -1,5 +1,4 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { Cron, CronExpression } from "@nestjs/schedule";
 import { Frequency } from "../../../../../shared/libs/enums/enums.js";
 import { Subscription } from "../../../../../shared/libs/types/types.js";
 import { SUBSCRIPTION_INJECTION_TOKENS } from "../../libs/enums/enums.js";
@@ -26,19 +25,11 @@ class SubscriptionService {
     private readonly subscriptionEmailService: SubscriptionEmailClient
   ) {}
 
-  @Cron(CronExpression.EVERY_HOUR)
-  public async sendHourlyEmails(): Promise<void> {
+  public async sendEmails(frequency: Frequency): Promise<void> {
     const subscriptions = await this.subscriptionRepository.findByFrequency(
-      Frequency.HOURLY
+      frequency
     );
-    await this.subscriptionEmailService.sendEmails(subscriptions);
-  }
 
-  @Cron(CronExpression.EVERY_DAY_AT_10AM)
-  public async sendDailyEmails(): Promise<void> {
-    const subscriptions = await this.subscriptionRepository.findByFrequency(
-      Frequency.DAILY
-    );
     await this.subscriptionEmailService.sendEmails(subscriptions);
   }
 
