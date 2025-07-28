@@ -1,14 +1,5 @@
 import { Controller, Get, Query } from "@nestjs/common";
-import { GrpcMethod } from "@nestjs/microservices";
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
-import {
-  GetWeatherRequest,
-  GetWeatherResponse,
-} from "../../../../../shared/generated/weather.js";
-import {
-  GRPC_METHODS,
-  GRPC_SERVICES,
-} from "../../../../../shared/libs/enums/enums.js";
 import {
   SwaggerOperation,
   SwaggerQuery,
@@ -19,7 +10,7 @@ import { WeatherService } from "./weather.service.js";
 
 @ApiTags("weather")
 @Controller("weather")
-class WeatherController {
+class WeatherHttpController {
   public constructor(private readonly weatherService: WeatherService) {}
 
   @Get()
@@ -31,13 +22,6 @@ class WeatherController {
   public async getOne(@Query() payload: WeatherQueryDto): Promise<WeatherDto> {
     return await this.weatherService.get(payload);
   }
-
-  @GrpcMethod(GRPC_SERVICES.WEATHER_SERVICE, GRPC_METHODS.GET_WEATHER)
-  public async GetWeather(
-    payload: GetWeatherRequest
-  ): Promise<GetWeatherResponse> {
-    return await this.weatherService.get(payload);
-  }
 }
 
-export { WeatherController };
+export { WeatherHttpController };

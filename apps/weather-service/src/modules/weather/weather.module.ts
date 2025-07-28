@@ -9,12 +9,13 @@ import {
 } from "../../libs/enums/enums.js";
 import { FileLogger, WeatherErrorHandler } from "../../libs/helpers/helpers.js";
 import { IWeatherProvider } from "../../libs/interfaces/interfaces.js";
-import { WeatherController } from "./weather.controller.js";
+import { WeatherGrpcController } from "./weather-grpc.controller.js";
+import { WeatherHttpController } from "./weather-http.controller.js";
 import { WeatherRepository } from "./weather.repository.js";
 import { WeatherService } from "./weather.service.js";
 
 @Module({
-  controllers: [WeatherController],
+  controllers: [WeatherHttpController, WeatherGrpcController],
   imports: [HttpModule],
   providers: [
     WeatherService,
