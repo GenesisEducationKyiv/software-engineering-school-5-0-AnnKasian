@@ -84,13 +84,9 @@ class WeatherErrorHandler {
       axiosError.message ??
       ERROR_MESSAGES.UNKNOWN_ERROR;
 
-    const statusCode =
-      axiosError.response?.status ??
-      WEATHER_PROVIDERS_ERROR_CODES.INTERNAL_SERVER_ERROR;
+    this.fileLogger.apiError(errorMessage, providerName);
 
-    this.fileLogger.apiError(statusCode, errorMessage, providerName);
-
-    throw new UnknownErrorException(errorMessage, statusCode);
+    throw new UnknownErrorException(errorMessage);
   }
 
   private extractErrorMessage(
