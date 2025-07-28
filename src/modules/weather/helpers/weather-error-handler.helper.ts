@@ -1,8 +1,18 @@
 import { type AxiosError, isAxiosError } from "axios";
-import { HttpException, Inject, Injectable } from "@nestjs/common";
-import { ErrorMessage, ErrorStatusCode } from "../../../libs/enums/enums.js";
-import { WEATHER_INJECTION_TOKENS, WeatherErrors } from "../enums/enums.js";
-import { type WeatherError } from "../types/types.js";
+import { Inject, Injectable } from "@nestjs/common";
+import { ERROR_MESSAGES } from "../../../libs/enums/enums.js";
+import {
+  WEATHER_ERROR_MESSAGES,
+  WEATHER_PROVIDERS_ERROR_CODES,
+  WEATHER_INJECTION_TOKENS,
+} from "../enums/enums.js";
+import {
+  CityNotFoundException,
+  InvalidRequestException,
+  NotAvailableException,
+  UnknownErrorException,
+} from "../exceptions/exceptions.js";
+import { type WeatherErrorType } from "../types/types.js";
 import { FileLogger } from "./file-logger.helper.js";
 
 @Injectable()
@@ -16,74 +26,71 @@ class WeatherErrorHandler {
     if (!(error instanceof Error)) {
       this.fileLogger.unknownError(error, providerName);
 
-      throw new HttpException(
-        ErrorMessage.UNKNOWN_ERROR,
-        ErrorStatusCode.INTERNAL_SERVER_ERROR
-      );
+      throw new UnknownErrorException();
     }
 
     if (isAxiosError(error)) {
       return this.handleAxiosError(
-        error as AxiosError<WeatherError>,
+        error as AxiosError<WeatherErrorType>,
         providerName
       );
     }
 
-    if (error.message === WeatherErrors.CITY_NOT_FOUND) {
+    if (error.message === WEATHER_ERROR_MESSAGES.CITY_NOT_FOUND) {
       this.fileLogger.invalidCity(error.message, providerName);
 
-      throw new HttpException(
-        WeatherErrors.CITY_NOT_FOUND,
-        ErrorStatusCode.BAD_REQUEST
-      );
+      throw new CityNotFoundException();
     }
 
-    if (error.message === WeatherErrors.PROVIDERS_NOT_AVAILABLE) {
+    if (error.message === WEATHER_ERROR_MESSAGES.PROVIDERS_NOT_AVAILABLE) {
       this.fileLogger.allProvidersFailed(error.message, providerName);
 
-      throw new HttpException(
-        WeatherErrors.PROVIDERS_NOT_AVAILABLE,
-        ErrorStatusCode.INTERNAL_SERVER_ERROR
-      );
+      throw new NotAvailableException();
     }
 
-    throw new HttpException(error.message, ErrorStatusCode.BAD_REQUEST);
+    throw new InvalidRequestException(error.message);
   }
 
   public isCityNotFoundError(error: unknown): boolean {
     if (isAxiosError(error)) {
-      return error.response?.status === ErrorStatusCode.BAD_REQUEST;
+      return (
+        error.response?.status === WEATHER_PROVIDERS_ERROR_CODES.BAD_REQUEST
+      );
     }
 
     return (
-      error instanceof Error && error.message === WeatherErrors.CITY_NOT_FOUND
+      error instanceof Error &&
+      error.message === WEATHER_ERROR_MESSAGES.CITY_NOT_FOUND
     );
   }
 
   private handleAxiosError(
-    axiosError: AxiosError<WeatherError>,
+    axiosError: AxiosError<WeatherErrorType>,
     providerName: string
   ): never {
-    if (axiosError.response?.status === ErrorStatusCode.BAD_REQUEST) {
+    if (
+      axiosError.response?.status === WEATHER_PROVIDERS_ERROR_CODES.BAD_REQUEST
+    ) {
       this.fileLogger.invalidCity(
         this.extractErrorMessage(axiosError.response.data.error),
         providerName
       );
 
-      throw new HttpException(axiosError.message, ErrorStatusCode.BAD_REQUEST);
+      throw new InvalidRequestException(axiosError.message);
     }
 
     const errorMessage =
       this.extractErrorMessage(axiosError.response?.data?.error) ??
       axiosError.message ??
-      ErrorMessage.UNKNOWN_ERROR;
+      ERROR_MESSAGES.UNKNOWN_ERROR;
 
     const statusCode =
-      axiosError.response?.status ?? ErrorStatusCode.INTERNAL_SERVER_ERROR;
+      axiosError.response?.status ??
+      WEATHER_PROVIDERS_ERROR_CODES.INTERNAL_SERVER_ERROR;
 
     this.fileLogger.apiError(statusCode, errorMessage, providerName);
 
-    throw new HttpException(errorMessage, statusCode);
+    throw new UnknownErrorException(errorMessage, statusCode);
   }
 
   private extractErrorMessage(
@@ -97,7 +104,7 @@ class WeatherErrorHandler {
       return error.message;
     }
 
-    return ErrorMessage.UNKNOWN_ERROR;
+    return ERROR_MESSAGES.UNKNOWN_ERROR;
   }
 }
 

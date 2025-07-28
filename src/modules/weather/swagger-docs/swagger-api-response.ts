@@ -9,12 +9,12 @@ const SwaggerResponse = {
   },
   FAILED: {
     status: 400,
-    description: "Invalid request",
+    description: "Invalid request.",
     type: ErrorDto,
   },
   NOT_FOUND: {
     status: 404,
-    description: "City not found",
+    description: "City not found.",
     type: ErrorDto,
   },
 };

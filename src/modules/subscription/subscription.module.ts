@@ -3,7 +3,7 @@ import { Repository } from "typeorm";
 import { Module } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { getRepositoryToken, TypeOrmModule } from "@nestjs/typeorm";
-import { ConfigKeys } from "../../libs/enums/enums.js";
+import { CONFIG_KEYS } from "../../libs/enums/enums.js";
 import { WeatherService } from "../weather/weather.js";
 import { WeatherModule } from "../weather/weather.module.js";
 import { SubscriptionEntity } from "./entities/entities.js";
@@ -25,7 +25,7 @@ import { SubscriptionService } from "./subscription.service.js";
         mailerService: MailerService,
         weatherService: WeatherService
       ) => {
-        const baseUrl = configService.get(ConfigKeys.BASE_URL) as string;
+        const baseUrl = configService.get(CONFIG_KEYS.BASE_URL) as string;
 
         return new SubscriptionEmailService(
           mailerService,

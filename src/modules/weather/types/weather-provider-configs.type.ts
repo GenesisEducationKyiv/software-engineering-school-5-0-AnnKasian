@@ -5,7 +5,7 @@ import {
 } from "../helpers/helpers.js";
 import { type IWeatherProvider } from "../interfaces/interfaces.js";
 
-type WeatherProviderConfig = {
+type WeatherProviderConfigType = {
   token: string;
   url: string;
   key: string;
@@ -17,4 +17,4 @@ type WeatherProviderConfig = {
   ) => IWeatherProvider;
 };
 
-export { type WeatherProviderConfig };
+export { type WeatherProviderConfigType };

@@ -19,8 +19,8 @@ class WeatherController {
   @ApiResponse(SwaggerResponse.SUCCESSFUL)
   @ApiResponse(SwaggerResponse.FAILED)
   @ApiResponse(SwaggerResponse.NOT_FOUND)
-  public getOne(@Query() payload: WeatherQueryDto): Promise<WeatherDto> {
-    return this.weatherService.get(payload.city);
+  public async getOne(@Query() payload: WeatherQueryDto): Promise<WeatherDto> {
+    return await this.weatherService.get(payload);
   }
 }
 

@@ -2,6 +2,7 @@ import { DataSource, type Repository } from "typeorm";
 import { ConfigModule } from "@nestjs/config";
 import { Test, type TestingModule } from "@nestjs/testing";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import { MapToDomain } from "../../src/modules/subscription/mappers/mappers.js";
 import { SubscriptionEntity } from "../../src/modules/subscription/subscription.js";
 import { SubscriptionRepository } from "../../src/modules/subscription/subscription.repository.js";
 import { testDatabaseConfig } from "../text-database.config.js";
@@ -47,7 +48,7 @@ describe("SubscriptionRepository Integration Tests", () => {
     overrideData: Partial<SubscriptionEntity> = {}
   ) => {
     return db.save({
-      ...SubscriptionIntegrationMock.newData.newSubscription,
+      ...SubscriptionIntegrationMock.newData.newSubscriptionEntity,
       ...overrideData,
     });
   };
@@ -84,12 +85,13 @@ describe("SubscriptionRepository Integration Tests", () => {
     });
   });
 
-  describe("update", () => {
+  describe("save", () => {
     it("should update subscription confirm status ", async () => {
-      const subscription = await createTestSubscription();
-      expect(subscription.confirmed).toBe(false);
+      const entityFromDb = await createTestSubscription();
+      const subscription = MapToDomain(entityFromDb);
+      expect(subscription.isConfirmed()).toBe(false);
 
-      await repository.confirm(subscription);
+      await repository.save(subscription.confirm());
       const confirmed = await db.findOne({
         where: {
           token: subscription.token,
@@ -106,7 +108,9 @@ describe("SubscriptionRepository Integration Tests", () => {
       await Promise.all([
         createTestSubscription({ confirmed: true }),
         createTestSubscription({
+          id: SubscriptionIntegrationMock.newData.newSubscriptionDaily.id,
           email: SubscriptionIntegrationMock.newData.newSubscriptionDaily.email,
+          token: SubscriptionIntegrationMock.newData.newSubscriptionDaily.token,
           frequency:
             SubscriptionIntegrationMock.newData.newSubscriptionDaily.frequency,
           confirmed: true,
@@ -164,7 +168,7 @@ describe("SubscriptionRepository Integration Tests", () => {
 
     it("should return null when subscription not found by token", async () => {
       const result = await repository.find({
-        token: SubscriptionIntegrationMock.newData.subscriptionToConfirm.token,
+        token: SubscriptionIntegrationMock.newData.newSubscription.token,
       });
 
       expect(result).toBeNull();

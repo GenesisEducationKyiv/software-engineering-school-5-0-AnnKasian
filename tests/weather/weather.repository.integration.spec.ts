@@ -2,13 +2,16 @@ import { type Cache } from "cache-manager";
 import nock from "nock";
 import { HttpModule, HttpService } from "@nestjs/axios";
 import { CACHE_MANAGER, CacheModule } from "@nestjs/cache-manager";
-import { HttpException } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { Test, type TestingModule } from "@nestjs/testing";
 import {
   WEATHER_INJECTION_TOKENS,
-  WeatherstackErrorCodes,
+  WEATHER_PROVIDERS_ERROR_CODES,
 } from "../../src/modules/weather/enums/enums.js";
+import {
+  CityNotFoundException,
+  NotAvailableException,
+} from "../../src/modules/weather/exceptions/exceptions.js";
 import {
   FileLogger,
   WeatherErrorHandler,
@@ -264,14 +267,14 @@ describe("WeatherRepository  Integration Tests", () => {
         .reply(200, {
           success: false,
           error: {
-            code: WeatherstackErrorCodes.CITY_NOT_FOUND,
+            code: WEATHER_PROVIDERS_ERROR_CODES.WEATHERSTACK_CITY_NOT_FOUND,
             info: expect.any(String),
           },
         });
 
       await expect(
         repository.get(WeatherMock.request.wrongCity)
-      ).rejects.toThrow(HttpException);
+      ).rejects.toThrow(CityNotFoundException);
     });
 
     it("should throw HttpException if all servers are not responding", async () => {
@@ -300,7 +303,7 @@ describe("WeatherRepository  Integration Tests", () => {
 
       await expect(
         repository.get(WeatherMock.request.corectCity)
-      ).rejects.toThrow(HttpException);
+      ).rejects.toThrow(NotAvailableException);
     });
   });
 });

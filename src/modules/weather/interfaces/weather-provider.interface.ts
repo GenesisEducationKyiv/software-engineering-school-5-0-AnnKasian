@@ -1,9 +1,12 @@
-import { type WeatherDto } from "../types/types";
+import { type WeatherType } from "../types/types.js";
 
 interface IWeatherProvider {
   setNext(provider: IWeatherProvider): IWeatherProvider;
-  getWeather(city: string): Promise<WeatherDto>;
-  getWeatherWithErrors(city: string, allErrors: unknown[]): Promise<WeatherDto>;
+  getWeather(city: string): Promise<WeatherType>;
+  getWeatherWithErrors(
+    city: string,
+    allErrors: unknown[]
+  ): Promise<WeatherType>;
 }
 
 export { type IWeatherProvider };

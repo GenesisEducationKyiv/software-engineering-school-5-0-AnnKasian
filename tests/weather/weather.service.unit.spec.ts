@@ -1,7 +1,7 @@
-import { NotFoundException } from "@nestjs/common";
 import { Test } from "@nestjs/testing";
 import { WEATHER_INJECTION_TOKENS } from "../../src/modules/weather/enums/weather-injection-tokens.enum.js";
-import { type WeatherDto } from "../../src/modules/weather/types/weather.dto.type.js";
+import { CityNotFoundException } from "../../src/modules/weather/exceptions/exceptions.js";
+import { type WeatherDto } from "../../src/modules/weather/types/dtos/weather.dto.type.js";
 import { WeatherService } from "../../src/modules/weather/weather.js";
 import { WeatherMock } from "./mock-data/mock-data.js";
 
@@ -32,9 +32,9 @@ describe("WeatherService", () => {
 
       mockWeatherRepository.get.mockResolvedValue(weather);
 
-      expect(await weatherService.get(WeatherMock.request.corectCity)).toEqual(
-        weather
-      );
+      expect(
+        await weatherService.get({ city: WeatherMock.request.corectCity })
+      ).toEqual(weather);
       expect(mockWeatherRepository.get).toHaveBeenCalledWith(
         WeatherMock.request.corectCity
       );
@@ -42,10 +42,10 @@ describe("WeatherService", () => {
   });
 
   test("should throw NotFoundException if city not found", async () => {
-    mockWeatherRepository.get.mockRejectedValue(new NotFoundException());
+    mockWeatherRepository.get.mockRejectedValue(new CityNotFoundException());
 
     await expect(
-      weatherService.get(WeatherMock.request.wrongCity)
-    ).rejects.toThrow(NotFoundException);
+      weatherService.get({ city: WeatherMock.request.wrongCity })
+    ).rejects.toThrow(CityNotFoundException);
   });
 });

@@ -1,5 +1,5 @@
-const ErrorMessage = {
-  UNKNOWN_ERROR: "Unknown error",
-};
+const ERROR_MESSAGES = {
+  UNKNOWN_ERROR: "Unknown error.",
+} as const;
 
-export { ErrorMessage };
+export { ERROR_MESSAGES };

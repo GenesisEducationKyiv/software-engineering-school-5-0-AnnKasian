@@ -1,19 +1,16 @@
-import { type SubscriptionEntity } from "../entities/entities.js";
 import { type Frequency } from "../enums/enums.js";
 import {
-  type SubscribeFilterDto,
-  type SubscriptionDto,
+  type Subscription,
+  type SubscribeFilterType,
+  type SubscriptionType,
 } from "../types/types.js";
 
 interface ISubscriptionRepository {
-  create(data: SubscriptionDto): Promise<SubscriptionEntity>;
-  confirm(subscription: SubscriptionEntity): Promise<void>;
+  create(data: SubscriptionType): Promise<Subscription>;
+  save(data: Subscription): Promise<Subscription>;
   delete(id: string): Promise<void>;
-  findByFrequency(frequency: Frequency): Promise<SubscriptionEntity[]>;
-  find({
-    email,
-    token,
-  }: SubscribeFilterDto): Promise<SubscriptionEntity | null>;
+  findByFrequency(frequency: Frequency): Promise<Subscription[]>;
+  find({ email, token }: SubscribeFilterType): Promise<Subscription | null>;
 }
 
 export { type ISubscriptionRepository };

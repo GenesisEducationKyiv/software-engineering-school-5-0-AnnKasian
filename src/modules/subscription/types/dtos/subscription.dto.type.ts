@@ -1,6 +1,6 @@
 import { IsBoolean, IsNotEmpty, IsOptional, IsString } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
-import { Frequency } from "../enums/enums.js";
+import { Frequency } from "../../enums/enums.js";
 
 class SubscriptionDto {
   @IsString()

@@ -1,6 +1,9 @@
-const ErrorStatusCode = {
+const ERROR_STATUS_CODES = {
   INTERNAL_SERVER_ERROR: 500,
   BAD_REQUEST: 400,
-};
+  NOT_FOUND: 404,
+  CONFLICT: 409,
+  SERVICE_UNAVAILABLE: 503,
+} as const;
 
-export { ErrorStatusCode };
+export { ERROR_STATUS_CODES };
