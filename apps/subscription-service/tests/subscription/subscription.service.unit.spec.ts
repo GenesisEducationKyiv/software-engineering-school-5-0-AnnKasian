@@ -188,13 +188,13 @@ describe("SubscriptionService", () => {
     });
   });
 
-  describe("sendHourlyEmails", () => {
-    test("should call sendFrequencyEmails with Frequency.Hourly", async () => {
+  describe("sendEmails", () => {
+    test("should call sendEmails with hourly subscriptions", async () => {
       mockSubscriptionRepository.findByFrequency.mockResolvedValue(
         SubscriptionMock.responsefromRepository.hourly
       );
 
-      await subscriptionService.sendHourlyEmails();
+      await subscriptionService.sendEmails(Frequency.HOURLY);
 
       expect(mockSubscriptionRepository.findByFrequency).toHaveBeenCalledWith(
         Frequency.HOURLY
@@ -206,13 +206,13 @@ describe("SubscriptionService", () => {
     });
   });
 
-  describe("sendDailyEmails", () => {
-    test("should call sendFrequencyEmails with Frequency.Daily", async () => {
+  describe("sendEmails", () => {
+    test("should call sendEmails with daily subscriptions", async () => {
       mockSubscriptionRepository.findByFrequency.mockResolvedValue(
         SubscriptionMock.responsefromRepository.daily
       );
 
-      await subscriptionService.sendDailyEmails();
+      await subscriptionService.sendEmails(Frequency.DAILY);
 
       expect(mockSubscriptionRepository.findByFrequency).toHaveBeenCalledWith(
         Frequency.DAILY

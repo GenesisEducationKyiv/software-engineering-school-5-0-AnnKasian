@@ -10,8 +10,8 @@ class FileLogger {
     this.logResponse(`Invalid city: ${error}`, provider);
   }
 
-  apiError(statusCode: number, errorMessage: string, provider: string) {
-    this.logResponse(`API Error: (${statusCode}) - ${errorMessage}`, provider);
+  apiError(errorMessage: string, provider: string) {
+    this.logResponse(`API Error: (${errorMessage}`, provider);
   }
 
   allProvidersFailed(errorMessage: string, provider: string) {

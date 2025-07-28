@@ -5,6 +5,9 @@ import {
   ERROR_MESSAGES,
   ERROR_STATUS_CODES,
   CONTEXT_TYPE,
+  SUBSCRIPTION_ERROR_CODES,
+  WEATHER_ERROR_CODES,
+  EMAIL_ERROR_CODES,
 } from "../enums/enums.js";
 import { BaseException } from "../exceptions/exceptions.js";
 
@@ -30,7 +33,7 @@ class HandleErrorMiddleware implements ExceptionFilter {
     let details: string[] = [];
 
     if (error instanceof BaseException) {
-      status = error.statusCode;
+      status = this.httpStatusCodeMapper(error.code);
       const { message: errorMessage, details: errorDetails } = error;
       message = errorMessage;
       details = errorDetails;
@@ -52,6 +55,48 @@ class HandleErrorMiddleware implements ExceptionFilter {
     }
 
     throw new RpcException(message);
+  }
+
+  private httpStatusCodeMapper(code: string): number {
+    if (
+      code === EMAIL_ERROR_CODES.DATA_IS_REQUIRED ||
+      SUBSCRIPTION_ERROR_CODES.INVALID_INPUT ||
+      SUBSCRIPTION_ERROR_CODES.INVALID_TOKEN ||
+      WEATHER_ERROR_CODES.INVALID_REQUEST
+    ) {
+      return ERROR_STATUS_CODES.BAD_REQUEST;
+    }
+
+    if (
+      code === SUBSCRIPTION_ERROR_CODES.TOKEN_NOT_FOUND ||
+      WEATHER_ERROR_CODES.CITY_NOT_FOUND
+    ) {
+      return ERROR_STATUS_CODES.NOT_FOUND;
+    }
+
+    if (
+      code === SUBSCRIPTION_ERROR_CODES.EMAIL_ALREADY_EXISTS ||
+      SUBSCRIPTION_ERROR_CODES.SUBSCRIPTION_ALREADY_CONFIRMED
+    ) {
+      return ERROR_STATUS_CODES.CONFLICT;
+    }
+
+    if (
+      code === EMAIL_ERROR_CODES.EMAIL_SEND_FAILED ||
+      EMAIL_ERROR_CODES.WEATHER_SERVICE_ERROR ||
+      SUBSCRIPTION_ERROR_CODES.EMAIL_SERVICE_ERROR ||
+      WEATHER_ERROR_CODES.UNKNOWN_ERROR ||
+      WEATHER_ERROR_CODES.APP_ERROR ||
+      WEATHER_ERROR_CODES.WEATHER_LOG_EXCEPTION
+    ) {
+      return ERROR_STATUS_CODES.INTERNAL_SERVER_ERROR;
+    }
+
+    if (code === WEATHER_ERROR_CODES.PROVIDERS_NOT_AVAILABLE) {
+      return ERROR_STATUS_CODES.SERVICE_UNAVAILABLE;
+    }
+
+    return ERROR_STATUS_CODES.INTERNAL_SERVER_ERROR;
   }
 }
 
