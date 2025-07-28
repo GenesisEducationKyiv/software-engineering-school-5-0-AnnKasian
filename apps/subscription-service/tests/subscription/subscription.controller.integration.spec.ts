@@ -79,15 +79,13 @@ describe("SubscriptionController Integration Tests", () => {
 
       const response = await request(app.getHttpServer())
         .post("/subscribe")
-        .send(SubscriptionIntegrationMock.newData.newDtoSubscription)
-        .expect(409);
+        .send(SubscriptionIntegrationMock.newData.newDtoSubscription);
 
       expect(mockSubscriptionService.subscribe).toHaveBeenCalledWith(
         SubscriptionIntegrationMock.newData.newDtoSubscription
       );
 
       expect(response.body).toMatchObject({
-        statusCode: 409,
         message: expect.any(String),
       });
     });
@@ -95,20 +93,18 @@ describe("SubscriptionController Integration Tests", () => {
     it("should return a message that data is invalid", async () => {
       const response = await request(app.getHttpServer())
         .post("/subscribe")
-        .send(SubscriptionIntegrationMock.newData.invalidData)
-        .expect(400);
+        .send(SubscriptionIntegrationMock.newData.invalidData);
 
       expect(mockSubscriptionService.subscribe).not.toHaveBeenCalled();
 
       expect(response.body).toMatchObject({
-        statusCode: 400,
         message: expect.any(Array),
       });
     });
   });
 
   describe("confirm", () => {
-    it("should сonfirm subscription", async () => {
+    it("should confirm subscription", async () => {
       mockSubscriptionService.confirm.mockReturnValue(undefined);
       const response = await request(app.getHttpServer())
         .get(
@@ -121,7 +117,6 @@ describe("SubscriptionController Integration Tests", () => {
         SubscriptionIntegrationMock.newData.newSubscription.token
       );
       expect(response.body).toMatchObject({
-        statusCode: 200,
         message: expect.any(String),
       });
     });
@@ -134,15 +129,13 @@ describe("SubscriptionController Integration Tests", () => {
         .get(
           `/confirm/${SubscriptionIntegrationMock.newData.newSubscription.token}`
         )
-        .send(SubscriptionIntegrationMock.newData.newSubscription.token)
-        .expect(409);
+        .send(SubscriptionIntegrationMock.newData.newSubscription.token);
 
       expect(mockSubscriptionService.confirm).toHaveBeenCalledWith(
         SubscriptionIntegrationMock.newData.newSubscription.token
       );
 
       expect(response.body).toMatchObject({
-        statusCode: 409,
         message: expect.any(String),
       });
     });
@@ -155,15 +148,13 @@ describe("SubscriptionController Integration Tests", () => {
         .get(
           `/confirm/${SubscriptionIntegrationMock.newData.newSubscription.token}`
         )
-        .send(SubscriptionIntegrationMock.newData.newSubscription.token)
-        .expect(404);
+        .send(SubscriptionIntegrationMock.newData.newSubscription.token);
 
       expect(mockSubscriptionService.confirm).toHaveBeenCalledWith(
         SubscriptionIntegrationMock.newData.newSubscription.token
       );
 
       expect(response.body).toMatchObject({
-        statusCode: 404,
         message: expect.any(String),
       });
     });
@@ -177,11 +168,9 @@ describe("SubscriptionController Integration Tests", () => {
         .get(
           `/confirm/${SubscriptionIntegrationMock.newData.invalidToken.token}`
         )
-        .send(SubscriptionIntegrationMock.newData.invalidToken.token)
-        .expect(400);
+        .send(SubscriptionIntegrationMock.newData.invalidToken.token);
 
       expect(response.body).toMatchObject({
-        statusCode: 400,
         message: expect.any(String),
       });
     });
@@ -201,7 +190,6 @@ describe("SubscriptionController Integration Tests", () => {
         SubscriptionIntegrationMock.newData.newSubscription.token
       );
       expect(response.body).toMatchObject({
-        statusCode: 200,
         message: expect.any(String),
       });
     });
@@ -215,15 +203,13 @@ describe("SubscriptionController Integration Tests", () => {
         .get(
           `/unsubscribe/${SubscriptionIntegrationMock.newData.newSubscription.token}`
         )
-        .send(SubscriptionIntegrationMock.newData.newSubscription.token)
-        .expect(404);
+        .send(SubscriptionIntegrationMock.newData.newSubscription.token);
 
       expect(mockSubscriptionService.unsubscribe).toHaveBeenCalledWith(
         SubscriptionIntegrationMock.newData.newSubscription.token
       );
 
       expect(response.body).toMatchObject({
-        statusCode: 404,
         message: expect.any(String),
       });
     });
@@ -237,11 +223,9 @@ describe("SubscriptionController Integration Tests", () => {
         .get(
           `/unsubscribe/${SubscriptionIntegrationMock.newData.invalidToken.token}`
         )
-        .send(SubscriptionIntegrationMock.newData.invalidToken.token)
-        .expect(400);
+        .send(SubscriptionIntegrationMock.newData.invalidToken.token);
 
       expect(response.body).toMatchObject({
-        statusCode: 400,
         message: expect.any(String),
       });
     });

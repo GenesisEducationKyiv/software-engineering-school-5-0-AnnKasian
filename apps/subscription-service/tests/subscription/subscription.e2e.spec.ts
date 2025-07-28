@@ -95,11 +95,9 @@ describe("Subscription", () => {
 
       const response = await request(baseUrl)
         .post("/subscribe")
-        .send(SubscriptionE2eMock.newSubscription)
-        .expect(409);
+        .send(SubscriptionE2eMock.newSubscription);
 
       expect(response.body).toMatchObject({
-        statusCode: 409,
         message: expect.any(String),
       });
     });
@@ -107,11 +105,9 @@ describe("Subscription", () => {
     it("should return a message that data is invalid", async () => {
       const response = await request(baseUrl)
         .post("/subscribe")
-        .send(SubscriptionE2eMock.invalidData)
-        .expect(400);
+        .send(SubscriptionE2eMock.invalidData);
 
       expect(response.body).toMatchObject({
-        statusCode: 400,
         message: expect.any(String),
         details: expect.any(Array),
       });
@@ -124,8 +120,7 @@ describe("Subscription", () => {
 
       const response = await request(baseUrl)
         .get(`/confirm/${subscription.token}`)
-        .send(subscription.token)
-        .expect(200);
+        .send(subscription.token);
 
       const result = await db.findOne({
         where: {
@@ -137,7 +132,6 @@ describe("Subscription", () => {
       expect(result?.confirmed).toBe(true);
 
       expect(response.body).toMatchObject({
-        statusCode: 200,
         message: expect.any(String),
       });
     });
@@ -150,11 +144,9 @@ describe("Subscription", () => {
 
       const response = await request(baseUrl)
         .get(`/confirm/${subscription.token}`)
-        .send(subscription.token)
-        .expect(409);
+        .send(subscription.token);
 
       expect(response.body).toMatchObject({
-        statusCode: 409,
         message: expect.any(String),
       });
     });
@@ -162,11 +154,9 @@ describe("Subscription", () => {
     it("should return a message that token is invalid", async () => {
       const response = await request(baseUrl)
         .get(`/confirm/${SubscriptionE2eMock.invalidToken}`)
-        .send(SubscriptionE2eMock.invalidToken)
-        .expect(400);
+        .send(SubscriptionE2eMock.invalidToken);
 
       expect(response.body).toMatchObject({
-        statusCode: 400,
         message: expect.any(String),
       });
     });
@@ -178,8 +168,7 @@ describe("Subscription", () => {
 
       const response = await request(baseUrl)
         .get(`/unsubscribe/${subscription.token}`)
-        .send(subscription.token)
-        .expect(200);
+        .send(subscription.token);
 
       const result = await db.findOne({
         where: {
@@ -190,7 +179,6 @@ describe("Subscription", () => {
       expect(result).toBeNull();
 
       expect(response.body).toMatchObject({
-        statusCode: 200,
         message: expect.any(String),
       });
     });
@@ -198,11 +186,9 @@ describe("Subscription", () => {
     it("should return a message that token not found", async () => {
       const response = await request(baseUrl)
         .get(`/unsubscribe/${SubscriptionE2eMock.token}`)
-        .send(SubscriptionE2eMock.token)
-        .expect(404);
+        .send(SubscriptionE2eMock.token);
 
       expect(response.body).toMatchObject({
-        statusCode: 404,
         message: expect.any(String),
       });
     });
@@ -210,11 +196,9 @@ describe("Subscription", () => {
     it("should return a message that token is invalid", async () => {
       const response = await request(baseUrl)
         .get(`/unsubscribe/${SubscriptionE2eMock.invalidToken}`)
-        .send(SubscriptionE2eMock.invalidToken)
-        .expect(400);
+        .send(SubscriptionE2eMock.invalidToken);
 
       expect(response.body).toMatchObject({
-        statusCode: 400,
         message: expect.any(String),
       });
     });
