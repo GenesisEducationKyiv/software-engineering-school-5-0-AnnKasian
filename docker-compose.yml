@@ -1,0 +1,53 @@
+version: "3.9"
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: deployment/Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "${PORT}:7081"
+    depends_on:
+      - db
+      - cache
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - app-network
+
+  db:
+    image: postgres:16.4
+    restart: always
+    container_name: weather-notify
+    environment:
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "${DATABASE_PORT}:5432"
+    networks:
+      - app-network
+
+  cache:
+    image: redis:7-alpine
+    container_name: weather-cache
+    ports:
+      - "6379:6379"
+    volumes:
+      - cache_data:/data
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+    networks:
+      - app-network
+
+volumes:
+  postgres_data:
+  cache_data:
+
+networks:
+  app-network:
+    driver: bridge
