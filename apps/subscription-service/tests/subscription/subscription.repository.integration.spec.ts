@@ -2,6 +2,10 @@ import { DataSource, type Repository } from "typeorm";
 import { ConfigModule } from "@nestjs/config";
 import { Test, type TestingModule } from "@nestjs/testing";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import {
+  InvalidInputSyntax,
+  UniqueConstraintException,
+} from "../../src/libs/exceptions/exceptions.js";
 import { MapToDomain } from "../../src/libs/mappers/mappers.js";
 import { SubscriptionEntity } from "../../src/modules/subscription/subscription.js";
 import { SubscriptionRepository } from "../../src/modules/subscription/subscription.repository.js";
@@ -79,9 +83,32 @@ describe("SubscriptionRepository Integration Tests", () => {
           id: result.id,
         },
       });
+
       expect(record).toMatchObject({
         token: result.token,
       });
+    });
+
+    it("should throw error when creating subscription with duplicate email", async () => {
+      await repository.create(
+        SubscriptionIntegrationMock.newData.newSubscription
+      );
+
+      await expect(
+        repository.create(
+          SubscriptionIntegrationMock.newData.duplicateSubscription
+        )
+      ).rejects.toThrow(UniqueConstraintException);
+    });
+
+    it("should throw error when data type is invalid", async () => {
+      await repository.create(
+        SubscriptionIntegrationMock.newData.newSubscription
+      );
+
+      await expect(
+        repository.create(SubscriptionIntegrationMock.newData.invalidDataType)
+      ).rejects.toThrow(InvalidInputSyntax);
     });
   });
 

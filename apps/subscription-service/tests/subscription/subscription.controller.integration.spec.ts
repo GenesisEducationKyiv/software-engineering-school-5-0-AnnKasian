@@ -2,8 +2,11 @@ import request from "supertest";
 import { type App } from "supertest/types.js";
 import { type INestApplication, ValidationPipe } from "@nestjs/common";
 import { Test } from "@nestjs/testing";
+import { ERROR_STATUS_CODES } from "../../../../shared/libs/enums/error-status-code.enum.js";
+import { HandleErrorMiddleware } from "../../../../shared/libs/middlewares/middlewares.js";
 import {
   EmailAlreadyExistsException,
+  InvalidSubscriptionInputException,
   InvalidTokenException,
   SubscriptionAlreadyConfirmedException,
   TokenNotFoundException,
@@ -35,11 +38,12 @@ describe("SubscriptionController Integration Tests", () => {
     app = module.createNestApplication();
     app.useGlobalPipes(
       new ValidationPipe({
-        whitelist: true,
-        forbidNonWhitelisted: true,
         transform: true,
+        exceptionFactory: (errors) =>
+          new InvalidSubscriptionInputException(errors),
       })
     );
+    app.useGlobalFilters(new HandleErrorMiddleware());
 
     await app.init();
   });
@@ -79,13 +83,15 @@ describe("SubscriptionController Integration Tests", () => {
 
       const response = await request(app.getHttpServer())
         .post("/subscribe")
-        .send(SubscriptionIntegrationMock.newData.newDtoSubscription);
+        .send(SubscriptionIntegrationMock.newData.newDtoSubscription)
+        .expect(ERROR_STATUS_CODES.CONFLICT);
 
       expect(mockSubscriptionService.subscribe).toHaveBeenCalledWith(
         SubscriptionIntegrationMock.newData.newDtoSubscription
       );
 
       expect(response.body).toMatchObject({
+        statusCode: ERROR_STATUS_CODES.CONFLICT,
         message: expect.any(String),
       });
     });
@@ -93,12 +99,14 @@ describe("SubscriptionController Integration Tests", () => {
     it("should return a message that data is invalid", async () => {
       const response = await request(app.getHttpServer())
         .post("/subscribe")
-        .send(SubscriptionIntegrationMock.newData.invalidData);
+        .send(SubscriptionIntegrationMock.newData.invalidData)
+        .expect(ERROR_STATUS_CODES.BAD_REQUEST);
 
       expect(mockSubscriptionService.subscribe).not.toHaveBeenCalled();
 
       expect(response.body).toMatchObject({
-        message: expect.any(Array),
+        statusCode: ERROR_STATUS_CODES.BAD_REQUEST,
+        message: expect.any(String),
       });
     });
   });
@@ -129,13 +137,15 @@ describe("SubscriptionController Integration Tests", () => {
         .get(
           `/confirm/${SubscriptionIntegrationMock.newData.newSubscription.token}`
         )
-        .send(SubscriptionIntegrationMock.newData.newSubscription.token);
+        .send(SubscriptionIntegrationMock.newData.newSubscription.token)
+        .expect(ERROR_STATUS_CODES.CONFLICT);
 
       expect(mockSubscriptionService.confirm).toHaveBeenCalledWith(
         SubscriptionIntegrationMock.newData.newSubscription.token
       );
 
       expect(response.body).toMatchObject({
+        statusCode: ERROR_STATUS_CODES.CONFLICT,
         message: expect.any(String),
       });
     });
@@ -148,13 +158,15 @@ describe("SubscriptionController Integration Tests", () => {
         .get(
           `/confirm/${SubscriptionIntegrationMock.newData.newSubscription.token}`
         )
-        .send(SubscriptionIntegrationMock.newData.newSubscription.token);
+        .send(SubscriptionIntegrationMock.newData.newSubscription.token)
+        .expect(ERROR_STATUS_CODES.NOT_FOUND);
 
       expect(mockSubscriptionService.confirm).toHaveBeenCalledWith(
         SubscriptionIntegrationMock.newData.newSubscription.token
       );
 
       expect(response.body).toMatchObject({
+        statusCode: ERROR_STATUS_CODES.NOT_FOUND,
         message: expect.any(String),
       });
     });
@@ -168,9 +180,11 @@ describe("SubscriptionController Integration Tests", () => {
         .get(
           `/confirm/${SubscriptionIntegrationMock.newData.invalidToken.token}`
         )
-        .send(SubscriptionIntegrationMock.newData.invalidToken.token);
+        .send(SubscriptionIntegrationMock.newData.invalidToken.token)
+        .expect(ERROR_STATUS_CODES.BAD_REQUEST);
 
       expect(response.body).toMatchObject({
+        statusCode: ERROR_STATUS_CODES.BAD_REQUEST,
         message: expect.any(String),
       });
     });
@@ -203,13 +217,15 @@ describe("SubscriptionController Integration Tests", () => {
         .get(
           `/unsubscribe/${SubscriptionIntegrationMock.newData.newSubscription.token}`
         )
-        .send(SubscriptionIntegrationMock.newData.newSubscription.token);
+        .send(SubscriptionIntegrationMock.newData.newSubscription.token)
+        .expect(ERROR_STATUS_CODES.NOT_FOUND);
 
       expect(mockSubscriptionService.unsubscribe).toHaveBeenCalledWith(
         SubscriptionIntegrationMock.newData.newSubscription.token
       );
 
       expect(response.body).toMatchObject({
+        statusCode: ERROR_STATUS_CODES.NOT_FOUND,
         message: expect.any(String),
       });
     });
@@ -223,9 +239,11 @@ describe("SubscriptionController Integration Tests", () => {
         .get(
           `/unsubscribe/${SubscriptionIntegrationMock.newData.invalidToken.token}`
         )
-        .send(SubscriptionIntegrationMock.newData.invalidToken.token);
+        .send(SubscriptionIntegrationMock.newData.invalidToken.token)
+        .expect(ERROR_STATUS_CODES.BAD_REQUEST);
 
       expect(response.body).toMatchObject({
+        statusCode: ERROR_STATUS_CODES.BAD_REQUEST,
         message: expect.any(String),
       });
     });

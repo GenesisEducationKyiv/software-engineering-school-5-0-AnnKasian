@@ -4,6 +4,7 @@ import { HandlebarsAdapter } from "@nestjs-modules/mailer/dist/adapters/handleba
 import ms from "smtp-tester";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { Test, type TestingModule } from "@nestjs/testing";
+import { EmailSubject } from "../../../../shared/libs/email-data/email-data.js";
 import { TIMEOUT } from "../../../../shared/libs/enums/enums.js";
 import { EMAIL_INJECTION_TOKENS } from "../../src/libs/enums/enums.js";
 import { EmailSendFailException } from "../../src/libs/exceptions/exceptions.js";
@@ -108,6 +109,12 @@ describe("EmailService Integration Tests", () => {
       expect(capturedEmail.email.headers.to).toBe(
         EmailIntegrationMock.newData.newSubscription.email
       );
+
+      expect(capturedEmail.email.headers.subject).toBe(EmailSubject.SUBSCRIBE);
+
+      expect(capturedEmail.email.html).toContain(
+        EmailIntegrationMock.emailData.regular
+      );
     });
 
     it("should throw HttpException if email is not valid", async () => {
@@ -135,6 +142,12 @@ describe("EmailService Integration Tests", () => {
 
       expect(capturedEmail.email.headers.to).toBe(
         EmailIntegrationMock.newData.newSubscription.email
+      );
+
+      expect(capturedEmail.email.headers.subject).toBe(EmailSubject.CONFIRM);
+
+      expect(capturedEmail.email.html).toContain(
+        EmailIntegrationMock.emailData.confirm
       );
     });
 

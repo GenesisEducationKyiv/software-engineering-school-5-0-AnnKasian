@@ -15,6 +15,9 @@ const SubscriptionE2eMock = {
     confirmed: false,
   },
   invalidToken: "invalid-token",
+  emailHeaders: {
+    subject: "Subject",
+  },
 };
 
 export { SubscriptionE2eMock };

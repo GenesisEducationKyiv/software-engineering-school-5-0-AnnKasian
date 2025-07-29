@@ -25,6 +25,7 @@ const EmailIntegrationMock = {
     ),
   },
   weather: { temperature: 20, humidity: 50, description: "Sunny" },
+  emailData: { confirm: "Confirm", regular: "Weather in" },
 };
 
 export { EmailIntegrationMock };
