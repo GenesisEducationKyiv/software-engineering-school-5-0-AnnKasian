@@ -1,11 +1,11 @@
 import { MailerService } from "@nestjs-modules/mailer";
 import { Inject, Injectable } from "@nestjs/common";
-import { ERROR_MESSAGES } from "../../../../../shared/libs/enums/enums.js";
-import { Subscription } from "../../../../../shared/libs/types/types.js";
 import {
   EmailSubject,
   EmailTemplate,
-} from "../../libs/email-data/email-data.js";
+} from "../../../../../shared/libs/email-data/email-data.js";
+import { ERROR_MESSAGES } from "../../../../../shared/libs/enums/enums.js";
+import { Subscription } from "../../../../../shared/libs/types/types.js";
 import {
   EMAIL_INJECTION_TOKENS,
   EMAIL_STATUS,

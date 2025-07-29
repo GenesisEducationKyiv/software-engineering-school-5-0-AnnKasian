@@ -3,6 +3,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Frequency } from "../../../../../shared/libs/enums/enums.js";
 import { Subscription } from "../../../../../shared/libs/types/types.js";
+import { postgresErrorHandler } from "../../libs/helpers/helpers.js";
 import { ISubscriptionRepository } from "../../libs/interfaces/interfaces.js";
 import { MapToDomain, MapToEntity } from "../../libs/mappers/mappers.js";
 import {
@@ -20,42 +21,64 @@ class SubscriptionRepository implements ISubscriptionRepository {
 
   public async create(data: SubscriptionType): Promise<Subscription> {
     const entity = new SubscriptionEntity(data);
-    const savedEntity = await this.subscription.save(entity);
 
-    return MapToDomain(savedEntity);
+    try {
+      const savedEntity = await this.subscription.save(entity);
+
+      return MapToDomain(savedEntity);
+    } catch (error: unknown) {
+      return postgresErrorHandler(error);
+    }
   }
 
   public async save(subscription: Subscription): Promise<Subscription> {
     const entity = MapToEntity(subscription);
-    const savedEntity = await this.subscription.save(entity);
 
-    return MapToDomain(savedEntity);
+    try {
+      const savedEntity = await this.subscription.save(entity);
+
+      return MapToDomain(savedEntity);
+    } catch (error: unknown) {
+      return postgresErrorHandler(error);
+    }
   }
 
   public async delete(id: string): Promise<void> {
-    await this.subscription.delete(id);
+    try {
+      await this.subscription.delete(id);
+    } catch (error: unknown) {
+      return postgresErrorHandler(error);
+    }
   }
 
   public async findByFrequency(frequency: Frequency): Promise<Subscription[]> {
-    const entities = await this.subscription.find({
-      where: {
-        frequency,
-        confirmed: true,
-      },
-    });
+    try {
+      const entities = await this.subscription.find({
+        where: {
+          frequency,
+          confirmed: true,
+        },
+      });
 
-    return entities.map((entity) => MapToDomain(entity));
+      return entities.map((entity) => MapToDomain(entity));
+    } catch (error: unknown) {
+      return postgresErrorHandler(error);
+    }
   }
 
   public async find({
     email,
     token,
   }: SubscribeFilterType): Promise<Subscription | null> {
-    const entities = await this.subscription.findOne({
-      where: { email, token },
-    });
+    try {
+      const entities = await this.subscription.findOne({
+        where: { email, token },
+      });
 
-    return entities ? MapToDomain(entities) : null;
+      return entities ? MapToDomain(entities) : null;
+    } catch (error: unknown) {
+      return postgresErrorHandler(error);
+    }
   }
 }
 
