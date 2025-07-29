@@ -13,6 +13,26 @@ const SubscriptionIntegrationMock = {
       new Date(),
       new Date()
     ),
+    duplicateSubscription: new Subscription(
+      "123e4567-e89b-12d3-a456-426614174010",
+      "new@example.com",
+      "Kyiv",
+      Frequency.HOURLY,
+      "123e4567-e89b-12d3-a456-426614174010",
+      false,
+      new Date(),
+      new Date()
+    ),
+    invalidDataType: new Subscription(
+      "123e4567-e89b-12d3-a456-426614174010",
+      "new@example.com",
+      "Kyiv",
+      Frequency.HOURLY,
+      "123e4567-e89b-",
+      false,
+      new Date(),
+      new Date()
+    ),
     newDtoSubscription: {
       email: "new@example.com",
       city: "Kyiv",

@@ -3,7 +3,11 @@ import request from "supertest";
 import { DataSource, type Repository } from "typeorm";
 import { Test, type TestingModule } from "@nestjs/testing";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { TIMEOUT } from "../../../../shared/libs/enums/enums.js";
+import { EmailSubject } from "../../../../shared/libs/email-data/email-data.js";
+import {
+  ERROR_STATUS_CODES,
+  TIMEOUT,
+} from "../../../../shared/libs/enums/enums.js";
 import { SubscriptionEntity } from "../../src/modules/subscription/subscription.js";
 import { MailHogClient } from "../mailhog.client.js";
 import { testDatabaseConfig } from "../text-database.config.js";
@@ -82,6 +86,10 @@ describe("Subscription", () => {
         SubscriptionE2eMock.newSubscription.email.split("@")[0]
       );
 
+      expect(
+        capturedEmail.Content.Headers[SubscriptionE2eMock.emailHeaders.subject]
+      ).toStrictEqual([EmailSubject.CONFIRM]);
+
       const decodedBody = decode(capturedEmail.Content.Body).toString();
 
       expect(decodedBody).toContain(result?.token);
@@ -95,9 +103,11 @@ describe("Subscription", () => {
 
       const response = await request(baseUrl)
         .post("/subscribe")
-        .send(SubscriptionE2eMock.newSubscription);
+        .send(SubscriptionE2eMock.newSubscription)
+        .expect(ERROR_STATUS_CODES.CONFLICT);
 
       expect(response.body).toMatchObject({
+        statusCode: ERROR_STATUS_CODES.CONFLICT,
         message: expect.any(String),
       });
     });
@@ -105,9 +115,11 @@ describe("Subscription", () => {
     it("should return a message that data is invalid", async () => {
       const response = await request(baseUrl)
         .post("/subscribe")
-        .send(SubscriptionE2eMock.invalidData);
+        .send(SubscriptionE2eMock.invalidData)
+        .expect(ERROR_STATUS_CODES.BAD_REQUEST);
 
       expect(response.body).toMatchObject({
+        statusCode: ERROR_STATUS_CODES.BAD_REQUEST,
         message: expect.any(String),
         details: expect.any(Array),
       });
@@ -144,9 +156,11 @@ describe("Subscription", () => {
 
       const response = await request(baseUrl)
         .get(`/confirm/${subscription.token}`)
-        .send(subscription.token);
+        .send(subscription.token)
+        .expect(ERROR_STATUS_CODES.CONFLICT);
 
       expect(response.body).toMatchObject({
+        statusCode: ERROR_STATUS_CODES.CONFLICT,
         message: expect.any(String),
       });
     });
@@ -154,9 +168,11 @@ describe("Subscription", () => {
     it("should return a message that token is invalid", async () => {
       const response = await request(baseUrl)
         .get(`/confirm/${SubscriptionE2eMock.invalidToken}`)
-        .send(SubscriptionE2eMock.invalidToken);
+        .send(SubscriptionE2eMock.invalidToken)
+        .expect(ERROR_STATUS_CODES.BAD_REQUEST);
 
       expect(response.body).toMatchObject({
+        statusCode: ERROR_STATUS_CODES.BAD_REQUEST,
         message: expect.any(String),
       });
     });
@@ -186,9 +202,11 @@ describe("Subscription", () => {
     it("should return a message that token not found", async () => {
       const response = await request(baseUrl)
         .get(`/unsubscribe/${SubscriptionE2eMock.token}`)
-        .send(SubscriptionE2eMock.token);
+        .send(SubscriptionE2eMock.token)
+        .expect(ERROR_STATUS_CODES.NOT_FOUND);
 
       expect(response.body).toMatchObject({
+        statusCode: ERROR_STATUS_CODES.NOT_FOUND,
         message: expect.any(String),
       });
     });
@@ -196,9 +214,11 @@ describe("Subscription", () => {
     it("should return a message that token is invalid", async () => {
       const response = await request(baseUrl)
         .get(`/unsubscribe/${SubscriptionE2eMock.invalidToken}`)
-        .send(SubscriptionE2eMock.invalidToken);
+        .send(SubscriptionE2eMock.invalidToken)
+        .expect(ERROR_STATUS_CODES.BAD_REQUEST);
 
       expect(response.body).toMatchObject({
+        statusCode: ERROR_STATUS_CODES.BAD_REQUEST,
         message: expect.any(String),
       });
     });
