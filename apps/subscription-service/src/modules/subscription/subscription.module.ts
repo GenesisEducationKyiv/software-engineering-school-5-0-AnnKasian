@@ -3,6 +3,7 @@ import { Module } from "@nestjs/common";
 import { ClientGrpc } from "@nestjs/microservices";
 import { getRepositoryToken, TypeOrmModule } from "@nestjs/typeorm";
 import { GRPC_SERVICES } from "../../../../../shared/libs/enums/enums.js";
+import { EmailSchedulerCron } from "../../libs/cli/cli.js";
 import { SUBSCRIPTION_INJECTION_TOKENS } from "../../libs/enums/enums.js";
 import { IEmailService } from "../../libs/interfaces/interfaces.js";
 import { GrpcClientsModule } from "../grpc-client.module.js";
@@ -17,6 +18,7 @@ import { SubscriptionService } from "./subscription.service.js";
   controllers: [SubscriptionController],
   providers: [
     SubscriptionService,
+    EmailSchedulerCron,
     {
       provide: SUBSCRIPTION_INJECTION_TOKENS.EMAIL_SERVICE,
       useFactory: (client: ClientGrpc) =>
@@ -37,6 +39,7 @@ import { SubscriptionService } from "./subscription.service.js";
       inject: [getRepositoryToken(SubscriptionEntity)],
     },
   ],
+  exports: [SubscriptionService],
 })
 class SubscriptionModule {}
 

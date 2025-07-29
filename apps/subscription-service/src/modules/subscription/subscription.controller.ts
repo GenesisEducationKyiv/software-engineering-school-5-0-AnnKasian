@@ -1,5 +1,4 @@
 import { Body, Controller, Get, Param, Post } from "@nestjs/common";
-import { Cron, CronExpression } from "@nestjs/schedule";
 import {
   ApiBody,
   ApiOperation,
@@ -7,7 +6,6 @@ import {
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
-import { Frequency } from "../../../../../shared/libs/enums/enums.js";
 import {
   SwaggerBody,
   SwaggerOperation,
@@ -67,16 +65,6 @@ class SubscriptionController {
       message: SwaggerResponse.UNSUBSCRIBED_SUCCESSFULLY.description,
       statusCode: SwaggerResponse.UNSUBSCRIBED_SUCCESSFULLY.status,
     };
-  }
-
-  @Cron(CronExpression.EVERY_HOUR)
-  public async hourly(): Promise<void> {
-    await this.subscriptionService.sendEmails(Frequency.HOURLY);
-  }
-
-  @Cron(CronExpression.EVERY_DAY_AT_10AM)
-  public async daily(): Promise<void> {
-    await this.subscriptionService.sendEmails(Frequency.DAILY);
   }
 }
 
