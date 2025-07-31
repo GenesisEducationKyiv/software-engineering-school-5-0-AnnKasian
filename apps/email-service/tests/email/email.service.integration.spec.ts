@@ -5,11 +5,12 @@ import ms from "smtp-tester";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { Test, type TestingModule } from "@nestjs/testing";
 import { EmailSubject } from "../../../../shared/libs/email-data/email-data.js";
-import { TIMEOUT } from "../../../../shared/libs/enums/enums.js";
+import { CONFIG_KEYS, TIMEOUT } from "../../../../shared/libs/enums/enums.js";
 import { EMAIL_INJECTION_TOKENS } from "../../src/libs/enums/enums.js";
 import { EmailSendFailException } from "../../src/libs/exceptions/exceptions.js";
 import { type EmailWeatherClient } from "../../src/modules/email/email-weather.client.js";
 import { EmailService } from "../../src/modules/email/email.service.js";
+import { KafkaService } from "../../src/modules/kafka.service.js";
 import { EmailIntegrationMock } from "./mock-data/mock-data.js";
 
 describe("EmailService Integration Tests", () => {
@@ -29,7 +30,6 @@ describe("EmailService Integration Tests", () => {
         ConfigModule.forRoot({
           isGlobal: true,
         }),
-
         MailerModule.forRootAsync({
           imports: [ConfigModule],
           inject: [ConfigService],
@@ -57,6 +57,17 @@ describe("EmailService Integration Tests", () => {
       ],
       providers: [
         {
+          provide: EMAIL_INJECTION_TOKENS.MESSAGE_BROKER,
+          useFactory: (configService: ConfigService) => {
+            const brokerHost = configService.get<string>(
+              CONFIG_KEYS.KAFKA_HOST
+            ) as string;
+
+            return new KafkaService(brokerHost);
+          },
+          inject: [ConfigService],
+        },
+        {
           provide: EMAIL_INJECTION_TOKENS.WEATHER_SERVICE,
           useValue: mockWeatherService,
         },
@@ -68,11 +79,21 @@ describe("EmailService Integration Tests", () => {
           provide: EmailService,
           useFactory: (
             mailerService: MailerService,
-            weatherService: EmailWeatherClient
+            weatherService: EmailWeatherClient,
+            kafkaService: KafkaService
           ) => {
-            return new EmailService(mailerService, baseUrl, weatherService);
+            return new EmailService(
+              mailerService,
+              baseUrl,
+              weatherService,
+              kafkaService
+            );
           },
-          inject: [MailerService, EMAIL_INJECTION_TOKENS.WEATHER_SERVICE],
+          inject: [
+            MailerService,
+            EMAIL_INJECTION_TOKENS.WEATHER_SERVICE,
+            EMAIL_INJECTION_TOKENS.MESSAGE_BROKER,
+          ],
         },
       ],
     }).compile();
@@ -94,7 +115,8 @@ describe("EmailService Integration Tests", () => {
 
       await service.sendWeatherEmail(
         EmailIntegrationMock.newData.newSubscription.city,
-        [EmailIntegrationMock.newData.newSubscription]
+        [EmailIntegrationMock.newData.newSubscription],
+        baseUrl
       );
 
       expect(mockWeatherService.get).toHaveBeenCalledWith(
@@ -123,7 +145,8 @@ describe("EmailService Integration Tests", () => {
       await expect(
         service.sendWeatherEmail(
           EmailIntegrationMock.newData.invalidSubscriptionToConfirm.city,
-          [EmailIntegrationMock.newData.invalidSubscriptionToConfirm]
+          [EmailIntegrationMock.newData.invalidSubscriptionToConfirm],
+          baseUrl
         )
       ).rejects.toThrow(EmailSendFailException);
     });

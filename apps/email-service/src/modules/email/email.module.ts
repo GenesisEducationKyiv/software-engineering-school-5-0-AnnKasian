@@ -9,6 +9,7 @@ import {
 import { EMAIL_INJECTION_TOKENS } from "../../libs/enums/enums.js";
 import { IWeatherService } from "../../libs/interfaces/interfaces.js";
 import { GrpcClientsModule } from "../grpc-client.module.js";
+import { KafkaService } from "../kafka.service.js";
 import { EmailWeatherClient } from "./email-weather.client.js";
 import { EmailController } from "./email.controller.js";
 import { EmailService } from "./email.service.js";
@@ -17,6 +18,29 @@ import { EmailService } from "./email.service.js";
   controllers: [EmailController],
   imports: [GrpcClientsModule],
   providers: [
+    {
+      provide: EMAIL_INJECTION_TOKENS.MESSAGE_BROKER,
+      useFactory: (configService: ConfigService) => {
+        const brokerHost = configService.get<string>(
+          CONFIG_KEYS.KAFKA_HOST
+        ) as string;
+
+        const clientId = configService.get<string>(
+          CONFIG_KEYS.EMAIL_SERVICE_HOST
+        ) as string;
+
+        const groupId = configService.get<string>(
+          CONFIG_KEYS.KAFKA_GROUP_ID
+        ) as string;
+
+        const retry = configService.get<number>(
+          CONFIG_KEYS.SEND_RETRY
+        ) as number;
+
+        return new KafkaService(brokerHost, clientId, groupId, retry);
+      },
+      inject: [ConfigService],
+    },
     {
       provide: EMAIL_INJECTION_TOKENS.EMAIL_WEATHER_CLIENT,
       useFactory: (weatherService: IWeatherService) =>
@@ -33,19 +57,31 @@ import { EmailService } from "./email.service.js";
       provide: EmailService,
       useFactory: (
         mailerService: MailerService,
-        emaiWeatherClient: EmailWeatherClient,
-        configService: ConfigService
+        emailWeatherClient: EmailWeatherClient,
+        configService: ConfigService,
+        kafkaService: KafkaService
       ) => {
         const baseUrl = configService.get<string>(
           CONFIG_KEYS.BASE_URL
         ) as string;
 
-        return new EmailService(mailerService, baseUrl, emaiWeatherClient);
+        const topic = configService.get<string>(
+          CONFIG_KEYS.EMAIL_TOPIC
+        ) as string;
+
+        return new EmailService(
+          mailerService,
+          baseUrl,
+          emailWeatherClient,
+          kafkaService,
+          topic
+        );
       },
       inject: [
         MailerService,
         EMAIL_INJECTION_TOKENS.EMAIL_WEATHER_CLIENT,
         ConfigService,
+        EMAIL_INJECTION_TOKENS.MESSAGE_BROKER,
       ],
     },
   ],
