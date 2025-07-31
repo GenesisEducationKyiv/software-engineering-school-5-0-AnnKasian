@@ -25,6 +25,7 @@ class KafkaService implements OnModuleInit {
       maxInFlightRequests: 1,
       idempotent: true,
     });
+
     this.consumer = this.kafka.consumer({
       groupId,
       maxWaitTimeInMs: 5000,
