@@ -1,9 +1,9 @@
 import { type EmailCommand } from "../types/types.js";
 
 interface IMessageBroker {
-  publish(queue: string, message: EmailCommand): Promise<void>;
+  publish(topic: string, message: EmailCommand): Promise<void>;
   subscribe(
-    queue: string,
+    topic: string,
     handler: (message: EmailCommand) => Promise<void>
   ): Promise<void>;
 }

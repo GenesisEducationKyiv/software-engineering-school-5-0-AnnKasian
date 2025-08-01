@@ -7,7 +7,10 @@ import {
   GRPC_SERVICES,
 } from "../../../../../shared/libs/enums/enums.js";
 import { EMAIL_INJECTION_TOKENS } from "../../libs/enums/enums.js";
-import { IWeatherService } from "../../libs/interfaces/interfaces.js";
+import {
+  IMessageBroker,
+  IWeatherService,
+} from "../../libs/interfaces/interfaces.js";
 import { GrpcClientsModule } from "../grpc-client.module.js";
 import { KafkaService } from "../kafka.service.js";
 import { EmailWeatherClient } from "./email-weather.client.js";
@@ -59,7 +62,7 @@ import { EmailService } from "./email.service.js";
         mailerService: MailerService,
         emailWeatherClient: EmailWeatherClient,
         configService: ConfigService,
-        kafkaService: KafkaService
+        messageBrokerService: IMessageBroker
       ) => {
         const baseUrl = configService.get<string>(
           CONFIG_KEYS.BASE_URL
@@ -73,7 +76,7 @@ import { EmailService } from "./email.service.js";
           mailerService,
           baseUrl,
           emailWeatherClient,
-          kafkaService,
+          messageBrokerService,
           topic
         );
       },

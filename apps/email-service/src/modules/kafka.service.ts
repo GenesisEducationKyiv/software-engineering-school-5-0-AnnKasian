@@ -1,10 +1,12 @@
 import { Kafka, Producer, Consumer } from "kafkajs";
 import { Injectable, OnModuleInit } from "@nestjs/common";
+import { TIMEOUT } from "../../../../shared/libs/enums/enums.js";
 import { MessageBrokerException } from "../libs/exceptions/exceptions.js";
+import { IMessageBroker } from "../libs/interfaces/interfaces.js";
 import { EmailCommand } from "../libs/types/types.js";
 
 @Injectable()
-class KafkaService implements OnModuleInit {
+class KafkaService implements OnModuleInit, IMessageBroker {
   private kafka: Kafka;
   private producer: Producer;
   private consumer: Consumer;
@@ -28,7 +30,7 @@ class KafkaService implements OnModuleInit {
 
     this.consumer = this.kafka.consumer({
       groupId,
-      maxWaitTimeInMs: 5000,
+      maxWaitTimeInMs: TIMEOUT.DEFAULT_TIMEOUT,
     });
   }
 

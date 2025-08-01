@@ -14,12 +14,12 @@ import {
   EmailCommandTypes,
 } from "../../libs/enums/enums.js";
 import { EmailSendFailException } from "../../libs/exceptions/exceptions.js";
+import { IMessageBroker } from "../../libs/interfaces/interfaces.js";
 import {
   type WeatherEmailCommand,
   type EmailConfirmationCommand,
   BatchEmailCommand,
 } from "../../libs/types/types.js";
-import { KafkaService } from "../kafka.service.js";
 import { EmailWeatherClient } from "./email-weather.client.js";
 
 @Injectable()
@@ -30,7 +30,7 @@ class EmailService implements OnModuleInit {
     @Inject(EMAIL_INJECTION_TOKENS.EMAIL_WEATHER_CLIENT)
     private readonly emailWeatherClient: EmailWeatherClient,
     @Inject(EMAIL_INJECTION_TOKENS.MESSAGE_BROKER)
-    private readonly kafkaService: KafkaService,
+    private readonly messageBrokerService: IMessageBroker,
     private readonly topic: string
   ) {}
 
@@ -45,7 +45,7 @@ class EmailService implements OnModuleInit {
       baseUrl: this.baseUrl,
     };
 
-    await this.kafkaService.publish(this.topic, command);
+    await this.messageBrokerService.publish(this.topic, command);
   }
 
   async sendEmails(subscriptions: Subscription[]): Promise<void> {
@@ -58,7 +58,7 @@ class EmailService implements OnModuleInit {
         baseUrl: this.baseUrl,
       };
 
-      await this.kafkaService.publish(this.topic, command);
+      await this.messageBrokerService.publish(this.topic, command);
     }
   }
 
@@ -119,7 +119,7 @@ class EmailService implements OnModuleInit {
   }
 
   private async initConsumer(): Promise<void> {
-    await this.kafkaService.subscribe(this.topic, async (command) => {
+    await this.messageBrokerService.subscribe(this.topic, async (command) => {
       switch (command.type) {
         case EmailCommandTypes.emailConfirmation:
           await this.processConfirmationEmail(command);

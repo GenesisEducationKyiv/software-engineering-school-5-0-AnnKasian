@@ -22,7 +22,9 @@ describe("Subscription", () => {
   const baseUrl = "http://localhost:7072";
 
   beforeAll(async () => {
-    await new Promise((resolve) => setTimeout(resolve, 10000));
+    await new Promise((resolve) =>
+      setTimeout(resolve, TIMEOUT.TEST_BROKER_TIMEOUT)
+    );
     module = await Test.createTestingModule({
       imports: [
         TypeOrmModule.forRoot({
@@ -36,7 +38,7 @@ describe("Subscription", () => {
     dataSource = module.get<DataSource>(DataSource);
     db = dataSource.getRepository(SubscriptionEntity);
     mailHog = new MailHogClient();
-  }, 15000);
+  }, TIMEOUT.TEST_E2E_TIMEOUT);
 
   beforeEach(async () => {
     await dataSource.dropDatabase();
