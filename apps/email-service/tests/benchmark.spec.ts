@@ -6,8 +6,8 @@ import {
   Transport,
   type ClientGrpc,
 } from "@nestjs/microservices";
-import { GRPC_SERVICES, TIMEOUT } from "../../../../shared/libs/enums/enums.js";
-import { type IWeatherService } from "../../src/libs/interfaces/interfaces.js";
+import { GRPC_SERVICES, TIMEOUT } from "../../../shared/libs/enums/enums.js";
+import { type IWeatherService } from "../src/libs/interfaces/interfaces.js";
 
 describe("E2E Benchmark Tests", () => {
   const httpUrl = "http://localhost:7064";

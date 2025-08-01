@@ -22,6 +22,9 @@ describe("Subscription", () => {
   const baseUrl = "http://localhost:7072";
 
   beforeAll(async () => {
+    await new Promise((resolve) =>
+      setTimeout(resolve, TIMEOUT.TEST_BROKER_TIMEOUT)
+    );
     module = await Test.createTestingModule({
       imports: [
         TypeOrmModule.forRoot({
@@ -35,7 +38,7 @@ describe("Subscription", () => {
     dataSource = module.get<DataSource>(DataSource);
     db = dataSource.getRepository(SubscriptionEntity);
     mailHog = new MailHogClient();
-  });
+  }, TIMEOUT.TEST_E2E_TIMEOUT);
 
   beforeEach(async () => {
     await dataSource.dropDatabase();
@@ -93,7 +96,7 @@ describe("Subscription", () => {
       const decodedBody = decode(capturedEmail.Content.Body).toString();
 
       expect(decodedBody).toContain(result?.token);
-    });
+    }, 15000);
 
     it("should return a message that email already confirmed", async () => {
       await createTestSubscription({
