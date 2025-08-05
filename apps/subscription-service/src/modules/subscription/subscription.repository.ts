@@ -3,6 +3,8 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Frequency } from "../../../../../shared/libs/enums/enums.js";
 import { Subscription } from "../../../../../shared/libs/types/types.js";
+import { DURATION } from "../../../../../shared/observability/metrics/libs/enums/enums.js";
+import { CustomMetricsService } from "../../../../../shared/observability/metrics/metrics.service.js";
 import { postgresErrorHandler } from "../../libs/helpers/helpers.js";
 import { ISubscriptionRepository } from "../../libs/interfaces/interfaces.js";
 import { MapToDomain, MapToEntity } from "../../libs/mappers/mappers.js";
@@ -16,17 +18,38 @@ import { SubscriptionEntity } from "./entities/entities.js";
 class SubscriptionRepository implements ISubscriptionRepository {
   public constructor(
     @InjectRepository(SubscriptionEntity)
-    private readonly subscription: Repository<SubscriptionEntity>
+    private readonly subscription: Repository<SubscriptionEntity>,
+    private readonly metricsService: CustomMetricsService
   ) {}
 
   public async create(data: SubscriptionType): Promise<Subscription> {
+    const startTime = Date.now();
     const entity = new SubscriptionEntity(data);
 
     try {
       const savedEntity = await this.subscription.save(entity);
+      const duration = (Date.now() - startTime) / DURATION.DEFAULT;
+      this.metricsService.incrementDbQueries("INSERT", "subscriptions");
+      this.metricsService.observeDbQueryDuration(
+        "INSERT",
+        "subscriptions",
+        duration
+      );
 
       return MapToDomain(savedEntity);
     } catch (error: unknown) {
+      const duration = (Date.now() - startTime) / DURATION.DEFAULT;
+      this.metricsService.incrementDbQueries("INSERT", "subscriptions");
+      this.metricsService.observeDbQueryDuration(
+        "INSERT",
+        "subscriptions",
+        duration
+      );
+      this.metricsService.incrementErrors(
+        "database_error",
+        "subscription_repository"
+      );
+
       return postgresErrorHandler(error);
     }
   }

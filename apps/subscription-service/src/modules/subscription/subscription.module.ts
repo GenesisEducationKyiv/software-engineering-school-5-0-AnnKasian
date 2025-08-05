@@ -3,6 +3,7 @@ import { Module } from "@nestjs/common";
 import { ClientGrpc } from "@nestjs/microservices";
 import { getRepositoryToken, TypeOrmModule } from "@nestjs/typeorm";
 import { GRPC_SERVICES } from "../../../../../shared/libs/enums/enums.js";
+import { CustomMetricsService } from "../../../../../shared/observability/metrics/metrics.service.js";
 import { EmailSchedulerCron } from "../../libs/cli/cli.js";
 import { SUBSCRIPTION_INJECTION_TOKENS } from "../../libs/enums/enums.js";
 import { IEmailService } from "../../libs/interfaces/interfaces.js";
@@ -33,10 +34,13 @@ import { SubscriptionService } from "./subscription.service.js";
     },
     {
       provide: SUBSCRIPTION_INJECTION_TOKENS.SUBSCRIPTION_REPOSITORY,
-      useFactory: (repository: Repository<SubscriptionEntity>) => {
-        return new SubscriptionRepository(repository);
+      useFactory: (
+        repository: Repository<SubscriptionEntity>,
+        metricsService: CustomMetricsService
+      ) => {
+        return new SubscriptionRepository(repository, metricsService);
       },
-      inject: [getRepositoryToken(SubscriptionEntity)],
+      inject: [getRepositoryToken(SubscriptionEntity), CustomMetricsService],
     },
   ],
   exports: [SubscriptionService],

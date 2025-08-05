@@ -9,3 +9,5 @@ export { TIMEOUT } from "./timeout.enum.js";
 export { SUBSCRIPTION_ERROR_CODES } from "./subscription-error-codes.enum.js";
 export { WEATHER_ERROR_CODES } from "./weather-error-codes.enum.js";
 export { EMAIL_ERROR_CODES } from "./email-error-codes.enum.js";
+export { OBSERVABILITY_ERROR_CODES } from "./observability-error-codes.enum.js";
+export { OBSERVABILITY_ERROR_MESSAGES } from "./observability-error-messages.js";

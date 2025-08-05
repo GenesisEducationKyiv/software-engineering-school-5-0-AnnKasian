@@ -5,11 +5,18 @@ import { type NestExpressApplication } from "@nestjs/platform-express";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { CONFIG_KEYS } from "../../../shared/libs/enums/config.enum.js";
 import { HandleErrorMiddleware } from "../../../shared/libs/middlewares/middlewares.js";
+import { CustomLoggerService } from "../../../shared/observability/logs/logger.service.js";
 import { AppModule } from "./app.module.js";
 import { InvalidSubscriptionInputException } from "./libs/exceptions/exceptions.js";
 
 async function bootstrap(): Promise<void> {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    logger: false,
+  });
+
+  const customLogger = app.get(CustomLoggerService);
+  app.useLogger(customLogger);
+
   const configService = app.get(ConfigService);
   const port = configService.get<number>(
     CONFIG_KEYS.HTTP_SUBSCRIPTION_SERVICE_PORT
@@ -45,6 +52,9 @@ async function bootstrap(): Promise<void> {
     })
   );
   app.useGlobalFilters(new HandleErrorMiddleware());
+
+  customLogger.setContext("Bootstrap");
+  customLogger.logStart("application-startup");
   await app.listen(port);
 }
 

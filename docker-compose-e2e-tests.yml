@@ -138,6 +138,38 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+    volumes:
+      - ./shared:/app/shared:ro
+    networks:
+      - test-network
+
+  prometheus-test:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus.config.yml:/etc/prometheus/prometheus.config.yml
+      - ./shared:/app/shared:ro
+    ports:
+      - "9090:9090"
+    networks:
+      - test-network
+
+  grafana-test:
+    image: grafana/grafana
+    volumes:
+      - ./shared:/app/shared:ro
+    ports:
+      - "3000:3000"
+    networks:
+      - test-network
+
+  loki-test:
+    image: grafana/loki
+    command: -config.file=/etc/loki/loki.config.yml
+    volumes:
+      - ./loki.config.yml:/etc/loki/loki.config.yml
+      - ./shared:/app/shared:ro
+    ports:
+      - "3100:3100"
     networks:
       - test-network
 

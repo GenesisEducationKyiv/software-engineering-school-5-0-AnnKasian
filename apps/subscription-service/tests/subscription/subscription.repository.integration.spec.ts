@@ -2,6 +2,7 @@ import { DataSource, type Repository } from "typeorm";
 import { ConfigModule } from "@nestjs/config";
 import { Test, type TestingModule } from "@nestjs/testing";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import { CustomMetricsService } from "../../../../shared/observability/metrics/metrics.service.js";
 import {
   InvalidInputSyntax,
   UniqueConstraintException,
@@ -18,6 +19,12 @@ describe("SubscriptionRepository Integration Tests", () => {
   let db: Repository<SubscriptionEntity>;
   let dataSource: DataSource;
 
+  const mockCustomMetricsService = {
+    incrementDbQueries: jest.fn(),
+    observeDbQueryDuration: jest.fn(),
+    incrementErrors: jest.fn(),
+  };
+
   beforeAll(async () => {
     module = await Test.createTestingModule({
       imports: [
@@ -30,7 +37,13 @@ describe("SubscriptionRepository Integration Tests", () => {
         }),
         TypeOrmModule.forFeature([SubscriptionEntity]),
       ],
-      providers: [SubscriptionRepository],
+      providers: [
+        SubscriptionRepository,
+        {
+          provide: CustomMetricsService,
+          useValue: mockCustomMetricsService,
+        },
+      ],
     }).compile();
 
     dataSource = module.get<DataSource>(DataSource);
