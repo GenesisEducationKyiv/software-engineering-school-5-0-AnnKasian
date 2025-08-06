@@ -103,7 +103,7 @@ describe("EmailService Integration Tests", () => {
 
       const capturedEmail = await mailServer.captureOne(
         EmailIntegrationMock.newData.newSubscription.email,
-        { wait: TIMEOUT.MAILER_TIMEOUT }
+        { wait: TIMEOUT.DEFAULT_TIMEOUT }
       );
 
       expect(capturedEmail.email.headers.to).toBe(
@@ -137,7 +137,7 @@ describe("EmailService Integration Tests", () => {
 
       const capturedEmail = await mailServer.captureOne(
         EmailIntegrationMock.newData.newSubscription.email,
-        { wait: TIMEOUT.MAILER_TIMEOUT }
+        { wait: TIMEOUT.DEFAULT_TIMEOUT }
       );
 
       expect(capturedEmail.email.headers.to).toBe(

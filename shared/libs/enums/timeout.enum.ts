@@ -1,5 +1,6 @@
 const TIMEOUT = {
-  MAILER_TIMEOUT: 5000,
+  DEFAULT_TIMEOUT: 5000,
+  TEST_VOLUME_TIMEOUT: 60000,
 } as const;
 
 export { TIMEOUT };
