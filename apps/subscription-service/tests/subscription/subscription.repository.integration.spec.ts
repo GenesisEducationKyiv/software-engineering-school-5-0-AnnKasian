@@ -2,11 +2,12 @@ import { DataSource, type Repository } from "typeorm";
 import { ConfigModule } from "@nestjs/config";
 import { Test, type TestingModule } from "@nestjs/testing";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { CustomMetricsService } from "../../../../shared/observability/metrics/metrics.service.js";
+import { type DB_METRICS_OPERATIONS } from "../../src/libs/enums/enums.js";
 import {
   InvalidInputSyntax,
   UniqueConstraintException,
 } from "../../src/libs/exceptions/exceptions.js";
+import { MetricsHelper } from "../../src/libs/helpers/helpers.js";
 import { MapToDomain } from "../../src/libs/mappers/mappers.js";
 import { SubscriptionEntity } from "../../src/modules/subscription/subscription.js";
 import { SubscriptionRepository } from "../../src/modules/subscription/subscription.repository.js";
@@ -19,10 +20,11 @@ describe("SubscriptionRepository Integration Tests", () => {
   let db: Repository<SubscriptionEntity>;
   let dataSource: DataSource;
 
-  const mockCustomMetricsService = {
-    incrementDbQueries: jest.fn(),
-    observeDbQueryDuration: jest.fn(),
-    incrementErrors: jest.fn(),
+  const mockMetricsHelper = {
+    withMetrics: <T>(
+      _operation: DB_METRICS_OPERATIONS,
+      fn: () => Promise<T>
+    ): Promise<T> => fn(),
   };
 
   beforeAll(async () => {
@@ -40,8 +42,8 @@ describe("SubscriptionRepository Integration Tests", () => {
       providers: [
         SubscriptionRepository,
         {
-          provide: CustomMetricsService,
-          useValue: mockCustomMetricsService,
+          provide: MetricsHelper,
+          useValue: mockMetricsHelper,
         },
       ],
     }).compile();
