@@ -11,6 +11,7 @@ import {
   IMessageBroker,
   IWeatherService,
 } from "../../libs/interfaces/interfaces.js";
+import { EmailCommand } from "../../libs/types/types.js";
 import { GrpcClientsModule } from "../grpc-client.module.js";
 import { KafkaService } from "../kafka.service.js";
 import { EmailWeatherClient } from "./email-weather.client.js";
@@ -63,7 +64,7 @@ import { EmailPublisher } from "./email.publisher.js";
         mailerService: MailerService,
         emailWeatherClient: EmailWeatherClient,
         configService: ConfigService,
-        messageBrokerService: IMessageBroker
+        messageBrokerService: IMessageBroker<EmailCommand>
       ) => {
         const baseUrl = configService.get<string>(
           CONFIG_KEYS.BASE_URL

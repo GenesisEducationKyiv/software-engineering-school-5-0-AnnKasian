@@ -1,10 +1,10 @@
 import { Kafka, Producer, Consumer } from "kafkajs";
 import { Injectable, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
 import { TIMEOUT } from "../../../../shared/libs/enums/enums.js";
+import { EMAIL_ERROR_MESSAGES } from "../libs/enums/enums.js";
 import { MessageBrokerException } from "../libs/exceptions/exceptions.js";
 import { IMessageBroker } from "../libs/interfaces/interfaces.js";
 import { PublishableMessage } from "../libs/types/types.js";
-import { EMAIL_ERROR_MESSAGES } from "../libs/enums/enums.js";
 
 @Injectable()
 class KafkaService implements OnModuleInit, OnModuleDestroy, IMessageBroker {

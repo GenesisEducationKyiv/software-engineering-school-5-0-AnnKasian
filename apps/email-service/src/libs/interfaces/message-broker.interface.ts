@@ -1,8 +1,8 @@
-interface IMessageBroker {
+interface IMessageBroker<T = unknown> {
   publish(topic: string, message: unknown): Promise<void>;
   subscribe(
     topic: string,
-    handler: (message: unknown) => Promise<void>
+    handler: (message: T) => Promise<void>
   ): Promise<void>;
 }
 

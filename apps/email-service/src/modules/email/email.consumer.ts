@@ -20,6 +20,7 @@ import {
   type WeatherEmailCommand,
   type EmailConfirmationCommand,
   BatchEmailCommand,
+  EmailCommand,
 } from "../../libs/types/types.js";
 import { EmailWeatherClient } from "./email-weather.client.js";
 
@@ -31,7 +32,7 @@ class EmailConsumer implements OnModuleInit {
     @Inject(EMAIL_INJECTION_TOKENS.EMAIL_WEATHER_CLIENT)
     private readonly emailWeatherClient: EmailWeatherClient,
     @Inject(EMAIL_INJECTION_TOKENS.MESSAGE_BROKER)
-    private readonly messageBrokerService: IMessageBroker,
+    private readonly messageBrokerService: IMessageBroker<EmailCommand>,
     private readonly topic: string
   ) {}
 
