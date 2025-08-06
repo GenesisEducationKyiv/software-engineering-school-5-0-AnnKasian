@@ -1,0 +1,36 @@
+syntax = "proto2";
+
+package email;
+
+enum FrequencyProto {
+   daily = 0;
+   hourly = 1;
+}
+
+message SubscriptionProto {
+  required string id = 1;
+  required string email = 2;
+  required string city = 3;
+  required FrequencyProto frequency = 4;
+  required string token = 5;
+  required bool confirmed = 6;
+  required string createdAt = 7; 
+  required string updatedAt = 8; 
+}
+
+service EmailService {
+  rpc SendEmails (SendEmailsRequest) returns (SendEmailsResponse);
+  rpc SendConfirmationEmail (SendConfirmationEmailRequest) returns (SendEmailConfirmationResponse);
+}
+
+message SendEmailsRequest {
+  repeated SubscriptionProto subscription = 1;
+}
+
+message SendEmailsResponse {}
+
+message SendConfirmationEmailRequest {
+  required SubscriptionProto subscription = 1;
+}
+
+message SendEmailConfirmationResponse {}

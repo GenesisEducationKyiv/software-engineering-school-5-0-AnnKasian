@@ -6,32 +6,32 @@ module.exports = {
       severity: "error",
       comment:
         "Entities should not depend on repositories, services, or controllers",
-      from: { path: "src/.+/.*\\.entity\\.(ts|js)$" },
+      from: { path: "apps/.+/src/.+/.*\\.entity\\.(ts|js)$" },
       to: {
-        path: "src/.+/.*(repository|service|controller|provider|mapper)\\.(ts|js)$",
-        pathNot: "src/.+/.*\\.entity\\.(ts|js)$",
+        path: "apps/.+/src/.+/.*(repository|service|controller|provider|mapper)\\.(ts|js)$",
+        pathNot: "apps/.+/src/.+/.*\\.entity\\.(ts|js)$",
       },
     },
     {
       name: "repositories-no-upper-layers",
       severity: "error",
       comment: "Repositories should not depend on services or controllers",
-      from: { path: "src/.+/.*\\.repository\\.(ts|js)$" },
-      to: { path: "src/.+/.*(service|controller)\\.(ts|js)$" },
+      from: { path: "apps/.+/src/.+/.*\\.repository\\.(ts|js)$" },
+      to: { path: "apps/.+/src/.+/.*(service|controller)\\.(ts|js)$" },
     },
     {
       name: "services-no-controllers",
       severity: "error",
       comment: "Services should not depend on controllers",
-      from: { path: "src/.+/.*\\.service\\.(ts|js)$" },
-      to: { path: "src/.+/.*\\.controller\\.(ts|js)$" },
+      from: { path: "apps/.+/src/.+/.*\\.service\\.(ts|js)$" },
+      to: { path: "apps/.+/src/.+/.*\\.controller\\.(ts|js)$" },
     },
     {
       name: "controllers-no-direct-coupling",
       severity: "warn",
       comment: "Controllers should communicate through services, not directly",
-      from: { path: "src/.+/.*\\.controller\\.(ts|js)$" },
-      to: { path: "src/.+/.*\\.controller\\.(ts|js)$" },
+      from: { path: "apps/.+/src/.+/.*\\.controller\\.(ts|js)$" },
+      to: { path: "apps/.+/src/.+/.*\\.controller\\.(ts|js)$" },
     },
     {
       name: "no-cross-module-repository-imports",
@@ -50,7 +50,7 @@ module.exports = {
       name: "no-db-in-services",
       severity: "error",
       comment: "Services should not directly import database modules",
-      from: { path: "src/.+/.*\\.service\\.(ts|js)$" },
+      from: { path: "apps/.+/src/.+/.*\\.service\\.(ts|js)$" },
       to: { path: "src/db/" },
     },
     {
@@ -59,7 +59,7 @@ module.exports = {
       comment: "Only providers should make external API calls",
       from: {
         path: "src/",
-        pathNot: "src/.+/.*\\.provider\\.(ts|js)$",
+        pathNot: "apps/.+/src/.+/.*\\.provider\\.(ts|js)$",
       },
       to: {
         path: "node_modules/(axios|node-fetch|got|superagent)/",
@@ -69,8 +69,8 @@ module.exports = {
       name: "no-swagger-in-business-logic",
       severity: "error",
       comment: "Swagger documentation should not be imported by business logic",
-      from: { path: "src/.+/.*(entity|repository|service)\\.(ts|js)$" },
-      to: { path: "src/.+/swagger-docs/" },
+      from: { path: "apps/.+/src/.+/.*(entity|repository|service)\\.(ts|js)$" },
+      to: { path: "apps/.+/src/.+/swagger-docs/" },
     },
     {
       name: "no-orphans",
@@ -176,7 +176,7 @@ module.exports = {
     },
   ],
   options: {
-    includeOnly: "^src",
+    includeOnly: "^apps/.+/src",
     exclude: {
       path: "\\.(test|spec)\\.(js|ts)$",
     },
@@ -191,23 +191,23 @@ module.exports = {
           graph: { bgcolor: "white" },
           modules: [
             {
-              criteria: { source: "src/.+/.*\\.entity\\.(ts|js)$" },
+              criteria: { source: "apps/.+/src/.+/.*\\.entity\\.(ts|js)$" },
               attributes: { color: "blue", shape: "box" },
             },
             {
-              criteria: { source: "src/.+/.*\\.repository\\.(ts|js)$" },
+              criteria: { source: "apps/.+/src/.+/.*\\.repository\\.(ts|js)$" },
               attributes: { color: "green", shape: "box" },
             },
             {
-              criteria: { source: "src/.+/.*\\.service\\.(ts|js)$" },
+              criteria: { source: "apps/.+/src/.+/.*\\.service\\.(ts|js)$" },
               attributes: { color: "orange", shape: "box" },
             },
             {
-              criteria: { source: "src/.+/.*\\.controller\\.(ts|js)$" },
+              criteria: { source: "apps/.+/src/.+/.*\\.controller\\.(ts|js)$" },
               attributes: { color: "red", shape: "box" },
             },
             {
-              criteria: { source: "src/.+/.*\\.provider\\.(ts|js)$" },
+              criteria: { source: "apps/.+/src/.+/.*\\.provider\\.(ts|js)$" },
               attributes: { color: "purple", shape: "box" },
             },
           ],
