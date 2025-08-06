@@ -1,3 +1,4 @@
+import { Inject, Injectable } from "@nestjs/common";
 import {
   DURATION,
   METRICS_ERROR_TYPES,
@@ -7,10 +8,15 @@ import { type CustomMetricsService } from "../../../../../shared/observability/m
 import {
   type DB_METRICS_OPERATIONS,
   DB_METRICS_TABLES,
+  SUBSCRIPTION_INJECTION_TOKENS,
 } from "../../libs/enums/enums.js";
 
+@Injectable()
 class MetricsHelper {
-  constructor(private readonly metricsService: CustomMetricsService) {}
+  constructor(
+    @Inject(SUBSCRIPTION_INJECTION_TOKENS.METRICS_SERVICE)
+    private readonly metricsService: CustomMetricsService
+  ) {}
 
   calculateDuration(startTime: number): number {
     return (Date.now() - startTime) / DURATION.DEFAULT;

@@ -6,6 +6,7 @@ import { GRPC_SERVICES } from "../../../../../shared/libs/enums/enums.js";
 import { CustomMetricsService } from "../../../../../shared/observability/metrics/metrics.service.js";
 import { EmailSchedulerCron } from "../../libs/cli/cli.js";
 import { SUBSCRIPTION_INJECTION_TOKENS } from "../../libs/enums/enums.js";
+import { MetricsHelper } from "../../libs/helpers/helpers.js";
 import { IEmailService } from "../../libs/interfaces/interfaces.js";
 import { GrpcClientsModule } from "../grpc-client.module.js";
 import { SubscriptionEntity } from "./entities/entities.js";
@@ -33,14 +34,24 @@ import { SubscriptionService } from "./subscription.service.js";
       inject: [SUBSCRIPTION_INJECTION_TOKENS.EMAIL_SERVICE],
     },
     {
+      provide: SUBSCRIPTION_INJECTION_TOKENS.METRICS_SERVICE,
+      useExisting: CustomMetricsService,
+    },
+    {
+      provide: MetricsHelper,
+      useFactory: (metricsService: CustomMetricsService) =>
+        new MetricsHelper(metricsService),
+      inject: [SUBSCRIPTION_INJECTION_TOKENS.METRICS_SERVICE],
+    },
+    {
       provide: SUBSCRIPTION_INJECTION_TOKENS.SUBSCRIPTION_REPOSITORY,
       useFactory: (
         repository: Repository<SubscriptionEntity>,
-        metricsService: CustomMetricsService
+        metricsHelper: MetricsHelper
       ) => {
-        return new SubscriptionRepository(repository, metricsService);
+        return new SubscriptionRepository(repository, metricsHelper);
       },
-      inject: [getRepositoryToken(SubscriptionEntity), CustomMetricsService],
+      inject: [getRepositoryToken(SubscriptionEntity), MetricsHelper],
     },
   ],
   exports: [SubscriptionService],
