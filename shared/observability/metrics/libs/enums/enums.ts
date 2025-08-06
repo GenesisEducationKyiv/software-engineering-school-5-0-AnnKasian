@@ -7,3 +7,5 @@ export {
 } from "./metrics-buckets.enum.js";
 export { DURATION } from "./duration.enum.js";
 export { RESPONSE_HEADERS } from "./response-headers.enum.js";
+export { METRICS_SERVICES } from "./metrics-services.enum.js";
+export { METRICS_ERROR_TYPES } from "./metrics-error-types.enum.js";
