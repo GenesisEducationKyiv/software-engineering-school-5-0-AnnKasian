@@ -12,11 +12,11 @@ import {
 } from "../../../../../shared/libs/enums/enums.js";
 import { MapSubscriptionToDomainFromProto } from "../../../../../shared/libs/mappers/mappers.js";
 import { DataIsRequiredException } from "../../libs/exceptions/exceptions.js";
-import { EmailService } from "./email.service.js";
+import { EmailPublisher } from "./email.publisher.js";
 
 @Controller()
 class EmailController {
-  constructor(private readonly emailService: EmailService) {}
+  constructor(private readonly emailService: EmailPublisher) {}
 
   @GrpcMethod(GRPC_SERVICES.EMAIL_SERVICE, GRPC_METHODS.SEND_EMAILS)
   public async SendEmails(

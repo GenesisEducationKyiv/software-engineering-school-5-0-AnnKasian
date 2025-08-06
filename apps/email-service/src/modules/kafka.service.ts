@@ -1,12 +1,13 @@
 import { Kafka, Producer, Consumer } from "kafkajs";
-import { Injectable, OnModuleInit } from "@nestjs/common";
+import { Injectable, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
 import { TIMEOUT } from "../../../../shared/libs/enums/enums.js";
 import { MessageBrokerException } from "../libs/exceptions/exceptions.js";
 import { IMessageBroker } from "../libs/interfaces/interfaces.js";
-import { EmailCommand } from "../libs/types/types.js";
+import { PublishableMessage } from "../libs/types/types.js";
+import { EMAIL_ERROR_MESSAGES } from "../libs/enums/enums.js";
 
 @Injectable()
-class KafkaService implements OnModuleInit, IMessageBroker {
+class KafkaService implements OnModuleInit, OnModuleDestroy, IMessageBroker {
   private kafka: Kafka;
   private producer: Producer;
   private consumer: Consumer;
@@ -39,16 +40,18 @@ class KafkaService implements OnModuleInit, IMessageBroker {
     await this.consumer.connect();
   }
 
-  async publish(topic: string, message: EmailCommand): Promise<void> {
+  async publish(topic: string, message: unknown): Promise<void> {
+    const messageKey = this.extractMessageKey(message);
+
     await this.producer.send({
       topic,
-      messages: [{ value: JSON.stringify(message), key: message.type }],
+      messages: [{ value: JSON.stringify(message), key: messageKey }],
     });
   }
 
   async subscribe(
     topic: string,
-    handler: (message: EmailCommand) => Promise<void>
+    handler: (message: unknown) => Promise<void>
   ): Promise<void> {
     await this.consumer.subscribe({ topic });
 
@@ -56,10 +59,21 @@ class KafkaService implements OnModuleInit, IMessageBroker {
       partitionsConsumedConcurrently: 1,
       eachMessage: async ({ message }) => {
         try {
-          const command = JSON.parse(
-            message.value?.toString() || "{}"
-          ) as EmailCommand;
-          await handler(command);
+          if (!message.value) {
+            throw new MessageBrokerException(
+              EMAIL_ERROR_MESSAGES.MESSAGE_IS_NULL_OR_UNDEFINED
+            );
+          }
+
+          if (!message.value.toString().trim()) {
+            throw new MessageBrokerException(
+              EMAIL_ERROR_MESSAGES.MESSAGE_HAS_NO_VALUE
+            );
+          }
+
+          const parsedMessage = JSON.parse(message.value.toString()) as unknown;
+
+          await handler(parsedMessage);
         } catch (error: unknown) {
           if (error instanceof Error) {
             throw new MessageBrokerException(error.message);
@@ -74,6 +88,16 @@ class KafkaService implements OnModuleInit, IMessageBroker {
   async onModuleDestroy() {
     await this.producer.disconnect();
     await this.consumer.disconnect();
+  }
+
+  private extractMessageKey(message: unknown): string | undefined {
+    if (typeof message === "object" && message !== null && "type" in message) {
+      const typedMessage = message as PublishableMessage;
+
+      return typedMessage.type;
+    }
+
+    return undefined;
   }
 }
 

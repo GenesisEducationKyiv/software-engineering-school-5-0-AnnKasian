@@ -14,6 +14,7 @@ import {
   EmailCommandTypes,
 } from "../../libs/enums/enums.js";
 import { EmailSendFailException } from "../../libs/exceptions/exceptions.js";
+import { createBatchesHelper } from "../../libs/helpers/helpers.js";
 import { IMessageBroker } from "../../libs/interfaces/interfaces.js";
 import {
   type WeatherEmailCommand,
@@ -23,7 +24,7 @@ import {
 import { EmailWeatherClient } from "./email-weather.client.js";
 
 @Injectable()
-class EmailService implements OnModuleInit {
+class EmailConsumer implements OnModuleInit {
   public constructor(
     private readonly mailerService: MailerService,
     private readonly baseUrl: string,
@@ -36,86 +37,6 @@ class EmailService implements OnModuleInit {
 
   async onModuleInit(): Promise<void> {
     await this.initConsumer();
-  }
-
-  async sendConfirmationEmail(subscription: Subscription): Promise<void> {
-    const command: EmailConfirmationCommand = {
-      type: EmailCommandTypes.emailConfirmation,
-      subscription,
-      baseUrl: this.baseUrl,
-    };
-
-    await this.messageBrokerService.publish(this.topic, command);
-  }
-
-  async sendEmails(subscriptions: Subscription[]): Promise<void> {
-    const batches = this.createBatches(subscriptions);
-
-    for (const batch of batches) {
-      const command: BatchEmailCommand = {
-        type: EmailCommandTypes.batchEmail,
-        subscriptions: batch,
-        baseUrl: this.baseUrl,
-      };
-
-      await this.messageBrokerService.publish(this.topic, command);
-    }
-  }
-
-  async sendWeatherEmail(
-    city: string,
-    subscriptions: Subscription[],
-    baseUrl: string
-  ): Promise<void> {
-    const weather = await this.emailWeatherClient.get(city);
-    const currentDate = new Date();
-    const batches = this.createBatches(subscriptions);
-    const allResults: PromiseSettledResult<void>[] = [];
-
-    for (const batch of batches) {
-      const results = await Promise.allSettled(
-        batch.map((subscription) =>
-          this.mailerService.sendMail({
-            to: subscription.email,
-            subject: EmailSubject.SUBSCRIBE,
-            template: EmailTemplate.WEATHER_NOTIFY,
-            context: {
-              city: subscription.city,
-              temperature: weather.temperature,
-              humidity: weather.humidity,
-              description: weather.description,
-              year: currentDate.getFullYear(),
-              unsubscribeUrl: `${baseUrl}${EMAIL_URLS.UNSUBSCRIBE}${subscription.token}`,
-            },
-          })
-        )
-      );
-
-      allResults.push(...results);
-
-      if (batch !== batches[batches.length - 1]) {
-        await this.delay(EMAIL_DISPATCH_SETTINGS.RATE_LIMIT_DELAY);
-      }
-    }
-
-    this.handleEmailFailures(allResults);
-  }
-
-  private createBatches<T>(
-    items: T[],
-    batchSize = EMAIL_DISPATCH_SETTINGS.BATCH_SIZE
-  ): T[][] {
-    const batches: T[][] = [];
-
-    for (let i = 0; i < items.length; i += batchSize) {
-      batches.push(items.slice(i, i + batchSize));
-    }
-
-    return batches;
-  }
-
-  private delay(milliseconds: number): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, milliseconds));
   }
 
   private async initConsumer(): Promise<void> {
@@ -137,7 +58,7 @@ class EmailService implements OnModuleInit {
   private async processConfirmationEmail(
     command: EmailConfirmationCommand
   ): Promise<void> {
-    const { subscription, baseUrl } = command;
+    const { subscription } = command;
     const currentDate = new Date();
 
     try {
@@ -147,7 +68,7 @@ class EmailService implements OnModuleInit {
         template: EmailTemplate.CONFIRM,
         context: {
           year: currentDate.getFullYear(),
-          confirmUrl: `${baseUrl}${EMAIL_URLS.CONFIRM}${subscription.token}`,
+          confirmUrl: `${this.baseUrl}${EMAIL_URLS.CONFIRM}${subscription.token}`,
         },
       });
     } catch (error: unknown) {
@@ -159,8 +80,15 @@ class EmailService implements OnModuleInit {
     }
   }
 
+  private async processBatchEmails(command: BatchEmailCommand): Promise<void> {
+    await this.processEmails({
+      type: EmailCommandTypes.weatherEmail,
+      subscriptions: command.subscriptions,
+    });
+  }
+
   private async processEmails(command: WeatherEmailCommand): Promise<void> {
-    const { subscriptions, baseUrl } = command;
+    const { subscriptions } = command;
     const cities: Record<string, Subscription[]> = {};
     subscriptions.forEach((subscription) => {
       cities[subscription.city] ??= [];
@@ -169,17 +97,51 @@ class EmailService implements OnModuleInit {
 
     await Promise.allSettled(
       Object.entries(cities).map(([city, subscriptions]) =>
-        this.sendWeatherEmail(city, subscriptions, baseUrl)
+        this.sendWeatherEmailForCity(city, subscriptions)
       )
     );
   }
 
-  private async processBatchEmails(command: BatchEmailCommand): Promise<void> {
-    await this.processEmails({
-      type: EmailCommandTypes.weatherEmail,
-      subscriptions: command.subscriptions,
-      baseUrl: command.baseUrl,
-    });
+  private async sendWeatherEmailForCity(
+    city: string,
+    subscriptions: Subscription[]
+  ): Promise<void> {
+    const weather = await this.emailWeatherClient.get(city);
+    const currentDate = new Date();
+    const batches = createBatchesHelper(subscriptions);
+    const allResults: PromiseSettledResult<void>[] = [];
+
+    for (const batch of batches) {
+      const results = await Promise.allSettled(
+        batch.map((subscription) =>
+          this.mailerService.sendMail({
+            to: subscription.email,
+            subject: EmailSubject.SUBSCRIBE,
+            template: EmailTemplate.WEATHER_NOTIFY,
+            context: {
+              city: subscription.city,
+              temperature: weather.temperature,
+              humidity: weather.humidity,
+              description: weather.description,
+              year: currentDate.getFullYear(),
+              unsubscribeUrl: `${this.baseUrl}${EMAIL_URLS.UNSUBSCRIBE}${subscription.token}`,
+            },
+          })
+        )
+      );
+
+      allResults.push(...results);
+
+      if (batch !== batches[batches.length - 1]) {
+        await this.delay(EMAIL_DISPATCH_SETTINGS.RATE_LIMIT_DELAY);
+      }
+    }
+
+    this.handleEmailFailures(allResults);
+  }
+
+  private delay(milliseconds: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, milliseconds));
   }
 
   private handleEmailFailures(results: PromiseSettledResult<void>[]) {
@@ -195,4 +157,4 @@ class EmailService implements OnModuleInit {
   }
 }
 
-export { EmailService };
+export { EmailConsumer };

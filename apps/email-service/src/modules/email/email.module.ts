@@ -14,8 +14,9 @@ import {
 import { GrpcClientsModule } from "../grpc-client.module.js";
 import { KafkaService } from "../kafka.service.js";
 import { EmailWeatherClient } from "./email-weather.client.js";
+import { EmailConsumer } from "./email.consumer.js";
 import { EmailController } from "./email.controller.js";
-import { EmailService } from "./email.service.js";
+import { EmailPublisher } from "./email.publisher.js";
 
 @Module({
   controllers: [EmailController],
@@ -57,7 +58,7 @@ import { EmailService } from "./email.service.js";
       inject: ["WEATHER_SERVICE"],
     },
     {
-      provide: EmailService,
+      provide: EmailConsumer,
       useFactory: (
         mailerService: MailerService,
         emailWeatherClient: EmailWeatherClient,
@@ -72,7 +73,7 @@ import { EmailService } from "./email.service.js";
           CONFIG_KEYS.EMAIL_TOPIC
         ) as string;
 
-        return new EmailService(
+        return new EmailConsumer(
           mailerService,
           baseUrl,
           emailWeatherClient,
@@ -87,9 +88,23 @@ import { EmailService } from "./email.service.js";
         EMAIL_INJECTION_TOKENS.MESSAGE_BROKER,
       ],
     },
+    {
+      provide: EmailPublisher,
+      useFactory: (
+        configService: ConfigService,
+        messageBrokerService: IMessageBroker
+      ) => {
+        const topic = configService.get<string>(
+          CONFIG_KEYS.EMAIL_TOPIC
+        ) as string;
+
+        return new EmailPublisher(messageBrokerService, topic);
+      },
+      inject: [ConfigService, EMAIL_INJECTION_TOKENS.MESSAGE_BROKER],
+    },
   ],
 
-  exports: [EmailService],
+  exports: [EmailPublisher],
 })
 class EmailModule {}
 

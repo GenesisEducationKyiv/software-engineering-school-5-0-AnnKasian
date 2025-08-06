@@ -4,19 +4,16 @@ import { type EmailCommandTypes } from "../enums/enums.js";
 type EmailConfirmationCommand = {
   type: typeof EmailCommandTypes.emailConfirmation;
   subscription: Subscription;
-  baseUrl: string;
 };
 
 type WeatherEmailCommand = {
   type: typeof EmailCommandTypes.weatherEmail;
   subscriptions: Subscription[];
-  baseUrl: string;
 };
 
 type BatchEmailCommand = {
   type: typeof EmailCommandTypes.batchEmail;
   subscriptions: Subscription[];
-  baseUrl: string;
 };
 
 type EmailCommand =
