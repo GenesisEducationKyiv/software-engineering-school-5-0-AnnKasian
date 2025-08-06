@@ -1,7 +1,4 @@
-import {
-  EMAIL_ERROR_CODES,
-  ERROR_STATUS_CODES,
-} from "../../../../../shared/libs/enums/enums.js";
+import { EMAIL_ERROR_CODES } from "../../../../../shared/libs/enums/enums.js";
 import { BaseException } from "../../../../../shared/libs/exceptions/base.exception.js";
 import { EMAIL_ERROR_MESSAGES } from "../enums/enums.js";
 
@@ -31,7 +28,6 @@ class WeatherServiceException extends BaseException {
 
 class MessageBrokerException extends BaseException {
   public code = EMAIL_ERROR_CODES.MESSAGE_BROKER_ERROR;
-  public statusCode = ERROR_STATUS_CODES.INTERNAL_SERVER_ERROR;
 
   constructor(message: string = EMAIL_ERROR_MESSAGES.MESSAGE_BROKER_ERROR) {
     super(message);
