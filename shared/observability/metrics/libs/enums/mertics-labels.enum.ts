@@ -6,6 +6,7 @@ const METRICS_LABELS = {
   TABLE: "table",
   TYPE: "type",
   SERVICE: "service",
+  IS_SUCCESS: "is_success",
 } as const;
 
 export { METRICS_LABELS };

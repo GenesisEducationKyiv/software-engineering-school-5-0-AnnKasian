@@ -64,14 +64,22 @@ class CustomMetricsService {
     this.dbQueriesTotal = new Counter({
       name: METRICS_NAME.DB_QUERIES_TOTAL,
       help: METRICS_HELP.DB_QUERIES_TOTAL,
-      labelNames: [METRICS_LABELS.OPERATION, METRICS_LABELS.TABLE],
+      labelNames: [
+        METRICS_LABELS.OPERATION,
+        METRICS_LABELS.TABLE,
+        METRICS_LABELS.IS_SUCCESS,
+      ],
       registers: [register],
     });
 
     this.dbQueryDuration = new Histogram({
       name: METRICS_NAME.DB_QUERY_DURATION,
       help: METRICS_HELP.DB_QUERY_DURATION,
-      labelNames: [METRICS_LABELS.OPERATION, METRICS_LABELS.TABLE],
+      labelNames: [
+        METRICS_LABELS.OPERATION,
+        METRICS_LABELS.TABLE,
+        METRICS_LABELS.IS_SUCCESS,
+      ],
       buckets: DB_QUERY_DURATION_BUCKETS,
       registers: [register],
     });
@@ -114,16 +122,24 @@ class CustomMetricsService {
     this.dbConnectionsActive.set(count);
   }
 
-  incrementDbQueries(operation: string, table: string): void {
-    this.dbQueriesTotal.inc({ operation, table });
+  incrementDbQueries(operation: string, table: string, isSuccess = true): void {
+    this.dbQueriesTotal.inc({
+      operation,
+      table,
+      is_success: isSuccess.toString(),
+    });
   }
 
   observeDbQueryDuration(
     operation: string,
     table: string,
-    duration: number
+    duration: number,
+    isSuccess = true
   ): void {
-    this.dbQueryDuration.observe({ operation, table }, duration);
+    this.dbQueryDuration.observe(
+      { operation, table, is_success: isSuccess.toString() },
+      duration
+    );
   }
 
   incrementErrors(type: string, service: string): void {

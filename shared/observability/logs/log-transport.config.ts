@@ -7,7 +7,7 @@ import { type WinstonLogInfo } from "./libs/types/types.js";
 import { loggerConfig } from "./logger.config.js";
 
 @Injectable()
-class LokiConfigService {
+class LogTransportsConfigService {
   private logger?: Logger;
 
   createLogger(): Logger {
@@ -99,4 +99,4 @@ class LokiConfigService {
   }
 }
 
-export { LokiConfigService };
+export { LogTransportsConfigService };

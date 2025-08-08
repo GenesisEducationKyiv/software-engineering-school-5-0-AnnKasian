@@ -97,8 +97,6 @@ services:
       - KAFKA_CFG_LOG_RETENTION_HOURS=1
       - KAFKA_CFG_LOG_RETENTION_BYTES=104857600
       - KAFKA_CFG_LOG_RETENTION_CHECK_INTERVAL_MS=30000
-    volumes:
-      - ./shared:/app/shared:ro
     healthcheck:
       test: ["CMD", "bash", "-c", "echo > /dev/tcp/localhost/9092"]
       interval: 5s
@@ -111,7 +109,6 @@ services:
     image: prom/prometheus
     volumes:
       - ./prometheus.config.yml:/etc/prometheus/prometheus.config.yml
-      - ./shared:/app/shared:ro
     ports:
       - "9090:9090"
     networks:
@@ -123,7 +120,6 @@ services:
       - "3000:3000"
     volumes:
       - grafana-storage:/var/lib/grafana
-      - ./shared:/app/shared:ro
     networks:
       - app-network
 
@@ -132,7 +128,6 @@ services:
     command: -config.file=/etc/loki/loki.config.yml
     volumes:
       - ./loki.config.yml:/etc/loki/loki.config.yml
-      - ./shared:/app/shared:ro
     ports:
       - "3100:3100"
     networks:

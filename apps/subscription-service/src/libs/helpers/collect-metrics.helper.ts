@@ -22,35 +22,30 @@ class MetricsHelper {
     return (Date.now() - startTime) / DURATION.DEFAULT;
   }
 
-  recordDbOperation(operation: DB_METRICS_OPERATIONS, duration: number): void {
+  recordDbMetrics(
+    operation: DB_METRICS_OPERATIONS,
+    duration: number,
+    isSuccess: boolean
+  ): void {
     this.metricsService.incrementDbQueries(
       operation,
-      DB_METRICS_TABLES.SUBSCRIPTIONS
+      DB_METRICS_TABLES.SUBSCRIPTIONS,
+      isSuccess
     );
 
     this.metricsService.observeDbQueryDuration(
       operation,
       DB_METRICS_TABLES.SUBSCRIPTIONS,
-      duration
-    );
-  }
-
-  recordDbError(operation: DB_METRICS_OPERATIONS, duration: number): void {
-    this.metricsService.incrementDbQueries(
-      operation,
-      DB_METRICS_TABLES.SUBSCRIPTIONS
+      duration,
+      isSuccess
     );
 
-    this.metricsService.observeDbQueryDuration(
-      operation,
-      DB_METRICS_TABLES.SUBSCRIPTIONS,
-      duration
-    );
-
-    this.metricsService.incrementErrors(
-      METRICS_ERROR_TYPES.DATABASE,
-      METRICS_SERVICES.SUBSCRIPTION_REPOSITORY
-    );
+    if (!isSuccess) {
+      this.metricsService.incrementErrors(
+        METRICS_ERROR_TYPES.DATABASE,
+        METRICS_SERVICES.SUBSCRIPTION_REPOSITORY
+      );
+    }
   }
 
   async withMetrics<T>(
@@ -62,12 +57,12 @@ class MetricsHelper {
     try {
       const result = await dbOperation();
       const duration = this.calculateDuration(startTime);
-      this.recordDbOperation(operation, duration);
+      this.recordDbMetrics(operation, duration, true);
 
       return result;
     } catch (error) {
       const duration = this.calculateDuration(startTime);
-      this.recordDbError(operation, duration);
+      this.recordDbMetrics(operation, duration, false);
 
       throw error;
     }

@@ -4,7 +4,7 @@ import { SamplingService } from "../samplings/sampling.service.js";
 import { LOG_ACTIONS, LOG_PREFIXES } from "./libs/enums/enums.js";
 import { LogInput, LogContext, LogLevel } from "./libs/types/types.js";
 import { LogFormatterService } from "./log-formatter.service.js";
-import { LokiConfigService } from "./loki.config.js";
+import { LogTransportsConfigService } from "./log-transport.config.js";
 
 @Injectable()
 class CustomLoggerService implements LoggerService {
@@ -15,7 +15,7 @@ class CustomLoggerService implements LoggerService {
 
   constructor(
     private readonly samplingService: SamplingService,
-    private readonly loggerConfig: LokiConfigService,
+    private readonly loggerConfig: LogTransportsConfigService,
     private readonly formatter: LogFormatterService
   ) {
     this.customLogger = this.loggerConfig.createLogger();
