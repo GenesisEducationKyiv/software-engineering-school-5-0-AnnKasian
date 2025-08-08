@@ -26,8 +26,17 @@ class WeatherServiceException extends BaseException {
   }
 }
 
+class MessageBrokerException extends BaseException {
+  public code = EMAIL_ERROR_CODES.MESSAGE_BROKER_ERROR;
+
+  constructor(message: string = EMAIL_ERROR_MESSAGES.MESSAGE_BROKER_ERROR) {
+    super(message);
+  }
+}
+
 export {
   EmailSendFailException,
   DataIsRequiredException,
   WeatherServiceException,
+  MessageBrokerException,
 };

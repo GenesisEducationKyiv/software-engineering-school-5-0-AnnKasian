@@ -32,6 +32,7 @@ services:
     build:
       context: .
       dockerfile: apps/email-service/Dockerfile
+    restart: unless-stopped
     environment:
       - EMAIL_SERVICE_HOST=email-service
       - GRPC_EMAIL_SERVICE_PORT=7071
@@ -43,12 +44,24 @@ services:
       - EMAIL_PASS=
       - EMAIL_FROM=test@example.com
       - EMAIL_TLS=false
+      - KAFKA_HOST=weather-test-kafka:9082
+      - KAFKA_GROUP_ID=email-group
+      - EMAIL_TOPIC=email-commands
+      - SEND_RETRY=3
     ports:
       - "7071:7071"
     depends_on:
-      - weather-test-mailer
+      weather-test-mailer:
+        condition: service_started
+      weather-test-kafka:
+        condition: service_healthy
     volumes:
       - ./shared:/app/shared:ro
+    healthcheck:
+      test: ["CMD", "bash", "-c", "echo > /dev/tcp/localhost/7071"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
     networks:
       - test-network
 
@@ -105,6 +118,29 @@ services:
     container_name: weather-test-mailer
     ports:
       - "8025:8025"
+    networks:
+      - test-network
+
+  weather-test-kafka:
+    image: bitnami/kafka:latest
+    container_name: weather-test-kafka
+    ports:
+      - "9082:9082"
+    environment:
+      - KAFKA_CFG_NODE_ID=0
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9082,CONTROLLER://:9083
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@weather-test-kafka:9083
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_LOG_RETENTION_HOURS=1
+      - KAFKA_CFG_LOG_RETENTION_BYTES=104857600
+      - KAFKA_CFG_LOG_RETENTION_CHECK_INTERVAL_MS=30000
+    healthcheck:
+      test: ["CMD", "bash", "-c", "echo > /dev/tcp/localhost/9082"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     networks:
       - test-network
 
