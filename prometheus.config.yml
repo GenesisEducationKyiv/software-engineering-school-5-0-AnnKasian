@@ -1,0 +1,13 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["prometheus:9090"]
+
+  - job_name: "weather-notify"
+    static_configs:
+      - targets: ["subscription-service:7082"]
+    metrics_path: "/metrics"
+    scrape_interval: 15s

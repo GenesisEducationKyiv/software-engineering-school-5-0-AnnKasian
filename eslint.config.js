@@ -145,6 +145,7 @@ const sonarConfig = {
     ...sonarjsPlugin.configs.recommended.rules,
     "sonarjs/no-duplicate-string": ["off"],
     "sonarjs/no-nested-template-literals": ["off"],
+    "sonarjs/pseudo-random": ["off"],
   },
 };
 
@@ -208,7 +209,7 @@ const typescriptConfig = {
         ignoreEnums: true,
         ignoreReadonlyClassProperties: true,
         ignoreArrayIndexes: true,
-        ignore: [0, 1],
+        ignore: [0, 1, 0.01, 0.05, 0.1, 0.5, 2, 5],
       },
     ],
     "@typescript-eslint/return-await": ["warn", "always"],

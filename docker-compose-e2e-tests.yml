@@ -144,6 +144,32 @@ services:
     networks:
       - test-network
 
+  prometheus-test:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus.config.yml:/etc/prometheus/prometheus.config.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - test-network
+
+  grafana-test:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    networks:
+      - test-network
+
+  loki-test:
+    image: grafana/loki
+    command: -config.file=/etc/loki/loki.config.yml
+    volumes:
+      - ./loki.config.yml:/etc/loki/loki.config.yml
+    ports:
+      - "3100:3100"
+    networks:
+      - test-network
+
 networks:
   test-network:
     driver: bridge

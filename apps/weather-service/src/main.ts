@@ -6,11 +6,18 @@ import { type MicroserviceOptions, Transport } from "@nestjs/microservices";
 import { type NestExpressApplication } from "@nestjs/platform-express";
 import { CONFIG_KEYS } from "../../../shared/libs/enums/enums.js";
 import { HandleErrorMiddleware } from "../../../shared/libs/middlewares/middlewares.js";
+import { CustomLoggerService } from "../../../shared/observability/logs/logger.service.js";
 import { AppModule } from "./app.module.js";
 
 async function bootstrap(): Promise<void> {
   try {
-    const app = await NestFactory.create<NestExpressApplication>(AppModule);
+    const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+      logger: false,
+    });
+
+    const customLogger = app.get(CustomLoggerService);
+    app.useLogger(customLogger);
+
     const configService = app.get(ConfigService);
 
     const httpPort = configService.get<number>(
@@ -37,6 +44,9 @@ async function bootstrap(): Promise<void> {
 
     app.useGlobalPipes(new ValidationPipe({ transform: true }));
     app.useGlobalFilters(new HandleErrorMiddleware());
+
+    customLogger.setContext("Weather Service Bootstrap");
+    customLogger.logStart("weather-service-startup");
 
     await app.startAllMicroservices();
     await app.listen(httpPort);

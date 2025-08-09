@@ -15,7 +15,6 @@ const __dirname = path.dirname(__filename);
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-
     MailerModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

@@ -1,0 +1,5 @@
+const OBSERVABILITY_ERROR_MESSAGES = {
+  LOGGER_EXCEPTION: "Logger exception",
+} as const;
+
+export { OBSERVABILITY_ERROR_MESSAGES };
