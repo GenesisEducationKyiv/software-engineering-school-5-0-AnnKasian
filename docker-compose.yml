@@ -1,0 +1,143 @@
+version: "3.9"
+
+services:
+  subscription-service:
+    build:
+      context: .
+      dockerfile: apps/subscription-service/Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "${HTTP_SUBSCRIPTION_SERVICE_PORT}:7082"
+    depends_on:
+      - db
+      - email-service
+      - weather-service
+      - loki
+      - prometheus
+      - grafana
+    volumes:
+      - ./shared:/app/shared:ro
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  email-service:
+    build:
+      context: .
+      dockerfile: apps/email-service/Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "${GRPC_EMAIL_SERVICE_PORT}:7081"
+    volumes:
+      - ./shared:/app/shared:ro
+    depends_on:
+      kafka:
+        condition: service_healthy
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  weather-service:
+    build:
+      context: .
+      dockerfile: apps/weather-service/Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "${HTTP_WEATHER_SERVICE_PORT}:7083"
+      - "${GRPC_WEATHER_SERVICE_PORT}:7084"
+    depends_on:
+      - cache
+    volumes:
+      - ./apps/weather-service/logs:/app/apps/weather-service/logs
+      - ./shared:/app/shared:ro
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  db:
+    image: postgres:16.4
+    restart: always
+    container_name: weather-notify
+    environment:
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "${DATABASE_PORT}:5432"
+    networks:
+      - app-network
+
+  cache:
+    image: redis:7-alpine
+    container_name: weather-cache
+    ports:
+      - "6379:6379"
+    volumes:
+      - cache_data:/data
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  kafka:
+    image: bitnami/kafka:latest
+    environment:
+      - KAFKA_CFG_NODE_ID=0
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_LOG_RETENTION_HOURS=1
+      - KAFKA_CFG_LOG_RETENTION_BYTES=104857600
+      - KAFKA_CFG_LOG_RETENTION_CHECK_INTERVAL_MS=30000
+    healthcheck:
+      test: ["CMD", "bash", "-c", "echo > /dev/tcp/localhost/9092"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - app-network
+
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus.config.yml:/etc/prometheus/prometheus.config.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - app-network
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    networks:
+      - app-network
+
+  loki:
+    image: grafana/loki
+    command: -config.file=/etc/loki/loki.config.yml
+    volumes:
+      - ./loki.config.yml:/etc/loki/loki.config.yml
+    ports:
+      - "3100:3100"
+    networks:
+      - app-network
+
+volumes:
+  postgres_data:
+  cache_data:
+  grafana-storage:
+
+networks:
+  app-network:
+    driver: bridge

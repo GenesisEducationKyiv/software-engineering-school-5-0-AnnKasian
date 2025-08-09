@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  weather-db-test:
+    image: postgres:16.4
+    container_name: weather-db-test
+    ports:
+      - 5435:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: weather_notify_test
+    networks:
+      - test-network
+
+  weather-test-cache:
+    image: redis:7-alpine
+    container_name: weather-test-cache
+    ports:
+      - "6379:6379"
+    environment:
+      - TEST_REDIS_PORT=6379
+      - TEST_REDIS_HOST=localhost
+      - TEST_CACHE_TTL=60
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+    networks:
+      - test-network
+
+networks:
+  test-network:
+    driver: bridge

@@ -1,0 +1,141 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Arial", sans-serif;
+  background: linear-gradient(135deg, #76c4ff 0%, #0984e3 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.container {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  max-width: 450px;
+  width: 100%;
+  text-align: center;
+}
+
+.loading {
+  display: block;
+}
+
+.loading.hidden {
+  display: none;
+}
+
+.result {
+  display: none;
+}
+
+.result.show {
+  display: block;
+}
+
+.spinner {
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #76c4ff;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.success-icon {
+  font-size: 4rem;
+  color: #00b894;
+  margin-bottom: 20px;
+}
+
+.error-icon {
+  font-size: 4rem;
+  color: #e17055;
+  margin-bottom: 20px;
+}
+
+.processing-icon {
+  font-size: 4rem;
+  margin-bottom: 20px;
+}
+
+h1 {
+  color: #2d3436;
+  margin-bottom: 15px;
+  font-size: 1.8rem;
+}
+
+p {
+  color: #636e72;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.email-info {
+  background: #f8f9fc;
+  border-radius: 10px;
+  padding: 15px;
+  margin: 20px 0;
+  border-left: 4px solid #76c4ff;
+}
+
+.email-info strong {
+  color: #2d3436;
+}
+
+.action-type {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 15px;
+}
+
+.confirm-action {
+  background: #d1f2eb;
+  color: #00b894;
+}
+
+.unsubscribe-action {
+  background: #ffeaa7;
+  color: #fdcb6e;
+}
+
+.back-button {
+  background: #76c4ff;
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+  margin-top: 20px;
+}
+
+.back-button:hover {
+  background: #0984e3;
+  transform: translateY(-2px);
+}

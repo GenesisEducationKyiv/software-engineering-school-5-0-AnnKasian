@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "noUnusedParameters": true,
+    "noUnusedLocals": true,
+    "target": "ES2021",
+    "sourceMap": true,
+    "strictNullChecks": true,
+    "incremental": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "outDir": "./dist"
+  },
+  "include": ["apps/**/*", "libs/**/*", "shared/**/*", "jest.config.ts"],
+  "exclude": ["node_modules", "dist"]
+}

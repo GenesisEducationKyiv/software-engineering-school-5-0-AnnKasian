@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weather Notify</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="weather-icon">🌤️</div>
+      <h1>Subscribe to Weather Updates</h1>
+      <p class="subtitle">
+        Get personalized weather notifications delivered straight to your inbox
+      </p>
+
+      <form id="subscriptionForm">
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="your.email@example.com"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="city">City</label>
+          <input
+            type="text"
+            id="city"
+            name="city"
+            placeholder="Kyiv"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="frequency">Notification Frequency</label>
+          <select id="frequency" name="frequency" required>
+            <option value="">Choose frequency</option>
+            <option value="hourly">Hourly</option>
+            <option value="daily">Daily</option>
+          </select>
+        </div>
+
+        <button type="submit" class="subscribe-button" id="subscribeButton">
+          Subscribe
+        </button>
+      </form>
+
+      <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p style="margin-top: 10px; color: #636e72">
+          Processing your subscription...
+        </p>
+      </div>
+
+      <div class="message" id="message"></div>
+    </div>
+    <script src="script.js"></script>
+  </body>
+</html>
